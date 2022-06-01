@@ -1,0 +1,7 @@
+export { LoginForm } from './Login'
+export { SignUpForm } from './SignUp'
+export { ForgotPasswordForm } from './ForgotPassword'
+export { Dashboard } from './Dashboard'
+export { NotFound } from './NotFound'
+export { ResetPasswordForm } from './ResetPassword'
+export { Confirmed } from './Confirmed'

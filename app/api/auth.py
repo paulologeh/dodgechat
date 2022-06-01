@@ -7,10 +7,10 @@ from app.models.user import User
 from app.serde import (
     ChangeEmailSchema,
     ChangePasswordSchema,
+    DeleteAccountSchema,
     LoginSchema,
     PasswordResetRequestSchema,
     ResetPasswordSchema,
-    DeleteAccountSchema,
 )
 from app.serde.user import UserSchema
 from app.utils.email import send_email

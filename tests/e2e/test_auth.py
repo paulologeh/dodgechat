@@ -1,5 +1,6 @@
 import pytest
 from faker import Faker
+
 from app.models.user import User
 
 
@@ -142,17 +143,13 @@ class TestClassPasswordReset(BaseTestUser):
         self.register_user(client)
         self.login_user(client)
 
-        response = client.post("/api/auth/reset", json={
-            "email": self.user["email"]
-        })
+        response = client.post("/api/auth/reset", json={"email": self.user["email"]})
 
         assert response.status_code == 400
         self.logout_user(client)
 
     def test_password_reset_request(self, client):
-        response = client.post("/api/auth/reset", json={
-            "email": self.user["email"]
-        })
+        response = client.post("/api/auth/reset", json={"email": self.user["email"]})
         assert response.status_code == 200
 
     def get_reset_token(self, client_database):
@@ -162,19 +159,19 @@ class TestClassPasswordReset(BaseTestUser):
     def test_does_not_reset_password_with_invalid_token(self, client):
         token = "invalid"
         url = f"/api/auth/reset/{token}"
-        response = client.post(url, json={
-            "password": self.new_password,
-            "confirm_password": self.new_password
-        })
+        response = client.post(
+            url,
+            json={"password": self.new_password, "confirm_password": self.new_password},
+        )
         assert response.status_code == 400
 
     def test_password_reset(self, client, client_database):
         token = self.get_reset_token(client_database)
         url = f"/api/auth/reset/{token}"
-        response = client.post(url, json={
-            "password": self.new_password,
-            "confirm_password": self.new_password
-        })
+        response = client.post(
+            url,
+            json={"password": self.new_password, "confirm_password": self.new_password},
+        )
         assert response.status_code == 200
 
     def test_can_login_with_new_password(self, client):
@@ -191,17 +188,17 @@ class TestClassChangeEmail(BaseTestUser):
     def test_change_email_request_invalid(self, client):
         self.register_user(client)
         self.login_user(client)
-        response = client.post(f"/api/auth/change_email", json={
-            "email": self.user["email"],
-            "password": "wrongpassword"
-        })
+        response = client.post(
+            "/api/auth/change_email",
+            json={"email": self.user["email"], "password": "wrongpassword"},
+        )
         assert response.status_code == 400
 
     def test_change_email_request(self, client):
-        response = client.post(f"/api/auth/change_email", json={
-            "email": self.user["email"],
-            "password": self.user["password"]
-        })
+        response = client.post(
+            "/api/auth/change_email",
+            json={"email": self.user["email"], "password": self.user["password"]},
+        )
         assert response.status_code == 200
 
     def get_email_change_token(self, client_database):
@@ -226,7 +223,7 @@ class TestClassAdvanced:
     users = [
         {"username": "user1", "email": "user1@example.com", "password": "password"},
         {"username": "user2", "email": "user2@example.com", "password": "password"},
-        {"username": "user3", "email": "user3@example.com", "password": "password"}
+        {"username": "user3", "email": "user3@example.com", "password": "password"},
     ]
 
     def test_register_multiple_users(self, client):
@@ -258,7 +255,7 @@ class TestClassLoad:
             payload = {
                 "email": self.fake.email(),
                 "username": self.fake.user_name(),
-                "password": "password"
+                "password": "password",
             }
             self.fake_users.append(payload)
             res = client.post("/api/auth/register", json=payload)

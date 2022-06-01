@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, request
 
 from app.errors import (
     bad_request,
@@ -16,6 +16,32 @@ logger = logging.getLogger(__name__)
 
 
 api = Blueprint("api", __name__, url_prefix="/api")
+
+
+@api.before_request
+def handle_before_request():
+    # logger.info(
+    #     {
+    #         "message": "Received request",
+    #         "endpoint": request.url,
+    #         "method": request.method,
+    #         "headers": request.headers,
+    #     }
+    # )
+    pass
+
+
+@api.after_request
+def handle_after_request(response):
+    # logger.info(
+    #     {
+    #         "message": "Sent response",
+    #         "status_code": response.status_code,
+    #         "headers": response.headers,
+    #         "body": response.get_json(),
+    #     }
+    # )
+    return response
 
 
 @api.errorhandler(500)

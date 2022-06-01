@@ -26,7 +26,12 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    CORS_HEADERS = "Content-Type"
     SQLALCHEMY_DATABASE_URI = os.environ.get("DEV_DATABASE_URL")
+
+    @staticmethod
+    def get_front_end():
+        return os.getenv("FRONT_END_URL", "http://localhost:8080")
 
 
 class TestConfig(Config):

@@ -50,6 +50,7 @@ Werkzeug = "==2.1.2"
 WTForms = "==3.0.1"
 pytest = "==7.1.2"
 faker = "==13.11.1"
+flask-cors = "==3.0.10"
 
 [dev-packages]
 black = "*"

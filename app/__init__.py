@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
@@ -16,6 +17,14 @@ def create_app(config_name):
 
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
+
+    cors_config = {
+        "origins": ["http://localhost:8080"],
+        "methods": ["OPTIONS", "GET", "POST"],
+        "allow_headers": ["Authorization"],
+    }
+
+    CORS(app, resources={"r/api": cors_config}, supports_credentials=True)
 
     mail.init_app(app)
     db.init_app(app)

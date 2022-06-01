@@ -1,12 +1,13 @@
 import pytest
 from marshmallow import ValidationError
+
 from app.models.user import User
 from app.serde import (
     ChangeEmailSchema,
     ChangePasswordSchema,
+    LoginSchema,
     PasswordResetRequestSchema,
     ResetPasswordSchema,
-    LoginSchema,
 )
 
 

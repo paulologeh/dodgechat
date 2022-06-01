@@ -1,0 +1,1 @@
+export { useThemeDetector } from './useThemeDetector'
