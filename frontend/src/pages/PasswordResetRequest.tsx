@@ -32,7 +32,7 @@ export const ForgotPasswordForm = () => {
     }
 
     try {
-      const response = await User.forgotPassword(email)
+      const response = await User.passwordResetRequest(email)
 
       if (response.status === 200) {
         setSuccess(
@@ -53,11 +53,11 @@ export const ForgotPasswordForm = () => {
         <Image
           src={logo}
           alt="dodgechat"
-          style={{ width: 100, height: 100 }}
+          style={{ width: 70, height: 70 }}
           centered
         />
         <Header as="h2" textAlign="center">
-          Forgot Password
+          Request password reset
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
@@ -79,23 +79,14 @@ export const ForgotPasswordForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Button fluid size="large">
+            <Button fluid size="large" color="black">
               Submit
             </Button>
           </Segment>
         </Form>
 
         <Message>
-          Know your password ?{' '}
-          <a
-            href="login"
-            style={{
-              color: 'black',
-              textDecoration: 'underline',
-            }}
-          >
-            Login
-          </a>
+          Know your password ? <a href="login">Login</a>
         </Message>
       </Grid.Column>
     </Grid>

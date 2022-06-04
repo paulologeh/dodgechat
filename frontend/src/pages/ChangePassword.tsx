@@ -9,38 +9,27 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { User } from 'services'
-import { validateEmail } from 'utils'
 import logo from 'assets/logo.png'
 
 type StateType = {
-  email: string
+  oldPassword: string
   password: string
-  firstName: string
-  lastName: string
   confirmPassword: string
 }
 
-export const SignUpForm = () => {
+export const ChangePasswordForm = () => {
   const [state, setState] = useState<StateType>({
-    email: '',
+    oldPassword: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
-
-    if (!validateEmail(state.email)) {
-      return setError('Invalid email address')
-    }
 
     if (state.confirmPassword !== state.password) {
       return setError('Passwords do not match')
@@ -50,21 +39,17 @@ export const SignUpForm = () => {
     setError('')
 
     try {
-      const responseSignUp = await User.signup(
-        state.email,
+      const response = await User.changePassword(
+        state.oldPassword,
         state.password,
-        state.firstName,
-        state.lastName
+        state.confirmPassword
       )
 
-      if (responseSignUp.status !== 201) {
-        setError('Failed to sign up')
-        setLoading(false)
-        return
+      if (response.status === 200) {
+        setSuccess('Your password has been changed')
+      } else {
+        setError('Failed to change password')
       }
-
-      setSuccess('You are all signed up! Now please login')
-      navigate('../login', { replace: true })
     } catch (error) {
       setError('Server error, please try again later')
     }
@@ -77,11 +62,11 @@ export const SignUpForm = () => {
         <Image
           src={logo}
           alt="dodgechat"
-          style={{ width: 100, height: 100 }}
+          style={{ width: 70, height: 70 }}
           centered
         />
         <Header as="h2" textAlign="center">
-          Register as a new user
+          Change password
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
@@ -89,54 +74,31 @@ export const SignUpForm = () => {
               <Loader active inline="centered" style={{ marginBottom: 10 }} />
             )}
             {error && (
-              <Message negative header="Failed to sign up" content={error} />
+              <Message
+                negative
+                header="Failed to change password"
+                content={error}
+              />
             )}
             {success && (
               <Message
-                success
-                header="Successfully signed up"
+                positive
+                header="Successfully changed password"
                 content={success}
               />
             )}
             <Form.Input
               fluid
               required
-              icon="user"
+              icon="lock"
               iconPosition="left"
-              placeholder="First name"
-              value={state.firstName}
+              placeholder="Old password"
+              type="password"
+              value={state.oldPassword}
               onChange={(e) =>
                 setState((prevState) => ({
                   ...prevState,
-                  firstName: e.target.value,
-                }))
-              }
-            />
-            <Form.Input
-              fluid
-              required
-              icon="user"
-              iconPosition="left"
-              placeholder="Last name"
-              value={state.lastName}
-              onChange={(e) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  lastName: e.target.value,
-                }))
-              }
-            />
-            <Form.Input
-              fluid
-              required
-              icon="mail"
-              iconPosition="left"
-              placeholder="E-mail address"
-              value={state.email}
-              onChange={(e) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  email: e.target.value,
+                  oldPassword: e.target.value,
                 }))
               }
             />
@@ -170,24 +132,11 @@ export const SignUpForm = () => {
                 }))
               }
             />
-            <Button fluid size="large">
-              Sign Up
+            <Button fluid size="large" color="black">
+              Submit
             </Button>
           </Segment>
         </Form>
-
-        <Message>
-          Already have an account?{' '}
-          <a
-            href="login"
-            style={{
-              color: 'black',
-              textDecoration: 'underline',
-            }}
-          >
-            Login
-          </a>
-        </Message>
       </Grid.Column>
     </Grid>
   )

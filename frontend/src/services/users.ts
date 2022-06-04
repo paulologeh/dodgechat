@@ -1,6 +1,6 @@
 import { fetcher } from 'utils'
 
-type userSignUp = {
+type registerType = {
   email: string
   username: string
   password: string
@@ -9,38 +9,70 @@ type userSignUp = {
   aboutMe?: string
 }
 
-type userLogin = {
+type loginType = {
   email: string
   password: string
 }
 
+const AUTH_ROUTE = `${process.env.API_URI}/api/auth`
 export class User {
   static whoami() {
-    return fetcher(`${process.env.API_URI}/api/auth/whoami`, 'GET')
+    return fetcher(`${AUTH_ROUTE}/whoami`, 'GET')
   }
 
-  static login(data: userLogin) {
-    return fetcher(`${process.env.API_URI}/api/auth/login`, 'POST', data)
+  static login(data: loginType) {
+    return fetcher(`${AUTH_ROUTE}/login`, 'POST', data)
   }
 
-  static signup(user: userSignUp) {
-    return fetcher(`${process.env.API_URI}/api/auth/register`, 'POST', user)
+  static delete(password: string) {
+    return fetcher(`${AUTH_ROUTE}/delete`, 'POST', { password })
+  }
+
+  static register(user: registerType) {
+    return fetcher(`${AUTH_ROUTE}/register`, 'POST', user)
   }
   static logout() {
-    return fetcher(`${process.env.API_URI}/api/auth/logout`, 'POST')
+    return fetcher(`${AUTH_ROUTE}/logout`, 'POST')
   }
 
-  static forgotPassword(email: string) {
-    return fetcher(`${process.env.API_URI}/api/auth/forgotpassword`, 'POST', {
+  static resendConfirmation() {
+    return fetcher(`${AUTH_ROUTE}/confirm`, 'POST')
+  }
+
+  static confirm(token: string) {
+    return fetcher(`${AUTH_ROUTE}/confirm/${token}`, 'POST')
+  }
+
+  static changePassword(
+    oldPassword: string,
+    password: string,
+    confirmPassword: string
+  ) {
+    return fetcher(`${AUTH_ROUTE}/change-password`, 'POST', {
+      oldPassword,
+      password,
+      confirmPassword,
+    })
+  }
+
+  static passwordResetRequest(email: string) {
+    return fetcher(`${AUTH_ROUTE}/reset`, 'POST', {
       email,
     })
   }
 
-  static async resetPassword(password: string, token: string, uuid: string) {
-    return await fetcher(
-      `${process.env.API_URI}/api/auth/resetpassword/${uuid}?token=${token}`,
-      'POST',
-      { password }
-    )
+  static passwordReset(password: string, token: string) {
+    return fetcher(`${AUTH_ROUTE}/reset/${token}`, 'POST', { password })
+  }
+
+  static changeEmailRequest(email: string, password: string) {
+    return fetcher(`${AUTH_ROUTE}/change_email`, 'POST', {
+      email,
+      password,
+    })
+  }
+
+  static changeEmail(token: string) {
+    return fetcher(`${AUTH_ROUTE}/change_email/${token}`, 'POST')
   }
 }

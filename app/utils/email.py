@@ -14,6 +14,7 @@ def send_async_email(app, msg):
 def send_email(to, subject, template, **kwargs):
     app = current_app._get_current_object()
     testing = app.config.get("TESTING")
+    kwargs["root_url"] = app.config.get("PROXY_ROOT")
     if testing:
         return
 

@@ -11,49 +11,61 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User } from 'services'
-import { useAuth } from 'contexts/userContext'
 import { validateEmail } from 'utils'
 import logo from 'assets/logo.png'
 
 type StateType = {
   email: string
   password: string
+  name: string
+  username: string
+  confirmPassword: string
 }
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const [state, setState] = useState<StateType>({
     email: '',
     password: '',
+    confirmPassword: '',
+    name: '',
+    username: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { setLoggedIn, setCurrentUser } = useAuth()
+  const [success, setSuccess] = useState('')
   const navigate = useNavigate()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
     if (!validateEmail(state.email)) {
-      return setError('Email address is not valid')
+      return setError('Invalid email address')
+    }
+
+    if (state.confirmPassword !== state.password) {
+      return setError('Passwords do not match')
     }
 
     setLoading(true)
     setError('')
 
     try {
-      const response = await User.login({
+      const user = {
+        username: state.username,
         email: state.email,
         password: state.password,
-      })
-      if (response.status !== 200) {
-        setError('Failed to login')
+        name: state.name,
+      }
+      const response = await User.register(user)
+
+      if (response.status !== 201) {
+        setError('Failed to register')
         setLoading(false)
         return
       }
-      const data = await response.json()
-      setLoggedIn(true)
-      setCurrentUser(data)
-      navigate('..', { replace: true })
+
+      setSuccess('You are all signed up! Now please login')
+      navigate('../login', { replace: true })
     } catch (error) {
       setError('Server error, please try again later')
     }
@@ -70,7 +82,7 @@ export const LoginForm = () => {
           centered
         />
         <Header as="h2" textAlign="center">
-          Log-in to your account
+          Register as a new user
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
@@ -78,8 +90,43 @@ export const LoginForm = () => {
               <Loader active inline="centered" style={{ marginBottom: 10 }} />
             )}
             {error && (
-              <Message negative header="Failed to login" content={error} />
+              <Message negative header="Failed to register" content={error} />
             )}
+            {success && (
+              <Message
+                success
+                header="Successfully signed up"
+                content={success}
+              />
+            )}
+            <Form.Input
+              fluid
+              required
+              icon="user"
+              iconPosition="left"
+              placeholder="Name"
+              value={state.name}
+              onChange={(e) =>
+                setState((prevState) => ({
+                  ...prevState,
+                  name: e.target.value,
+                }))
+              }
+            />
+            <Form.Input
+              fluid
+              required
+              icon="user"
+              iconPosition="left"
+              placeholder="Username"
+              value={state.username}
+              onChange={(e) =>
+                setState((prevState) => ({
+                  ...prevState,
+                  username: e.target.value,
+                }))
+              }
+            />
             <Form.Input
               fluid
               required
@@ -109,16 +156,30 @@ export const LoginForm = () => {
                 }))
               }
             />
+            <Form.Input
+              fluid
+              required
+              icon="lock"
+              iconPosition="left"
+              placeholder="Confirm password"
+              type="password"
+              value={state.confirmPassword}
+              onChange={(e) =>
+                setState((prevState) => ({
+                  ...prevState,
+                  confirmPassword: e.target.value,
+                }))
+              }
+            />
             <Button fluid size="large" color="black">
-              Login
+              Submit
             </Button>
-            <div style={{ marginTop: 10 }}>
-              <a href="passwordresetrequest">Forgot password ?</a>
-            </div>
           </Segment>
         </Form>
+
         <Message>
-          New to us ? <a href="register">Register</a>
+          Already have an account?
+          <a href="login">Login</a>
         </Message>
       </Grid.Column>
     </Grid>

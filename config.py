@@ -18,6 +18,9 @@ class Config:
     SQLALCHEMY_RECORD_QUERIES = True
     DODGECHAT_SLOW_DB_QUERY_TIME = 0.5
     FRONT_END_URL = os.getenv("FRONT_END_URL", "http://localhost:8080")
+    SQLALCHEMY_DATABASE_URI = (
+        f'{os.environ.get("POSTGRESQL_URI")}/{os.environ.get("POSTGRES_DB")}'
+    )
 
     @staticmethod
     def init_app(app):
@@ -27,11 +30,6 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     CORS_HEADERS = "Content-Type"
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DEV_DATABASE_URL")
-
-    @staticmethod
-    def get_front_end():
-        return os.getenv("FRONT_END_URL", "http://localhost:8080")
 
 
 class TestConfig(Config):

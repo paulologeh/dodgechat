@@ -8,7 +8,7 @@ export const NotFound = () => {
         <Image
           src={logo}
           alt="dodgechat"
-          style={{ width: 100, height: 100 }}
+          style={{ width: 70, height: 70 }}
           centered
         />
         <Header as="h2" textAlign="center">

@@ -18,13 +18,9 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    cors_config = {
-        "origins": ["http://localhost:8080"],
-        "methods": ["OPTIONS", "GET", "POST"],
-        "allow_headers": ["Authorization"],
-    }
+    cors_config = {"origins": ["http://localhost:8080"]}
 
-    CORS(app, resources={"r/api": cors_config}, supports_credentials=True)
+    CORS(app, resources={"/*": cors_config}, supports_credentials=True)
 
     mail.init_app(app)
     db.init_app(app)

@@ -3,12 +3,15 @@ import { RequireAuth, RequireNoAuth } from 'navigation/RequireAuth'
 
 import {
   LoginForm,
-  SignUpForm,
+  RegisterForm,
   ForgotPasswordForm,
   ResetPasswordForm,
   Dashboard,
   NotFound,
-  Confirmed,
+  ConfirmForm,
+  DeleteAccountForm,
+  ChangePasswordForm,
+  ChangeEmail,
 } from 'pages'
 
 const RouterConfig = () => {
@@ -16,12 +19,43 @@ const RouterConfig = () => {
     <BrowserRouter>
       <Routes>
         <Route path="*" element={<NotFound />} />
-        <Route path="confirmed" element={<Confirmed />} />
         <Route
           path="/"
           element={
             <RequireAuth redirectTo="/login">
               <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="delete"
+          element={
+            <RequireAuth redirectTo="/login">
+              <DeleteAccountForm />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="changeemail"
+          element={
+            <RequireAuth redirectTo="/login">
+              <ChangeEmail />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="confirm"
+          element={
+            <RequireAuth redirectTo="/login">
+              <ConfirmForm />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="change-password"
+          element={
+            <RequireAuth redirectTo="/login">
+              <ChangePasswordForm />
             </RequireAuth>
           }
         />
@@ -34,32 +68,29 @@ const RouterConfig = () => {
           }
         />
         <Route
-          path="signup"
+          path="register"
           element={
             <RequireNoAuth redirectTo="/">
-              <SignUpForm />
+              <RegisterForm />
             </RequireNoAuth>
           }
         />
         <Route
-          path="forgotpassword"
+          path="passwordresetrequest"
           element={
             <RequireNoAuth redirectTo="/">
               <ForgotPasswordForm />
             </RequireNoAuth>
           }
         />
-        <Route path="resetpassword">
-          <Route index element={<NotFound />} />
-          <Route
-            path=":uuid"
-            element={
-              <RequireNoAuth redirectTo="/">
-                <ResetPasswordForm />
-              </RequireNoAuth>
-            }
-          />
-        </Route>
+        <Route
+          path="passwordreset"
+          element={
+            <RequireNoAuth redirectTo="/">
+              <ResetPasswordForm />
+            </RequireNoAuth>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

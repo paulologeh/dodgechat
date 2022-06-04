@@ -4,7 +4,7 @@ Welcome to Dodgechat!
 
 To confirm your account please click on the following link:
 
-{{ url_for('api.auth.confirm', token=token, _external=True) }}
+{{ root }}/confirm?token={{ token }}
 
 Sincerely,
 

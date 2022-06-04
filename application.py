@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import socket
 
 from dotenv import load_dotenv
@@ -34,7 +34,7 @@ werkzeug_logger = logging.getLogger("werkzeug")
 werkzeug_logger.level = logging.DEBUG
 
 flask_cors_logger = logging.getLogger("flask_cors")
-flask_cors_logger.level = logging.DEBUG
+flask_cors_logger.level = logging.ERROR
 
 
 app = create_app(os.getenv("FLASK_CONFIG"))

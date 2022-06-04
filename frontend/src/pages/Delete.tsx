@@ -10,49 +10,35 @@ import {
 } from 'semantic-ui-react'
 import { useState } from 'react'
 import { User } from 'services'
-import { useParams, useSearchParams } from 'react-router-dom'
 import logo from 'assets/logo.png'
 
 type StateType = {
   password: string
-  confirmPassword: string
 }
 
-export const ResetPasswordForm = () => {
+export const DeleteAccountForm = () => {
   const [state, setState] = useState<StateType>({
     password: '',
-    confirmPassword: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const { uuid } = useParams()
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token') ?? ''
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
-
-    if (!uuid || !token) return setError('Invalid or expired link')
-    if (state.confirmPassword !== state.password) {
-      return setError('Passwords do not match')
-    }
 
     setLoading(true)
     setError('')
 
     try {
-      const response = await User.resetPassword(state.password, token, uuid)
+      const response = await User.delete(state.password)
 
       if (response.status === 200) {
-        setSuccess(
-          'Your password has been reset. You can now login with your new password'
-        )
+        setSuccess('Your account has been deleted')
       } else {
-        setError('Failed to reset password')
+        setError('Failed to delete account')
       }
     } catch (error) {
-      console.error(error)
       setError('Server error, please try again later')
     }
     setLoading(false)
@@ -64,11 +50,11 @@ export const ResetPasswordForm = () => {
         <Image
           src={logo}
           alt="dodgechat"
-          style={{ width: 100, height: 100 }}
+          style={{ width: 70, height: 70 }}
           centered
         />
         <Header as="h2" textAlign="center">
-          Reset Password
+          Delete account
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
@@ -76,10 +62,14 @@ export const ResetPasswordForm = () => {
               <Loader active inline="centered" style={{ marginBottom: 10 }} />
             )}
             {error && (
-              <Message negative header="Failed to reset" content={error} />
+              <Message negative header="Failed to delete" content={error} />
             )}
             {success && (
-              <Message positive header="Successfully reset" content={success} />
+              <Message
+                positive
+                header="Successfully deleted"
+                content={success}
+              />
             )}
             <Form.Input
               fluid
@@ -96,39 +86,11 @@ export const ResetPasswordForm = () => {
                 }))
               }
             />
-            <Form.Input
-              fluid
-              required
-              icon="lock"
-              iconPosition="left"
-              placeholder="Confirm password"
-              type="password"
-              value={state.confirmPassword}
-              onChange={(e) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  confirmPassword: e.target.value,
-                }))
-              }
-            />
-            <Button fluid size="large">
+            <Button fluid size="large" color="black">
               Submit
             </Button>
           </Segment>
         </Form>
-
-        <Message>
-          Reset successful ?{' '}
-          <a
-            href="/"
-            style={{
-              color: 'black',
-              textDecoration: 'underline',
-            }}
-          >
-            Login
-          </a>
-        </Message>
       </Grid.Column>
     </Grid>
   )

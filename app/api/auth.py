@@ -13,7 +13,10 @@ from app.serde import (
     ResetPasswordSchema,
 )
 from app.serde.user import UserSchema
+from app.utils import get_front_end
 from app.utils.email import send_email
+
+FRONT_END_URI = f"{get_front_end()}"
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -83,7 +86,12 @@ def register():
 
     token = user.generate_confirmation_token()
     send_email(
-        user.email, "Confirm Your Account", "confirm_email", user=user, token=token
+        user.email,
+        "Confirm Your Account",
+        "confirm_email",
+        user=user,
+        token=token,
+        root=FRONT_END_URI,
     )
 
     return response
@@ -102,7 +110,7 @@ def confirm(token):
     return jsonify({"message": "You have confirmed your account. Thanks!"})
 
 
-@auth.route("/confirm", methods=["GET"])
+@auth.route("/confirm", methods=["POST"])
 @login_required
 def resend_confirmation():
     if current_user.confirmed:
@@ -116,6 +124,7 @@ def resend_confirmation():
         "confirm_email",
         user=current_user,
         token=token,
+        root=FRONT_END_URI,
     )
 
     return jsonify({"message": "A confirmation email will be sent to you by email"})
@@ -159,7 +168,12 @@ def password_reset_request():
     if user:
         token = user.generate_reset_token()
         send_email(
-            user.email, "Reset Your Password", "reset_password", user=user, token=token
+            user.email,
+            "Reset Your Password",
+            "reset_password",
+            user=user,
+            token=token,
+            root=FRONT_END_URI,
         )
 
     return jsonify(
@@ -209,6 +223,7 @@ def change_email_request():
         "change_email",
         user=current_user,
         token=token,
+        root=FRONT_END_URI,
     )
     return jsonify(
         {
