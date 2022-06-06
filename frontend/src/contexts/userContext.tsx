@@ -7,7 +7,7 @@ const UserContext = createContext({
     loggedIn
   },
   currentUser: {},
-  setCurrentUser: (data: { email: string; uuid: string }) => {
+  setCurrentUser: (data: unknown) => {
     data
   },
 })

@@ -56,10 +56,9 @@ def logout():
 @auth.route("/login", methods=["POST"])
 def login():
     payload = request.get_json()
-    login_schema = LoginSchema()
 
     try:
-        user = login_schema.load(payload)
+        user = LoginSchema().load(payload)
     except ValidationError as err:
         abort(422, err.messages)
 

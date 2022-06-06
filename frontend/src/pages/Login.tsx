@@ -12,17 +12,16 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User } from 'services'
 import { useAuth } from 'contexts/userContext'
-import { validateEmail } from 'utils'
 import logo from 'assets/logo.png'
 
 type StateType = {
-  email: string
+  emailOrUsername: string
   password: string
 }
 
 export const LoginForm = () => {
   const [state, setState] = useState<StateType>({
-    email: '',
+    emailOrUsername: '',
     password: '',
   })
   const [loading, setLoading] = useState(false)
@@ -33,18 +32,11 @@ export const LoginForm = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
-    if (!validateEmail(state.email)) {
-      return setError('Email address is not valid')
-    }
-
     setLoading(true)
     setError('')
 
     try {
-      const response = await User.login({
-        email: state.email,
-        password: state.password,
-      })
+      const response = await User.login(state.emailOrUsername, state.password)
       if (response.status !== 200) {
         setError('Failed to login')
         setLoading(false)
@@ -56,8 +48,8 @@ export const LoginForm = () => {
       navigate('..', { replace: true })
     } catch (error) {
       setError('Server error, please try again later')
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -85,12 +77,12 @@ export const LoginForm = () => {
               required
               icon="mail"
               iconPosition="left"
-              placeholder="E-mail address"
-              value={state.email}
+              placeholder="E-mail or username"
+              value={state.emailOrUsername}
               onChange={(e) =>
                 setState((prevState) => ({
                   ...prevState,
-                  email: e.target.value,
+                  emailOrUsername: e.target.value,
                 }))
               }
             />
@@ -113,12 +105,12 @@ export const LoginForm = () => {
               Login
             </Button>
             <div style={{ marginTop: 10 }}>
-              <a href="passwordresetrequest">Forgot password ?</a>
+              <a href="passwordresetrequest">Forgot password</a>
             </div>
           </Segment>
         </Form>
         <Message>
-          New to us ? <a href="register">Register</a>
+          <a href="register">Register</a>
         </Message>
       </Grid.Column>
     </Grid>

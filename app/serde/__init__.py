@@ -5,7 +5,7 @@ from app.serde.utils import (
     lower_strip_email,
     must_not_be_blank,
     password_must_match,
-    validate_user_email,
+    camelcase,
 )
 
 
@@ -53,26 +53,18 @@ class ChangePasswordSchema(Schema):
 
 
 class LoginSchema(Schema):
-    email = fields.Str(validate=must_not_be_blank)
-    username = fields.Str(validate=must_not_be_blank)
+    email_or_username = fields.Str(validate=must_not_be_blank)
     password = fields.Str(required=True, validate=must_not_be_blank)
 
-    @pre_load
-    def username_or_email_required(self, data, **kwargs):
-        email = data.get("email")
-        username = data.get("username")
-
-        if email is None and username is None:
-            raise ValidationError("username or email is required")
-
-        return lower_strip_email(data)
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
     @post_load
     def get_user(self, data, **kwargs):
         user = (
-            User.query.filter_by(username=data["username"]).first()
+            User.query.filter_by(username=data["email_or_username"]).first()
             if data.get("username")
-            else User.query.filter_by(email=data["email"]).first()
+            else User.query.filter_by(email=data["email_or_username"]).first()
         )
 
         if user is None or not user.verify_password(data["password"]):

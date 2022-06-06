@@ -9,19 +9,18 @@ type registerType = {
   aboutMe?: string
 }
 
-type loginType = {
-  email: string
-  password: string
-}
-
 const AUTH_ROUTE = `${process.env.API_URI}/api/auth`
+
 export class User {
   static whoami() {
     return fetcher(`${AUTH_ROUTE}/whoami`, 'GET')
   }
 
-  static login(data: loginType) {
-    return fetcher(`${AUTH_ROUTE}/login`, 'POST', data)
+  static login(emailOrUsername: string, password: string) {
+    return fetcher(`${AUTH_ROUTE}/login`, 'POST', {
+      emailOrUsername,
+      password,
+    })
   }
 
   static delete(password: string) {

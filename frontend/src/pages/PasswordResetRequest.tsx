@@ -86,7 +86,7 @@ export const ForgotPasswordForm = () => {
         </Form>
 
         <Message>
-          Know your password ? <a href="login">Login</a>
+          <a href="login">Login</a>
         </Message>
       </Grid.Column>
     </Grid>

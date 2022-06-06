@@ -68,8 +68,8 @@ export const RegisterForm = () => {
       navigate('../login', { replace: true })
     } catch (error) {
       setError('Server error, please try again later')
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -178,7 +178,6 @@ export const RegisterForm = () => {
         </Form>
 
         <Message>
-          Already have an account?
           <a href="login">Login</a>
         </Message>
       </Grid.Column>
