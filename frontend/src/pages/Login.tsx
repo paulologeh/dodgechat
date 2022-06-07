@@ -9,7 +9,6 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { User } from 'services'
 import { useAuth } from 'contexts/userContext'
 import logo from 'assets/logo.png'
@@ -27,7 +26,6 @@ export const LoginForm = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { setLoggedIn, setCurrentUser } = useAuth()
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
@@ -45,7 +43,6 @@ export const LoginForm = () => {
       const data = await response.json()
       setLoggedIn(true)
       setCurrentUser(data)
-      navigate('..', { replace: true })
     } catch (error) {
       setError('Server error, please try again later')
       setLoading(false)

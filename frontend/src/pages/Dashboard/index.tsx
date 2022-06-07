@@ -1,8 +1,8 @@
 import { Container, Header } from 'semantic-ui-react'
-import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { UserMenu } from './UserMenu'
 import { User } from 'services/users'
+import { useAuth } from 'contexts/userContext'
 
 type stateType = {
   activeItem: string
@@ -13,16 +13,9 @@ export const Dashboard = () => {
     activeItem: 'home',
     unreadCount: 0,
   })
-  const navigate = useNavigate()
+  const { setLoggedIn, setCurrentUser } = useAuth()
   const handleMenuChange = (name: string) => {
     setState((prevState) => ({ ...prevState, activeItem: name }))
-    switch (name) {
-      case 'logout':
-        logout()
-        break
-      default:
-        break
-    }
   }
   const logout = async () => {
     const response = await User.logout()
@@ -34,8 +27,8 @@ export const Dashboard = () => {
       return
     }
 
-    console.log('navigating out')
-    navigate('../login', { replace: true })
+    setLoggedIn(false)
+    setCurrentUser({})
   }
 
   return (
@@ -44,6 +37,7 @@ export const Dashboard = () => {
         activeItem={state.activeItem}
         unreadCount={state.unreadCount}
         handleMenuChange={handleMenuChange}
+        logout={logout}
       />
       <Container text style={{ marginTop: '7em' }}>
         <Header as="h1">Semantic UI React Fixed Template</Header>

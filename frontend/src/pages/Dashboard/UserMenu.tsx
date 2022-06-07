@@ -1,16 +1,26 @@
-import { Input, Image, Icon, Container, Label, Menu } from 'semantic-ui-react'
+import {
+  Input,
+  Image,
+  Dropdown,
+  Icon,
+  Container,
+  Label,
+  Menu,
+} from 'semantic-ui-react'
 import logo from 'assets/logo.png'
 
 type propTypes = {
   activeItem: string
   handleMenuChange: (name: string) => void
   unreadCount: number
+  logout: () => void
 }
 
 export const UserMenu = ({
   activeItem,
   handleMenuChange,
   unreadCount,
+  logout,
 }: propTypes) => {
   return (
     <Menu fixed="top" inverted borderless>
@@ -50,17 +60,13 @@ export const UserMenu = ({
           <Menu.Item onClick={() => handleMenuChange('search')}>
             <Input icon="search" placeholder="Search..." />
           </Menu.Item>
-          <Menu.Item
-            icon="user outline"
-            active={activeItem === 'profile'}
-            content={''}
-            onClick={() => handleMenuChange('profile')}
-          />
-          <Menu.Item
-            active={activeItem === 'logout'}
-            content={'Logout'}
-            onClick={() => handleMenuChange('logout')}
-          />
+          <Dropdown item icon="user outline">
+            <Dropdown.Menu>
+              <Dropdown.Item>Profile</Dropdown.Item>
+              <Dropdown.Item>Settings</Dropdown.Item>
+              <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Menu.Menu>
       </Container>
     </Menu>
