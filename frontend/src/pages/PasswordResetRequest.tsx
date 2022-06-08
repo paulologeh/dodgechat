@@ -9,7 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 import { validateEmail } from 'utils'
 import logo from 'assets/logo.png'
 
@@ -32,7 +32,7 @@ export const ForgotPasswordForm = () => {
     }
 
     try {
-      const response = await User.passwordResetRequest(email)
+      const response = await Auth.passwordResetRequest(email)
 
       if (response.status === 200) {
         setSuccess(

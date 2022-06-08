@@ -9,7 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 import logo from 'assets/logo.png'
 
 type StateType = {
@@ -31,7 +31,7 @@ export const DeleteAccountForm = () => {
     setError('')
 
     try {
-      const response = await User.delete(state.password)
+      const response = await Auth.delete(state.password)
 
       if (response.status === 200) {
         setSuccess('Your account has been deleted')

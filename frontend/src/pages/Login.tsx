@@ -9,7 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
 import logo from 'assets/logo.png'
 
@@ -34,7 +34,7 @@ export const LoginForm = () => {
     setError('')
 
     try {
-      const response = await User.login(state.emailOrUsername, state.password)
+      const response = await Auth.login(state.emailOrUsername, state.password)
       if (response.status !== 200) {
         setError('Failed to login')
         setLoading(false)

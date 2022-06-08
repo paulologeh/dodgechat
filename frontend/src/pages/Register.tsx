@@ -10,7 +10,7 @@ import {
 } from 'semantic-ui-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User } from 'services'
+import { Auth } from 'services'
 import { validateEmail } from 'utils'
 import logo from 'assets/logo.png'
 
@@ -56,7 +56,7 @@ export const RegisterForm = () => {
         password: state.password,
         name: state.name,
       }
-      const response = await User.register(user)
+      const response = await Auth.register(user)
 
       if (response.status !== 201) {
         setError('Failed to register')

@@ -11,7 +11,7 @@ type registerType = {
 
 const AUTH_ROUTE = `${process.env.API_URI}/api/auth`
 
-export class User {
+export class Auth {
   static whoami() {
     return fetcher(`${AUTH_ROUTE}/whoami`, 'GET')
   }

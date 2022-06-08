@@ -1,7 +1,7 @@
 import { Grid, Header, Image, Loader, Message } from 'semantic-ui-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 
 import logo from 'assets/logo.png'
 
@@ -15,7 +15,7 @@ export const ConfirmForm = () => {
 
   const confirmToken = async () => {
     try {
-      const response = await User.confirm(token)
+      const response = await Auth.confirm(token)
 
       if (response.status !== 200) {
         setError('The confirmation link is invalid or has expired')

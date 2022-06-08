@@ -9,7 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 import logo from 'assets/logo.png'
 
 type StateType = {
@@ -39,7 +39,7 @@ export const ChangePasswordForm = () => {
     setError('')
 
     try {
-      const response = await User.changePassword(
+      const response = await Auth.changePassword(
         state.oldPassword,
         state.password,
         state.confirmPassword

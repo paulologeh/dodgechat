@@ -1,7 +1,7 @@
 import { Grid, Header, Image, Loader, Message } from 'semantic-ui-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 
 import logo from 'assets/logo.png'
 
@@ -15,7 +15,7 @@ export const ChangeEmail = () => {
 
   const confirmToken = async () => {
     try {
-      const response = await User.changeEmail(token)
+      const response = await Auth.changeEmail(token)
 
       if (response.status !== 200) {
         setError('The link is invalid or has expired')

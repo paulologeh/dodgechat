@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, createContext, FC } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 
 const UserContext = createContext({
   loggedIn: false,
@@ -23,7 +23,7 @@ export const UserProvider: FC = ({ children }) => {
 
   const getUserSession = async () => {
     try {
-      const response = await User.whoami()
+      const response = await Auth.whoami()
       if (response.status === 200) {
         const userData = await response.json()
         setCurrentUser(userData)

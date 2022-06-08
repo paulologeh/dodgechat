@@ -57,7 +57,7 @@ export const UserMenu = ({
           Friends
         </Menu.Item>
         <Menu.Menu position="right">
-          <Menu.Item onClick={() => handleMenuChange('search')}>
+          <Menu.Item>
             <Input icon="search" placeholder="Search..." />
           </Menu.Item>
           <Dropdown item icon="user outline">

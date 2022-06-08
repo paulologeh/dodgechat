@@ -9,7 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
-import { User } from 'services'
+import { Auth } from 'services'
 import { useSearchParams } from 'react-router-dom'
 import logo from 'assets/logo.png'
 
@@ -41,7 +41,7 @@ export const ResetPasswordForm = () => {
     setError('')
 
     try {
-      const response = await User.passwordReset(state.password, token)
+      const response = await Auth.passwordReset(state.password, token)
 
       if (response.status === 200) {
         setSuccess(

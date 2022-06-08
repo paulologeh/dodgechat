@@ -1,7 +1,9 @@
-import { Container, Header } from 'semantic-ui-react'
+import { Container } from 'semantic-ui-react'
 import { useState } from 'react'
 import { UserMenu } from './UserMenu'
-import { User } from 'services/users'
+import { HomeFeed } from './HomeFeed'
+import { Friends } from './Friends'
+import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
 
 type stateType = {
@@ -10,7 +12,7 @@ type stateType = {
 }
 export const Dashboard = () => {
   const [state, setState] = useState<stateType>({
-    activeItem: 'home',
+    activeItem: 'friends',
     unreadCount: 0,
   })
   const { setLoggedIn, setCurrentUser } = useAuth()
@@ -18,7 +20,7 @@ export const Dashboard = () => {
     setState((prevState) => ({ ...prevState, activeItem: name }))
   }
   const logout = async () => {
-    const response = await User.logout()
+    const response = await Auth.logout()
 
     if (response.status !== 200) {
       alert('Failed to logout')
@@ -40,12 +42,8 @@ export const Dashboard = () => {
         logout={logout}
       />
       <Container text style={{ marginTop: '7em' }}>
-        <Header as="h1">Semantic UI React Fixed Template</Header>
-        <p>This is a basic fixed menu template using fixed size containers.</p>
-        <p>
-          A text container is used for the main container, which is useful for
-          single column layouts.
-        </p>
+        {state.activeItem === 'home' && <HomeFeed />}
+        {state.activeItem === 'friends' && <Friends />}
       </Container>
     </div>
   )
