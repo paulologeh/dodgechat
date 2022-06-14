@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, createContext, FC } from 'react'
 import { Auth } from 'services'
+import { Loader, Dimmer } from 'semantic-ui-react'
 
 const UserContext = createContext({
   loggedIn: false,
@@ -44,6 +45,11 @@ export const UserProvider: FC = ({ children }) => {
   return (
     <UserContext.Provider value={value}>
       {!loading && children}
+      {loading && (
+        <Dimmer active>
+          <Loader />
+        </Dimmer>
+      )}
     </UserContext.Provider>
   )
 }

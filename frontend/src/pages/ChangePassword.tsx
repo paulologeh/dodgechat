@@ -5,7 +5,6 @@ import {
   Header,
   Image,
   Message,
-  Loader,
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
@@ -70,23 +69,8 @@ export const ChangePasswordForm = () => {
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
-            {loading && (
-              <Loader active inline="centered" style={{ marginBottom: 10 }} />
-            )}
-            {error && (
-              <Message
-                negative
-                header="Failed to change password"
-                content={error}
-              />
-            )}
-            {success && (
-              <Message
-                positive
-                header="Successfully changed password"
-                content={success}
-              />
-            )}
+            {error && <Message negative content={error} />}
+            {success && <Message positive content={success} />}
             <Form.Input
               fluid
               required
@@ -132,7 +116,7 @@ export const ChangePasswordForm = () => {
                 }))
               }
             />
-            <Button fluid size="large" color="black">
+            <Button fluid size="large" color="black" loading={loading}>
               Submit
             </Button>
           </Segment>

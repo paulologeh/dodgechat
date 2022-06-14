@@ -61,16 +61,8 @@ export const DeleteAccountForm = () => {
             {loading && (
               <Loader active inline="centered" style={{ marginBottom: 10 }} />
             )}
-            {error && (
-              <Message negative header="Failed to delete" content={error} />
-            )}
-            {success && (
-              <Message
-                positive
-                header="Successfully deleted"
-                content={success}
-              />
-            )}
+            {error && <Message negative content={error} />}
+            {success && <Message positive content={success} />}
             <Form.Input
               fluid
               required
@@ -86,7 +78,7 @@ export const DeleteAccountForm = () => {
                 }))
               }
             />
-            <Button fluid size="large" color="black">
+            <Button fluid size="large" color="black" loading={loading}>
               Submit
             </Button>
           </Segment>

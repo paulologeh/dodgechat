@@ -24,7 +24,7 @@ export class Auth {
   }
 
   static delete(password: string) {
-    return fetcher(`${AUTH_ROUTE}/delete`, 'POST', { password })
+    return fetcher(`${AUTH_ROUTE}/delete`, 'DELETE', { password })
   }
 
   static register(user: registerType) {

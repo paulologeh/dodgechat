@@ -14,6 +14,7 @@ type propTypes = {
   handleMenuChange: (name: string) => void
   unreadCount: number
   logout: () => void
+  friendRequests: number
 }
 
 export const UserMenu = ({
@@ -21,6 +22,7 @@ export const UserMenu = ({
   handleMenuChange,
   unreadCount,
   logout,
+  friendRequests,
 }: propTypes) => {
   return (
     <Menu fixed="top" inverted borderless>
@@ -55,6 +57,7 @@ export const UserMenu = ({
         >
           <Icon name="users" />
           Friends
+          {friendRequests > 0 && <Label size="tiny">{friendRequests}</Label>}
         </Menu.Item>
         <Menu.Menu position="right">
           <Menu.Item>

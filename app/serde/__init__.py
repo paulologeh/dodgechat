@@ -61,11 +61,9 @@ class LoginSchema(Schema):
 
     @post_load
     def get_user(self, data, **kwargs):
-        user = (
-            User.query.filter_by(username=data["email_or_username"]).first()
-            if data.get("username")
-            else User.query.filter_by(email=data["email_or_username"]).first()
-        )
+        user1 = User.query.filter_by(username=data["email_or_username"]).first()
+        user2 = User.query.filter_by(email=data["email_or_username"]).first()
+        user = user2 if user1 is None else user1
 
         if user is None or not user.verify_password(data["password"]):
             raise ValidationError("Invalid email or password.")

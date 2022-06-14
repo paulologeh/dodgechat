@@ -5,7 +5,15 @@ import {
   Icon,
   Container,
   Divider,
+  Form,
+  Modal,
+  Item,
+  Label,
 } from 'semantic-ui-react'
+import { useState } from 'react'
+import { Friend as FriendService } from 'services/friends'
+import { delay } from 'utils'
+import './Friends.css'
 
 const friendsData = [
   {
@@ -80,26 +88,128 @@ const Friend = ({ data }: { data: friendPropTypes }) => {
   const { name, dateJoined, aboutMe, noOfFriends, avatar } = data
 
   return (
-    <Card>
+    <Item>
       <Image src={avatar} wrapped ui={false} />
-      <Card.Content>
-        <Card.Header>{name}</Card.Header>
-        <Card.Meta>
+      <Item.Content>
+        <Item.Header>{name}</Item.Header>
+        <Item.Meta>
           <span className="date">{dateJoined}</span>
-        </Card.Meta>
-        <Card.Description>{aboutMe}</Card.Description>
-      </Card.Content>
-      <Card.Content extra>
-        <Icon name="user" />
-        {noOfFriends} Friends
-      </Card.Content>
-    </Card>
+        </Item.Meta>
+        <Item.Description>{aboutMe}</Item.Description>
+        <Item.Extra>
+          <Icon name="user" />
+          {noOfFriends} Friends
+        </Item.Extra>
+      </Item.Content>
+    </Item>
   )
 }
 
+type addFriendsPropTypes = {
+  open: boolean
+  setModalState: (arg: boolean) => void
+}
+
+type addFriendsStateTypes = {
+  username: string
+  loading: boolean
+  error: string
+  success: string
+}
+
+const AddFriends = ({ open, setModalState }: addFriendsPropTypes) => {
+  const [state, setState] = useState<addFriendsStateTypes>({
+    username: '',
+    loading: false,
+    error: '',
+    success: '',
+  })
+
+  const handleSubmit = async () => {
+    setState({ ...state, loading: true, success: '', error: '' })
+    try {
+      const request = await FriendService.addFriend(state.username)
+      if (request.status === 200) {
+        setState({ ...state, success: 'Sent request!', loading: false })
+      } else {
+        const response = await request.json()
+        setState({ ...state, error: response.message, loading: false })
+      }
+      await delay(3000)
+    } catch (error) {
+      console.error(error)
+      setState({
+        ...state,
+        error: 'Server error. Try again later',
+        loading: false,
+      })
+    }
+  }
+
+  const handleClose = () => {
+    setState({ ...state, username: '' })
+    setModalState(false)
+  }
+
+  return (
+    <Modal size="tiny" closeIcon open={open} onClose={handleClose}>
+      <Modal.Header>Add new friends</Modal.Header>
+      <Modal.Content>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group inline>
+            <Form.Field>
+              <label htmlFor="username">Username</label>
+            </Form.Field>
+            <Form.Input
+              id="username"
+              placeholder="joey123"
+              name="username"
+              required
+              value={state.username}
+              onChange={(e) => setState({ ...state, username: e.target.value })}
+            />
+            <Form.Button content="Add" color="black" loading={state.loading} />
+            {state.error && (
+              <Label basic color="red" pointing="left">
+                {state.error}
+              </Label>
+            )}
+            {state.success && (
+              <Label basic color="green" pointing="left">
+                {state.success}
+              </Label>
+            )}
+          </Form.Group>
+        </Form>
+      </Modal.Content>
+    </Modal>
+  )
+}
+
+type friendsState = {
+  openAddFriends: boolean
+}
+
 export const Friends = () => {
+  const [state, setState] = useState<friendsState>({
+    openAddFriends: false,
+  })
+
+  const setModalState = (val: boolean) => {
+    setState({ ...state, openAddFriends: val })
+  }
+
   return (
     <>
+      <Button
+        onClick={() => setState({ ...state, openAddFriends: true })}
+        color="black"
+      >
+        <Icon name="add user" />
+        Add friend
+      </Button>
+      <AddFriends open={state.openAddFriends} setModalState={setModalState} />
+      <Divider />
       {friendRequestsData.length > 0 && (
         <Container>
           <Card.Group centered itemsPerRow={2} stackable>
@@ -110,11 +220,11 @@ export const Friends = () => {
         </Container>
       )}
       <Divider />
-      <Card.Group itemsPerRow={3} stackable>
+      <Item.Group itemsPerRow={3} stackable>
         {friendsData.map((data, i) => (
           <Friend data={data} key={i} />
         ))}
-      </Card.Group>
+      </Item.Group>
     </>
   )
 }

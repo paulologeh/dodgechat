@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, request
+from flask import Blueprint
 
 from app.errors import (
     bad_request,
@@ -20,27 +20,11 @@ api = Blueprint("api", __name__, url_prefix="/api")
 
 @api.before_request
 def handle_before_request():
-    # logger.info(
-    #     {
-    #         "message": "Received request",
-    #         "endpoint": request.url,
-    #         "method": request.method,
-    #         "headers": request.headers,
-    #     }
-    # )
     pass
 
 
 @api.after_request
 def handle_after_request(response):
-    # logger.info(
-    #     {
-    #         "message": "Sent response",
-    #         "status_code": response.status_code,
-    #         "headers": response.headers,
-    #         "body": response.get_json(),
-    #     }
-    # )
     return response
 
 
@@ -52,35 +36,35 @@ def handle_internal_error(exception):
 
 @api.errorhandler(422)
 def handle_unprocessable_entity(e):
-    logger.info("Unprocessable entity %s", e)
-    return unprocessable_entity(e)
+    logger.info(e)
+    return unprocessable_entity(e.description)
 
 
 @api.errorhandler(409)
 def handle_conflict(e):
-    logger.info("Conflict %s", e)
-    return conflict(e)
+    logger.info(e)
+    return conflict(e.description)
 
 
 @api.errorhandler(404)
 def handle_not_found(e):
-    logger.info("Not found %s", e)
-    return not_found(e)
+    logger.info(e)
+    return not_found(e.description)
 
 
 @api.errorhandler(403)
 def handle_forbidden(e):
-    logger.info("Forbidden %s", e)
-    return forbidden(e)
+    logger.info(e)
+    return forbidden(e.description)
 
 
 @api.errorhandler(401)
 def handle_unauthorised(e):
-    logger.info("Unauthorized %s", e)
-    return unauthorized(e)
+    logger.info(e)
+    return unauthorized(e.description)
 
 
 @api.errorhandler(400)
 def handle_bad_request(e):
-    logger.info("Bad request %s", e)
-    return bad_request(e)
+    logger.info(e)
+    return bad_request(e.description)

@@ -29,9 +29,11 @@ def create_app(config_name):
     from app.api import api as api_blueprint
     from app.api.auth import auth as auth_blueprint
     from app.api.health import health as health_blueprint
+    from app.api.friend import friend as friend_blueprint
 
     api_blueprint.register_blueprint(auth_blueprint)
     api_blueprint.register_blueprint(health_blueprint)
+    api_blueprint.register_blueprint(friend_blueprint)
     app.register_blueprint(api_blueprint)
 
     return app

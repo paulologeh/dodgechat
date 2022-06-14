@@ -5,7 +5,6 @@ import {
   Header,
   Image,
   Message,
-  Loader,
   Segment,
 } from 'semantic-ui-react'
 import { useState } from 'react'
@@ -63,12 +62,7 @@ export const LoginForm = () => {
         </Header>
         <Form size="large" onSubmit={handleSubmit}>
           <Segment stacked>
-            {loading && (
-              <Loader active inline="centered" style={{ marginBottom: 10 }} />
-            )}
-            {error && (
-              <Message negative header="Failed to login" content={error} />
-            )}
+            {error && <Message negative content={error} />}
             <Form.Input
               fluid
               required
@@ -98,7 +92,7 @@ export const LoginForm = () => {
                 }))
               }
             />
-            <Button fluid size="large" color="black">
+            <Button fluid size="large" color="black" loading={loading}>
               Login
             </Button>
             <div style={{ marginTop: 10 }}>

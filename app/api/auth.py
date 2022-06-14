@@ -1,3 +1,5 @@
+import logging
+import time
 from flask import Blueprint, abort, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow.exceptions import ValidationError
@@ -16,6 +18,8 @@ from app.serde.user import UserSchema
 from app.utils import get_front_end
 from app.utils.email import send_email
 
+logger = logging.getLogger(__name__)
+
 FRONT_END_URI = f"{get_front_end()}"
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
@@ -28,7 +32,7 @@ def whoami():
 
 
 @login_required
-@auth.route("/delete", methods=["POST"])
+@auth.route("/delete", methods=["DELETE"])
 def delete_user():
     payload = request.get_json()
 
@@ -49,6 +53,7 @@ def delete_user():
 @auth.route("/logout", methods=["POST"])
 @login_required
 def logout():
+    time.sleep(2)
     logout_user()
     return jsonify({"message": "Logged out"})
 
@@ -62,6 +67,7 @@ def login():
     except ValidationError as err:
         abort(422, err.messages)
 
+    time.sleep(2)
     login_user(user)
 
     return jsonify(UserSchema().dump(user))
@@ -75,6 +81,16 @@ def register():
         user = UserSchema().load(payload)
     except ValidationError as err:
         abort(422, err.messages)
+
+    # check if username or email exists
+    user1 = User.query.filter_by(email=user.email).first()
+
+    if user1:
+        abort(400, "Email already exists")
+
+    user2 = User.query.filter_by(username=user.username).first()
+    if user2:
+        abort(400, "Username already exists")
 
     db.session.add(user)
 

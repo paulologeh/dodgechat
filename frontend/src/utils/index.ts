@@ -25,3 +25,5 @@ export const fetcher = (url: string, method: string, body: unknown = null) => {
     body: JSON.stringify(body),
   })
 }
+
+export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
