@@ -1,6 +1,7 @@
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, abort, request
+from flask_login import login_required
 
 from app.errors import (
     bad_request,
@@ -11,11 +12,36 @@ from app.errors import (
     unauthorized,
     unprocessable_entity,
 )
+from app.models import user
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
 
 api = Blueprint("api", __name__, url_prefix="/api")
+
+
+@api.route("/search", methods=["GET"])
+@login_required
+def search():
+    """
+    This will do a full text scan of
+    - usernames
+    - names
+    - messages (TO DO)
+    """
+    results = {}
+    term = request.args.get("term")
+    if not term:
+        abort(400, "No search term supplied")
+
+    users = User.query.filter(User.__ts_vector__.match(term)).all()
+    results["users"] = {
+        "name": "users",
+        "results": [user.to_minimal() for user in users],
+    }
+
+    return results
 
 
 @api.before_request
