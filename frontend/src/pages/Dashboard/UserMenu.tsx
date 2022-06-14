@@ -11,18 +11,18 @@ import logo from 'assets/logo.png'
 
 type propTypes = {
   activeItem: string
-  handleMenuChange: (name: string) => void
+  updateState: (key: string, value: string) => void
   unreadCount: number
   logout: () => void
-  friendRequests: number
+  friendRequestsCount: number
 }
 
 export const UserMenu = ({
   activeItem,
-  handleMenuChange,
+  updateState,
   unreadCount,
   logout,
-  friendRequests,
+  friendRequestsCount,
 }: propTypes) => {
   return (
     <Menu fixed="top" inverted borderless>
@@ -38,14 +38,14 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'home'}
-          onClick={() => handleMenuChange('home')}
+          onClick={() => updateState('activeItem', 'home')}
         >
           <Icon name="home" />
           Home
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'messages'}
-          onClick={() => handleMenuChange('messages')}
+          onClick={() => updateState('activeItem', 'messages')}
         >
           <Icon name="mail" />
           Messages
@@ -53,11 +53,13 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'friends'}
-          onClick={() => handleMenuChange('friends')}
+          onClick={() => updateState('activeItem', 'friends')}
         >
           <Icon name="users" />
           Friends
-          {friendRequests > 0 && <Label size="tiny">{friendRequests}</Label>}
+          {friendRequestsCount > 0 && (
+            <Label size="tiny">{friendRequestsCount}</Label>
+          )}
         </Menu.Item>
         <Menu.Menu position="right">
           <Menu.Item>

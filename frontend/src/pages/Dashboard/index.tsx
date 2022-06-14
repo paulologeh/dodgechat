@@ -6,24 +6,39 @@ import { Friends } from './Friends'
 import { Messages } from './Messages'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
+import { friendRequestsData, friendsData } from './Friends/sampledata'
+import { friendRequestType, friendType } from './Friends/types'
 
 type stateType = {
   activeItem: string
   unreadCount: number
-  friendRequests: number
+  friendRequestsCount: number
   loading: boolean
+  friendRequests: Array<friendRequestType>
+  friends: Array<friendType>
 }
+
+type updateStateValues =
+  | string
+  | number
+  | boolean
+  | Array<friendRequestType>
+  | Array<friendType>
+
 export const Dashboard = () => {
   const [state, setState] = useState<stateType>({
     activeItem: 'friends',
     unreadCount: 0,
-    friendRequests: 0,
+    friendRequestsCount: 0,
     loading: false,
+    friendRequests: friendRequestsData,
+    friends: friendsData,
   })
-  const { setLoggedIn, setCurrentUser } = useAuth()
-  const handleMenuChange = (name: string) => {
-    setState((prevState) => ({ ...prevState, activeItem: name }))
+
+  const updateState = (key: string, value: updateStateValues) => {
+    setState((prevState) => ({ ...prevState, [key]: value }))
   }
+  const { setLoggedIn, setCurrentUser } = useAuth()
   const logout = async () => {
     setState({ ...state, loading: true })
     const response = await Auth.logout()
@@ -47,13 +62,18 @@ export const Dashboard = () => {
       <UserMenu
         activeItem={state.activeItem}
         unreadCount={state.unreadCount}
-        handleMenuChange={handleMenuChange}
+        updateState={updateState}
         logout={logout}
-        friendRequests={state.friendRequests}
+        friendRequestsCount={state.friendRequestsCount}
       />
       <Container text style={{ marginTop: '7em' }}>
         {state.activeItem === 'home' && <HomeFeed />}
-        {state.activeItem === 'friends' && <Friends />}
+        {state.activeItem === 'friends' && (
+          <Friends
+            friendRequests={state.friendRequests}
+            friends={state.friends}
+          />
+        )}
         {state.activeItem === 'messages' && <Messages />}
       </Container>
     </div>
