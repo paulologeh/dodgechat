@@ -2,7 +2,9 @@ import hashlib
 from datetime import datetime
 
 from flask import current_app
+from .ts_vector import TSVector
 from flask_login import UserMixin
+from sqlalchemy import desc, Index
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -22,6 +24,15 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
+
+    __ts_vector__ = db.Column(
+        TSVector(),
+        db.Computed("to_tsvector('english', name || ' ' || username)", persisted=True),
+    )
+
+    __table_args__ = (
+        Index("ix_user___ts_vector__", __ts_vector__, postgresql_using="gin"),
+    )
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -114,12 +125,22 @@ class User(UserMixin, db.Model):
             url=url, hash=hash, size=size, default=default, rating=rating
         )
 
-    def to_json(self):
+    def to_minimal(self, private=False):
         json_user = {
             "username": self.username,
-            "member_since": self.member_since,
-            "last_seen": self.last_seen,
+            "name": self.name,
+            "location": self.location,
+            "about_me": self.about_me,
+            "avatar_hash": self.avatar_hash,
         }
+
+        if private:
+            return {
+                **json_user,
+                "member_since": self.member_since,
+                "last_seen": self.last_seen,
+            }
+
         return json_user
 
     def generate_auth_token(self, expiration):
