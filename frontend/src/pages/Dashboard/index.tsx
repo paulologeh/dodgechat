@@ -1,6 +1,6 @@
 import { Container, Loader, Dimmer } from 'semantic-ui-react'
 import { useState } from 'react'
-import { UserMenu } from './UserMenu'
+import { UserMenu, searchResultShape } from './UserMenu'
 import { HomeFeed } from './HomeFeed'
 import { Friends } from './Friends'
 import { Messages } from './Messages'
@@ -9,6 +9,15 @@ import { useAuth } from 'contexts/userContext'
 import { friendRequestsData, friendsData } from './Friends/sampledata'
 import { friendRequestType, friendType } from './Friends/types'
 
+type userResult = {
+  name: string
+  results: Array<searchResultShape>
+}
+
+export type searchResultsType = {
+  users: userResult
+}
+
 type stateType = {
   activeItem: string
   unreadCount: number
@@ -16,14 +25,18 @@ type stateType = {
   loading: boolean
   friendRequests: Array<friendRequestType>
   friends: Array<friendType>
+  isSearching: boolean
+  searchValue: string
+  searchResults: searchResultsType
 }
 
-type updateStateValues =
+export type updateStateValues =
   | string
   | number
   | boolean
   | Array<friendRequestType>
   | Array<friendType>
+  | searchResultsType
 
 export const Dashboard = () => {
   const [state, setState] = useState<stateType>({
@@ -33,6 +46,14 @@ export const Dashboard = () => {
     loading: false,
     friendRequests: friendRequestsData,
     friends: friendsData,
+    isSearching: false,
+    searchValue: '',
+    searchResults: {
+      users: {
+        name: 'users',
+        results: [],
+      },
+    },
   })
 
   const updateState = (key: string, value: updateStateValues) => {
@@ -65,6 +86,9 @@ export const Dashboard = () => {
         updateState={updateState}
         logout={logout}
         friendRequestsCount={state.friendRequestsCount}
+        isSearching={state.isSearching}
+        searchValue={state.searchValue}
+        searchResults={state.searchResults}
       />
       <Container text style={{ marginTop: '7em' }}>
         {state.activeItem === 'home' && <HomeFeed />}

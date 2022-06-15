@@ -15,3 +15,13 @@ export type friendsPropType = {
   friendRequests: Array<friendRequestType>
   friends: Array<friendType>
 }
+
+export type friendMinimalType = {
+  username: string
+  name: string
+  location: string
+  aboutMe: string
+  gravatar: string
+  memberSince?: Date
+  lastSeen?: Date
+}

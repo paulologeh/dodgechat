@@ -27,3 +27,5 @@ export const fetcher = (url: string, method: string, body: unknown = null) => {
 }
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+
+export const gravatarUrl = 'https://secure.gravatar.com/avatar'

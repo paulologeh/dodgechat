@@ -9,7 +9,7 @@ export const Friends = ({ friendRequests, friends }: friendsPropType) => {
       menuItem: 'My friends',
       render: () => (
         <Tab.Pane attached={false}>
-          <Item.Group stackable>
+          <Item.Group>
             {friends.map((data, i) => (
               <Friend data={data} key={i} />
             ))}

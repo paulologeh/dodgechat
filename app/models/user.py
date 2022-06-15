@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import current_app
 from .ts_vector import TSVector
 from flask_login import UserMixin
-from sqlalchemy import desc, Index
+from sqlalchemy import Index
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -130,15 +130,15 @@ class User(UserMixin, db.Model):
             "username": self.username,
             "name": self.name,
             "location": self.location,
-            "about_me": self.about_me,
-            "avatar_hash": self.avatar_hash,
+            "aboutMe": self.about_me,
+            "gravatar": self.gravatar(),
         }
 
         if private:
             return {
                 **json_user,
-                "member_since": self.member_since,
-                "last_seen": self.last_seen,
+                "memberSince": self.member_since,
+                "lastSeen": self.last_seen,
             }
 
         return json_user

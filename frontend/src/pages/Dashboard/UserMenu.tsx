@@ -1,5 +1,4 @@
 import {
-  Input,
   Image,
   Dropdown,
   Icon,
@@ -8,13 +7,26 @@ import {
   Menu,
 } from 'semantic-ui-react'
 import logo from 'assets/logo.png'
+import _ from 'lodash'
+import { Search as SearchService } from 'services/search'
+import { searchResultsType, updateStateValues } from './index'
+import { friendMinimalType } from './Friends/types'
+
+export type searchResultShape = {
+  title: string
+  image: string
+  description: string
+}
 
 type propTypes = {
   activeItem: string
-  updateState: (key: string, value: string) => void
+  updateState: (key: string, value: updateStateValues) => void
   unreadCount: number
   logout: () => void
   friendRequestsCount: number
+  isSearching: boolean
+  searchValue: string
+  searchResults: searchResultsType
 }
 
 export const UserMenu = ({
@@ -23,7 +35,39 @@ export const UserMenu = ({
   unreadCount,
   logout,
   friendRequestsCount,
+  isSearching,
+  searchValue,
+  searchResults,
 }: propTypes) => {
+  const handleResultSelect = () => {
+    alert('doing nothing')
+  }
+
+  const handleSearchChange = async (
+    _e: unknown,
+    { value }: { value: string }
+  ) => {
+    updateState('searchValue', value)
+    const response = await SearchService.search(value)
+    if (response.status === 200) {
+      const result = await response.json()
+      const toTransform = result.users.results
+      result.users.results = toTransform.map((item: friendMinimalType) => ({
+        title: item.name,
+        description: item.username,
+        image: item.gravatar,
+      }))
+      updateState('searchResults', result)
+    } else {
+      updateState('searchResults', {
+        users: {
+          name: 'users',
+          results: [],
+        },
+      })
+    }
+  }
+
   return (
     <Menu fixed="top" inverted borderless>
       <Container>
@@ -63,7 +107,14 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Menu position="right">
           <Menu.Item>
-            <Input icon="search" placeholder="Search..." />
+            category loading={isSearching}
+            onResultSelect={handleResultSelect}
+            onSearchChange=
+            {_.debounce(handleSearchChange, 500, {
+              leading: true,
+            })}
+            results={searchResults}
+            value={searchValue}
           </Menu.Item>
           <Dropdown item icon="user outline">
             <Dropdown.Menu>
