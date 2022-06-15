@@ -1,9 +1,13 @@
 import { fetcher } from 'utils'
 
-const API_URI = `${process.env.API_URI}/api`
+const ROOT_URL = `${process.env.API_URI}/api/search`
 
 export class Search {
-  static search(term: string) {
-    return fetcher(`${API_URI}/search?term=${term}`, 'GET')
+  static searchAll(term: string) {
+    return fetcher(`${ROOT_URL}?term=${term}`, 'GET')
+  }
+
+  static searchUser(username: string) {
+    return fetcher(`${ROOT_URL}/user/${username}`, 'GET')
   }
 }

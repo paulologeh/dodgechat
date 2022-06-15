@@ -5,6 +5,7 @@ import {
   Container,
   Label,
   Menu,
+  Search,
 } from 'semantic-ui-react'
 import logo from 'assets/logo.png'
 import _ from 'lodash'
@@ -39,8 +40,28 @@ export const UserMenu = ({
   searchValue,
   searchResults,
 }: propTypes) => {
-  const handleResultSelect = () => {
-    alert('doing nothing')
+  const handleResultSelect = async (
+    _e: unknown,
+    data: { result: { description: string } }
+  ) => {
+    try {
+      updateState('loading', true)
+      const result = await SearchService.searchUser(data.result.description)
+      const response = await result.json()
+      if (result.status === 200) {
+        updateState('openUserProfileModal', true)
+        updateState('selectedUserProfile', response)
+      } else {
+        updateState('modalError', response.message)
+        updateState('openErrorModal', true)
+      }
+      updateState('loading', false)
+    } catch (error) {
+      console.error(error)
+      updateState('modalError', 'Server error. please try again ')
+      updateState('openErrorModal', true)
+      updateState('loading', false)
+    }
   }
 
   const handleSearchChange = async (
@@ -48,7 +69,7 @@ export const UserMenu = ({
     { value }: { value: string }
   ) => {
     updateState('searchValue', value)
-    const response = await SearchService.search(value)
+    const response = await SearchService.searchAll(value)
     if (response.status === 200) {
       const result = await response.json()
       const toTransform = result.users.results
@@ -107,14 +128,16 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Menu position="right">
           <Menu.Item>
-            category loading={isSearching}
-            onResultSelect={handleResultSelect}
-            onSearchChange=
-            {_.debounce(handleSearchChange, 500, {
-              leading: true,
-            })}
-            results={searchResults}
-            value={searchValue}
+            <Search
+              category
+              loading={isSearching}
+              onResultSelect={handleResultSelect}
+              onSearchChange={_.debounce(handleSearchChange, 500, {
+                leading: true,
+              })}
+              results={searchResults}
+              value={searchValue}
+            />
           </Menu.Item>
           <Dropdown item icon="user outline">
             <Dropdown.Menu>

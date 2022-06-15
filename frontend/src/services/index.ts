@@ -1,3 +1,3 @@
 export { Auth } from './auth'
-export { Friend } from './friends'
+export { Relationships } from './relationships'
 export { Search } from './search'

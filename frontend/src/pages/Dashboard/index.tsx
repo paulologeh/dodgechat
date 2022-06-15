@@ -4,10 +4,12 @@ import { UserMenu, searchResultShape } from './UserMenu'
 import { HomeFeed } from './HomeFeed'
 import { Friends } from './Friends'
 import { Messages } from './Messages'
+import { UserProfileModal, ErrorModal } from './SharedComponents'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
 import { friendRequestsData, friendsData } from './Friends/sampledata'
 import { friendRequestType, friendType } from './Friends/types'
+import { userProfileType } from 'types/apiTypes'
 
 type userResult = {
   name: string
@@ -28,6 +30,10 @@ type stateType = {
   isSearching: boolean
   searchValue: string
   searchResults: searchResultsType
+  openErrorModal: boolean
+  modalError: string
+  openUserProfileModal: boolean
+  selectedUserProfile: userProfileType | null
 }
 
 export type updateStateValues =
@@ -37,6 +43,7 @@ export type updateStateValues =
   | Array<friendRequestType>
   | Array<friendType>
   | searchResultsType
+  | userProfileType
 
 export const Dashboard = () => {
   const [state, setState] = useState<stateType>({
@@ -54,6 +61,10 @@ export const Dashboard = () => {
         results: [],
       },
     },
+    openErrorModal: false,
+    modalError: '',
+    openUserProfileModal: false,
+    selectedUserProfile: null,
   })
 
   const updateState = (key: string, value: updateStateValues) => {
@@ -100,6 +111,16 @@ export const Dashboard = () => {
         )}
         {state.activeItem === 'messages' && <Messages />}
       </Container>
+      <UserProfileModal
+        open={state.openUserProfileModal}
+        updateState={updateState}
+        selectedUserProfile={state.selectedUserProfile}
+      />
+      <ErrorModal
+        open={state.openErrorModal}
+        updateState={updateState}
+        message={state.modalError}
+      />
     </div>
   )
 }

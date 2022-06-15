@@ -3,7 +3,6 @@ from flask import Blueprint, abort, jsonify
 from flask_login import current_user, login_required
 
 from app import db
-from app.models import relationship
 from app.models.user import User
 from app.models.relationship import Relationship, RelationshipType
 
@@ -14,14 +13,12 @@ logger = logging.getLogger(__name__)
 
 FRONT_END_URI = f"{get_front_end()}"
 
-friend = Blueprint("friend", __name__, url_prefix="/friend")
+relationships = Blueprint("relationships", __name__, url_prefix="/relationships")
 
 
-@friend.route("/friends", methods=["GET"])
-@login_required
-def get_friends():
-    rel_from = Relationship.query.filter_by(from_id=current_user.id).all()
-    rel_to = Relationship.query.filter_by(to_id=current_user.id).all()
+def get_friendships(user_id):
+    rel_from = Relationship.query.filter_by(from_id=user_id).all()
+    rel_to = Relationship.query.filter_by(to_id=user_id).all()
     rel_id_map = {}
 
     for rel in rel_from:
@@ -36,13 +33,19 @@ def get_friends():
         else:
             rel_id_map[rel.to_id] = 1
 
-    friend_ids = [key for key, val in rel_id_map if val == 2]
-    friend_request_ids = [key for key, val in rel_id_map if val == 1]
+    friend_ids = [key for key in rel_id_map if rel_id_map[key] == 2]
+    friend_request_ids = [key for key in rel_id_map if rel_id_map[key] == 1]
 
-    return jsonify({"friends": friend_ids, "friend_requests": friend_request_ids})
+    return {"friends": friend_ids, "friend_requests": friend_request_ids}
 
 
-@friend.route("/block/<username>", methods=["POST"])
+@relationships.route("/friends", methods=["GET"])
+@login_required
+def get_friends():
+    return jsonify(get_friendships(current_user.id))
+
+
+@relationships.route("/block/<username>", methods=["POST"])
 @login_required
 def block_user(username):
     if username == current_user.username:
@@ -81,9 +84,9 @@ def block_user(username):
     return jsonify({"message": f"Blocked {username}"})
 
 
-@friend.route("/add/<username>", methods=["POST"])
+@relationships.route("/add/<username>", methods=["POST"])
 @login_required
-def add_friend(username):
+def add_user(username):
     if username == current_user.username:
         abort(400, "Cannot add yourself")
 
@@ -120,9 +123,9 @@ def add_friend(username):
     return jsonify({"message": f"Added {username}"})
 
 
-@friend.route("/delete/<username>", methods=["DELETE"])
+@relationships.route("/delete/<username>", methods=["DELETE"])
 @login_required
-def delete_friend(username):
+def delete_user(username):
     if username == current_user.username:
         abort(400, "Cannot delete yourself")
 
