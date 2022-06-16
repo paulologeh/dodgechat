@@ -34,33 +34,44 @@ def search_user(username):
         from_id=current_user.id, to_id=user.id, relationship_type=RelationshipType.BLOCK
     ).first()
 
-    relationship_to = Relationship.query.filter_by(
+    relationship_from = Relationship.query.filter_by(
         from_id=current_user.id,
         to_id=user.id,
         relationship_type=RelationshipType.FRIEND,
     ).first()
 
-    relationship_from = Relationship.query.filter_by(
+    relationship_to = Relationship.query.filter_by(
         from_id=user.id,
         to_id=current_user.id,
         relationship_type=RelationshipType.FRIEND,
     ).first()
 
-    is_friend = True if relationship_from and relationship_to else False
-    is_blocked = True if block else False
-    is_friend_requested = True if relationship_to and not relationship_from else False
+    # determine relationship state
+    # FRIEND
+    # FRIEND_REQUEST_SENT
+    # FRIEND_REQUEST_RECEIVED
+    # BLOCKED_USER
+
+    if relationship_from and relationship_to:
+        relationship_state = "FRIEND"
+    elif relationship_from:
+        relationship_state = "FRIEND_REQUEST_SENT"
+    elif relationship_to:
+        relationship_state = "FRIEND_REQUEST_RECEIVED"
+    elif block:
+        relationship_state = "BLOCKED"
+    else:
+        relationship_state = None
 
     profile = {
         "name": user.name,
         "username": user.username,
         "location": user.location,
         "gravatar": user.gravatar(size=400),
-        "isFriend": is_friend,
-        "isBlocked": is_blocked,
-        "isFriendRequested": is_friend_requested,
+        "relationshipState": relationship_state,
     }
 
-    if is_friend:
+    if relationship_state == "FRIEND":
         friendships = get_friendships(current_user.id)
         number_of_friends = len(friendships["friends"])
         return {
@@ -89,7 +100,9 @@ def search_all():
         abort(400, "No search term supplied")
 
     users = User.query.filter(User.__ts_vector__.match(term)).all()
-    blocked = Relationship.query.filter_by(to_id=current_user.id).all()
+    blocked = Relationship.query.filter_by(
+        to_id=current_user.id, relationship_type=RelationshipType.BLOCK
+    ).all()
     blocked_ids = {val.from_id for val in blocked}
 
     results["users"] = {

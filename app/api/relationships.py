@@ -29,9 +29,9 @@ def get_friendships(user_id):
 
     for rel in rel_to:
         if rel.from_id in rel_id_map:
-            rel_id_map[rel.to_id] += 1
+            rel_id_map[rel.from_id] += 1
         else:
-            rel_id_map[rel.to_id] = 1
+            rel_id_map[rel.from_id] = 1
 
     friend_ids = [key for key in rel_id_map if rel_id_map[key] == 2]
     friend_request_ids = [key for key in rel_id_map if rel_id_map[key] == 1]
