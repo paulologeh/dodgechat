@@ -29,7 +29,8 @@ type stateType = {
   friends: Array<friendType>
   isSearching: boolean
   searchValue: string
-  searchResults: searchResultsType
+  searchError: string
+  searchResults: searchResultsType | Array<never>
   openErrorModal: boolean
   modalError: string
   openUserProfileModal: boolean
@@ -44,6 +45,7 @@ export type updateStateValues =
   | Array<friendType>
   | searchResultsType
   | userProfileType
+  | null
 
 export const Dashboard = () => {
   const [state, setState] = useState<stateType>({
@@ -55,12 +57,8 @@ export const Dashboard = () => {
     friends: friendsData,
     isSearching: false,
     searchValue: '',
-    searchResults: {
-      users: {
-        name: 'users',
-        results: [],
-      },
-    },
+    searchError: '',
+    searchResults: [],
     openErrorModal: false,
     modalError: '',
     openUserProfileModal: false,
@@ -100,6 +98,7 @@ export const Dashboard = () => {
         isSearching={state.isSearching}
         searchValue={state.searchValue}
         searchResults={state.searchResults}
+        searchError={state.searchError}
       />
       <Container text style={{ marginTop: '7em' }}>
         {state.activeItem === 'home' && <HomeFeed />}

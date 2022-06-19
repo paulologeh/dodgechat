@@ -53,7 +53,6 @@ def delete_user():
 @auth.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    time.sleep(2)
     logout_user()
     return jsonify({"message": "Logged out"})
 
@@ -67,7 +66,6 @@ def login():
     except ValidationError as err:
         abort(422, err.messages)
 
-    time.sleep(2)
     login_user(user)
 
     return jsonify(UserSchema().dump(user))

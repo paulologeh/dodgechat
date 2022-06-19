@@ -8,10 +8,11 @@ import {
   Search,
 } from 'semantic-ui-react'
 import logo from 'assets/logo.png'
-import _ from 'lodash'
+import { debounce } from 'lodash'
 import { Search as SearchService } from 'services/search'
 import { searchResultsType, updateStateValues } from './index'
 import { friendMinimalType } from './Friends/types'
+import { SyntheticEvent, useMemo, useEffect } from 'react'
 
 export type searchResultShape = {
   title: string
@@ -27,7 +28,8 @@ type propTypes = {
   friendRequestsCount: number
   isSearching: boolean
   searchValue: string
-  searchResults: searchResultsType
+  searchResults: searchResultsType | Array<never>
+  searchError: string
 }
 
 export const UserMenu = ({
@@ -39,9 +41,10 @@ export const UserMenu = ({
   isSearching,
   searchValue,
   searchResults,
+  searchError,
 }: propTypes) => {
   const handleResultSelect = async (
-    _e: unknown,
+    _e: SyntheticEvent,
     data: { result: { description: string } }
   ) => {
     try {
@@ -64,30 +67,64 @@ export const UserMenu = ({
     }
   }
 
-  const handleSearchChange = async (
-    _e: unknown,
-    { value }: { value: string }
-  ) => {
-    updateState('searchValue', value)
-    const response = await SearchService.searchAll(value)
-    if (response.status === 200) {
+  const search = async (term: string) => {
+    try {
+      const response = await SearchService.searchAll(term)
       const result = await response.json()
-      const toTransform = result.users.results
-      result.users.results = toTransform.map((item: friendMinimalType) => ({
-        title: item.name,
-        description: item.username,
-        image: item.gravatar,
-      }))
-      updateState('searchResults', result)
-    } else {
-      updateState('searchResults', {
-        users: {
-          name: 'users',
-          results: [],
-        },
-      })
+      if (response.status !== 200) {
+        updateState('searchResults', [])
+        updateState('searchError', result.message)
+        updateState('isSearching', false)
+      } else {
+        const userResults = result.users.results
+        if (userResults.length === 0) {
+          updateState('searchResults', [])
+        } else {
+          result.users.results = userResults.map((item: friendMinimalType) => ({
+            title: item.username,
+            description: item.name,
+            image: item.gravatar,
+          }))
+          updateState('searchResults', result)
+        }
+        updateState('isSearching', false)
+      }
+    } catch (error) {
+      console.error(error)
+      updateState('searchResults', [])
+      updateState('searchError', 'Server error. Please try again')
+      updateState('isSearching', false)
     }
   }
+
+  const handleSearchChange = async (
+    _e: SyntheticEvent,
+    { value }: { value?: string | undefined }
+  ) => {
+    value = value || ''
+    updateState('searchValue', value)
+    if (value === '') return updateState('isSearching', false)
+    debouncedSearch(value)
+    updateState('isSearching', true)
+  }
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const debouncedSearch = useMemo(() => {
+    return debounce(
+      (term) => {
+        search(term)
+      },
+      1000,
+      { trailing: true }
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Menu fixed="top" inverted borderless>
@@ -132,11 +169,11 @@ export const UserMenu = ({
               category
               loading={isSearching}
               onResultSelect={handleResultSelect}
-              onSearchChange={_.debounce(handleSearchChange, 500, {
-                leading: true,
-              })}
+              onSearchChange={handleSearchChange}
               results={searchResults}
               value={searchValue}
+              showNoResults={!isSearching}
+              noResultsMessage={searchError || 'No results found'}
             />
           </Menu.Item>
           <Dropdown item icon="user outline">

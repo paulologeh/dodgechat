@@ -28,6 +28,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
+    DEVELOPMENT = True
     DEBUG = True
     CORS_HEADERS = "Content-Type"
 

@@ -1,6 +1,6 @@
 import logging
-
-from flask import Blueprint
+import time
+from flask import Blueprint, current_app
 
 from app.errors import (
     bad_request,
@@ -21,6 +21,9 @@ api = Blueprint("api", __name__, url_prefix="/api")
 
 @api.before_request
 def handle_before_request():
+    if current_app.config.get("DEVELOPMENT"):
+        time.sleep(2)
+        # Intentionally delay responses to assess user experience
     pass
 
 

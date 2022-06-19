@@ -10,4 +10,12 @@ export class Relationships {
   static addUser(username: string) {
     return fetcher(`${ROOT}/add/${username}`, 'POST')
   }
+
+  static deleteUser(username: string) {
+    return fetcher(`${ROOT}/delete/${username}`, 'DELETE')
+  }
+
+  static blockUser(username: string) {
+    return fetcher(`${ROOT}/block/${username}`, 'POST')
+  }
 }
