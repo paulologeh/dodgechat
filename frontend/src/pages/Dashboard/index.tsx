@@ -1,32 +1,26 @@
 import { Container, Loader, Dimmer } from 'semantic-ui-react'
 import { useState } from 'react'
-import { UserMenu, searchResultShape } from './UserMenu'
+import { UserMenu } from './UserMenu'
 import { HomeFeed } from './HomeFeed'
 import { Friends } from './Friends'
 import { Messages } from './Messages'
 import { UserProfileModal, ErrorModal } from './SharedComponents'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
-import { friendRequestsData, friendsData } from './Friends/sampledata'
-import { friendRequestType, friendType } from './Friends/types'
-import { userProfileType } from 'types/apiTypes'
+import {
+  userProfileType,
+  searchResultsType,
+  friendMinimalType,
+} from 'types/apiTypes'
 
-type userResult = {
-  name: string
-  results: Array<searchResultShape>
-}
-
-export type searchResultsType = {
-  users: userResult
-}
-
-type stateType = {
+export type dashboardStateType = {
   activeItem: string
   unreadCount: number
   friendRequestsCount: number
   loading: boolean
-  friendRequests: Array<friendRequestType>
-  friends: Array<friendType>
+  loadingMessage: string
+  friendRequests: Array<friendMinimalType>
+  friends: Array<friendMinimalType>
   isSearching: boolean
   searchValue: string
   searchError: string
@@ -37,24 +31,15 @@ type stateType = {
   selectedUserProfile: userProfileType | null
 }
 
-export type updateStateValues =
-  | string
-  | number
-  | boolean
-  | Array<friendRequestType>
-  | Array<friendType>
-  | searchResultsType
-  | userProfileType
-  | null
-
 export const Dashboard = () => {
-  const [state, setState] = useState<stateType>({
+  const [state, setState] = useState<dashboardStateType>({
     activeItem: 'friends',
     unreadCount: 0,
     friendRequestsCount: 0,
     loading: false,
-    friendRequests: friendRequestsData,
-    friends: friendsData,
+    loadingMessage: '',
+    friendRequests: [],
+    friends: [],
     isSearching: false,
     searchValue: '',
     searchError: '',
@@ -65,12 +50,13 @@ export const Dashboard = () => {
     selectedUserProfile: null,
   })
 
-  const updateState = (key: string, value: updateStateValues) => {
-    setState((prevState) => ({ ...prevState, [key]: value }))
-  }
   const { setLoggedIn, setCurrentUser } = useAuth()
   const logout = async () => {
-    setState({ ...state, loading: true })
+    setState((prevState) => ({
+      ...prevState,
+      loading: true,
+      loadingMessage: 'Logging out',
+    }))
     const response = await Auth.logout()
 
     if (response.status !== 200) {
@@ -81,18 +67,52 @@ export const Dashboard = () => {
     }
     setLoggedIn(false)
     setCurrentUser({})
-    setState({ ...state, loading: false })
+    setState((prevState) => ({
+      ...prevState,
+      loading: false,
+      loadingMessage: '',
+    }))
   }
+
+  // const _getFriends = async () => {
+  //   setState((prevState) => ({ ...prevState, loading: true }))
+  //   const response = await Relationships.getFriends()
+  //   const data = await response.json()
+
+  //   if (response.status !== 200) {
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       loading: false,
+  //       openErrorModal: true,
+  //       modalError: data.message,
+  //     }))
+  //   } else {
+  //     const {
+  //       friendRequests,
+  //       friends,
+  //     }: {
+  //       friendRequests: Array<friendMinimalType>
+  //       friends: Array<friendMinimalType>
+  //     } = data
+
+  //     setState((prevState) => ({
+  //       ...prevState,
+  //       loading: false,
+  //       friendRequests: friendRequests,
+  //       friends: friends,
+  //     }))
+  //   }
+  // }
 
   return (
     <div>
       <Dimmer active={state.loading}>
-        <Loader>Logging out</Loader>
+        <Loader>{state.loadingMessage}</Loader>
       </Dimmer>
       <UserMenu
         activeItem={state.activeItem}
         unreadCount={state.unreadCount}
-        updateState={updateState}
+        setState={setState}
         logout={logout}
         friendRequestsCount={state.friendRequestsCount}
         isSearching={state.isSearching}
@@ -112,12 +132,12 @@ export const Dashboard = () => {
       </Container>
       <UserProfileModal
         open={state.openUserProfileModal}
-        updateState={updateState}
+        setState={setState}
         selectedUserProfile={state.selectedUserProfile}
       />
       <ErrorModal
         open={state.openErrorModal}
-        updateState={updateState}
+        setState={setState}
         message={state.modalError}
       />
     </div>

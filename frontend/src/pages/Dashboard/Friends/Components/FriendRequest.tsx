@@ -1,11 +1,7 @@
-type friendRequestsPropTypes = {
-  name?: string
-  username: string
-}
-
 import { Card, Image, Button } from 'semantic-ui-react'
+import { friendMinimalType } from 'types/apiTypes'
 
-export const FriendRequest = ({ data }: { data: friendRequestsPropTypes }) => {
+export const FriendRequest = ({ data }: { data: friendMinimalType }) => {
   const { name, username } = data
   return (
     <Card>

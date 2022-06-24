@@ -10,20 +10,20 @@ import {
 import logo from 'assets/logo.png'
 import { debounce } from 'lodash'
 import { Search as SearchService } from 'services/search'
-import { searchResultsType, updateStateValues } from './index'
-import { friendMinimalType } from './Friends/types'
-import { SyntheticEvent, useMemo, useEffect } from 'react'
-
-export type searchResultShape = {
-  title: string
-  image: string
-  description: string
-}
+import { dashboardStateType } from 'pages/Dashboard/index'
+import { friendMinimalType, searchResultsType } from 'types/apiTypes'
+import {
+  SyntheticEvent,
+  useMemo,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
 type propTypes = {
   activeItem: string
-  updateState: (key: string, value: updateStateValues) => void
   unreadCount: number
+  setState: Dispatch<SetStateAction<dashboardStateType>>
   logout: () => void
   friendRequestsCount: number
   isSearching: boolean
@@ -34,7 +34,7 @@ type propTypes = {
 
 export const UserMenu = ({
   activeItem,
-  updateState,
+  setState,
   unreadCount,
   logout,
   friendRequestsCount,
@@ -45,25 +45,40 @@ export const UserMenu = ({
 }: propTypes) => {
   const handleResultSelect = async (
     _e: SyntheticEvent,
-    data: { result: { description: string } }
+    data: { result: { title: string } }
   ) => {
     try {
-      updateState('loading', true)
-      const result = await SearchService.searchUser(data.result.description)
+      setState((prevState) => ({
+        ...prevState,
+        loading: true,
+        loadingMessage: 'Fetching user',
+      }))
+      const result = await SearchService.searchUser(data.result.title)
       const response = await result.json()
       if (result.status === 200) {
-        updateState('openUserProfileModal', true)
-        updateState('selectedUserProfile', response)
+        setState((prevState) => ({
+          ...prevState,
+          openUserProfileModal: true,
+          selectedUserProfile: response,
+          loading: false,
+        }))
       } else {
-        updateState('modalError', response.message)
-        updateState('openErrorModal', true)
+        setState((prevState) => ({
+          ...prevState,
+          modalError: response.message,
+          openErrorModal: true,
+          loading: false,
+        }))
       }
-      updateState('loading', false)
     } catch (error) {
       console.error(error)
-      updateState('modalError', 'Server error. please try again ')
-      updateState('openErrorModal', true)
-      updateState('loading', false)
+      setState((prevState) => ({
+        ...prevState,
+        modalError: 'Server error. please try again',
+        openErrorModal: true,
+        loading: false,
+        loadingMessage: '',
+      }))
     }
   }
 
@@ -72,28 +87,41 @@ export const UserMenu = ({
       const response = await SearchService.searchAll(term)
       const result = await response.json()
       if (response.status !== 200) {
-        updateState('searchResults', [])
-        updateState('searchError', result.message)
-        updateState('isSearching', false)
+        setState((prevState) => ({
+          ...prevState,
+          searchResults: [],
+          searchError: result.message,
+          isSearching: false,
+        }))
       } else {
         const userResults = result.users.results
         if (userResults.length === 0) {
-          updateState('searchResults', [])
+          setState((prevState) => ({
+            ...prevState,
+            searchResults: [],
+            isSearching: false,
+          }))
         } else {
           result.users.results = userResults.map((item: friendMinimalType) => ({
             title: item.username,
             description: item.name,
             image: item.gravatar,
           }))
-          updateState('searchResults', result)
+          setState((prevState) => ({
+            ...prevState,
+            searchResults: result,
+            isSearching: false,
+          }))
         }
-        updateState('isSearching', false)
       }
     } catch (error) {
       console.error(error)
-      updateState('searchResults', [])
-      updateState('searchError', 'Server error. Please try again')
-      updateState('isSearching', false)
+      setState((prevState) => ({
+        ...prevState,
+        searchResults: [],
+        isSearching: false,
+        searchError: 'Server error. Please try again',
+      }))
     }
   }
 
@@ -101,11 +129,20 @@ export const UserMenu = ({
     _e: SyntheticEvent,
     { value }: { value?: string | undefined }
   ) => {
-    value = value || ''
-    updateState('searchValue', value)
-    if (value === '') return updateState('isSearching', false)
-    debouncedSearch(value)
-    updateState('isSearching', true)
+    if (value === undefined) {
+      setState((prevState) => ({
+        ...prevState,
+        searchValue: '',
+        isSearching: false,
+      }))
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        searchValue: value,
+        isSearching: true,
+      }))
+      debouncedSearch(value)
+    }
   }
 
   useEffect(() => {
@@ -140,14 +177,24 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'home'}
-          onClick={() => updateState('activeItem', 'home')}
+          onClick={() =>
+            setState((prevState) => ({
+              ...prevState,
+              activeItem: 'home',
+            }))
+          }
         >
           <Icon name="home" />
           Home
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'messages'}
-          onClick={() => updateState('activeItem', 'messages')}
+          onClick={() =>
+            setState((prevState) => ({
+              ...prevState,
+              activeItem: 'messages',
+            }))
+          }
         >
           <Icon name="mail" />
           Messages
@@ -155,7 +202,12 @@ export const UserMenu = ({
         </Menu.Item>
         <Menu.Item
           active={activeItem === 'friends'}
-          onClick={() => updateState('activeItem', 'friends')}
+          onClick={() =>
+            setState((prevState) => ({
+              ...prevState,
+              activeItem: 'friends',
+            }))
+          }
         >
           <Icon name="users" />
           Friends

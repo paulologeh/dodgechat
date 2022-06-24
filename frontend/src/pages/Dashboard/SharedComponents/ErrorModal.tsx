@@ -1,16 +1,22 @@
 import { Button, Modal } from 'semantic-ui-react'
-import { updateStateValues } from '../index'
+import { dashboardStateType } from 'pages/Dashboard/index'
+import { SetStateAction, Dispatch } from 'react'
 
 type propTypes = {
   open: boolean
-  updateState: (key: string, value: updateStateValues) => void
+  setState: Dispatch<SetStateAction<dashboardStateType>>
   message: string
 }
 
-export const ErrorModal = ({ open, updateState, message }: propTypes) => {
+export const ErrorModal = ({ open, setState, message }: propTypes) => {
   return (
     <Modal
-      onClose={() => updateState('openErrorModal', false)}
+      onClose={() =>
+        setState((prevState) => ({
+          ...prevState,
+          openErrorModal: false,
+        }))
+      }
       onOpen={() => null}
       open={open}
     >
@@ -21,7 +27,12 @@ export const ErrorModal = ({ open, updateState, message }: propTypes) => {
 
       <Modal.Actions>
         <Button
-          onClick={() => updateState('openErrorModal', false)}
+          onClick={() =>
+            setState((prevState) => ({
+              ...prevState,
+              openErrorModal: false,
+            }))
+          }
           color="black"
         >
           Close

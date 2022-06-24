@@ -1,28 +1,22 @@
-import { Image, Item, Icon } from 'semantic-ui-react'
-type friendPropTypes = {
-  name?: string
-  dateJoined: string
-  aboutMe?: string
-  noOfFriends: number
-  avatar?: string
-}
+import { Image, Item } from 'semantic-ui-react'
+import { friendMinimalType } from 'types/apiTypes'
 
-export const Friend = ({ data }: { data: friendPropTypes }) => {
-  const { name, dateJoined, aboutMe, noOfFriends, avatar } = data
+export const Friend = ({ data }: { data: friendMinimalType }) => {
+  const { name, memberSince, aboutMe, gravatar } = data
 
   return (
     <Item>
-      <Image src={avatar} wrapped ui={false} />
+      <Image src={gravatar} wrapped ui={false} />
       <Item.Content>
         <Item.Header>{name}</Item.Header>
         <Item.Meta>
-          <span className="date">{dateJoined}</span>
+          <span className="date">{memberSince}</span>
         </Item.Meta>
         <Item.Description>{aboutMe}</Item.Description>
-        <Item.Extra>
+        {/* <Item.Extra>
           <Icon name="user" />
           {noOfFriends} Friends
-        </Item.Extra>
+        </Item.Extra> */}
       </Item.Content>
     </Item>
   )

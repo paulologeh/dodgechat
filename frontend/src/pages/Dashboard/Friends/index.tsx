@@ -1,7 +1,12 @@
 import { Card, Container, Item, Tab } from 'semantic-ui-react'
 import { FriendRequest } from './Components/FriendRequest'
 import { Friend } from './Components/Friend'
-import { friendsPropType } from './types'
+import { friendMinimalType } from 'types/apiTypes'
+
+type friendsPropType = {
+  friendRequests: Array<friendMinimalType>
+  friends: Array<friendMinimalType>
+}
 
 export const Friends = ({ friendRequests, friends }: friendsPropType) => {
   const panes = [

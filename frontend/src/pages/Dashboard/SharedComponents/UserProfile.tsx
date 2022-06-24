@@ -1,17 +1,17 @@
 import { Button, Image, Modal, Header, Icon } from 'semantic-ui-react'
-import { useState } from 'react'
-import { updateStateValues } from '../index'
+import { useState, Dispatch, SetStateAction } from 'react'
 import { userProfileType } from 'types/apiTypes'
 import { Relationships } from 'services'
 import { months } from 'utils/index'
+import { dashboardStateType } from 'pages/Dashboard/index'
 
 type propTypes = {
   open: boolean
-  updateState: (key: string, value: updateStateValues) => void
+  setState: Dispatch<SetStateAction<dashboardStateType>>
   selectedUserProfile: userProfileType | null
 }
 
-type stateType = {
+type loadingStateType = {
   add: boolean
   delete: boolean
   block: boolean
@@ -19,10 +19,10 @@ type stateType = {
 
 export const UserProfileModal = ({
   open,
-  updateState,
+  setState,
   selectedUserProfile,
 }: propTypes) => {
-  const [loading, setLoading] = useState<stateType>({
+  const [loading, setLoading] = useState<loadingStateType>({
     add: false,
     delete: false,
     block: false,
@@ -37,16 +37,22 @@ export const UserProfileModal = ({
         selectedUserProfile.username
       )
       if (response.status === 200) {
-        updateState('selectedUserProfile', {
-          ...selectedUserProfile,
-          relationshipState: 'BLOCKED',
-        })
+        setState((prevState) => ({
+          ...prevState,
+          selectedUserProfile: {
+            ...selectedUserProfile,
+            relationshipState: 'BLOCKED',
+          },
+        }))
         setLoading({ ...loading, block: false })
       } else {
         const data = await response.json()
         setLoading({ ...loading, block: false })
-        updateState('modalError', data.message)
-        updateState('openErrorModal', true)
+        setState((prevState) => ({
+          ...prevState,
+          modalError: data.message,
+          openErrorModal: true,
+        }))
       }
     } catch (error) {
       console.error(error)
@@ -62,16 +68,22 @@ export const UserProfileModal = ({
         selectedUserProfile.username
       )
       if (response.status === 200) {
-        updateState('selectedUserProfile', {
-          ...selectedUserProfile,
-          relationshipState: null,
-        })
+        setState((prevState) => ({
+          ...prevState,
+          selectedUserProfile: {
+            ...selectedUserProfile,
+            relationshipState: null,
+          },
+        }))
         setLoading({ ...loading, delete: false })
       } else {
         const data = await response.json()
         setLoading({ ...loading, delete: false })
-        updateState('modalError', data.message)
-        updateState('openErrorModal', true)
+        setState((prevState) => ({
+          ...prevState,
+          modalError: data.message,
+          openErrorModal: true,
+        }))
       }
     } catch (error) {
       console.error(error)
@@ -85,16 +97,23 @@ export const UserProfileModal = ({
     try {
       const response = await Relationships.addUser(selectedUserProfile.username)
       if (response.status === 200) {
-        updateState('selectedUserProfile', {
-          ...selectedUserProfile,
-          relationshipState: 'FRIEND_REQUEST_SENT',
-        })
+        setState((prevState) => ({
+          ...prevState,
+          selectedUserProfile: {
+            ...selectedUserProfile,
+            relationshipState: 'FRIEND_REQUEST_SENT',
+          },
+        }))
+
         setLoading({ ...loading, add: false })
       } else {
         const data = await response.json()
         setLoading({ ...loading, add: false })
-        updateState('modalError', data.message)
-        updateState('openErrorModal', true)
+        setState((prevState) => ({
+          ...prevState,
+          modalError: data.message,
+          openErrorModal: true,
+        }))
       }
     } catch (error) {
       console.error(error)
@@ -130,7 +149,12 @@ export const UserProfileModal = ({
   return (
     <Modal
       closeIcon
-      onClose={() => updateState('openUserProfileModal', false)}
+      onClose={() =>
+        setState((prevState) => ({
+          ...prevState,
+          openUserProfileModal: false,
+        }))
+      }
       onOpen={() => null}
       open={open}
       size="small"
