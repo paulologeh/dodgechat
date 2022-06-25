@@ -1,10 +1,11 @@
 import logging
+
 from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 
 from app.api.relationships import get_friendships
-from app.models.user import User
 from app.models.relationship import Relationship, RelationshipType
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,9 @@ def search_user(username):
 
     # check if user has blocked you
     blocked = Relationship.query.filter_by(
-        from_id=user.id, to_id=current_user.id, relationship_type=RelationshipType.BLOCK
+        requester_id=user.id,
+        addressee_id=current_user.id,
+        relationship_type=RelationshipType.BLOCK,
     ).first()
 
     if blocked:
@@ -31,18 +34,20 @@ def search_user(username):
 
     # check if you have blocked the user
     block = Relationship.query.filter_by(
-        from_id=current_user.id, to_id=user.id, relationship_type=RelationshipType.BLOCK
+        requester_id=current_user.id,
+        addressee_id=user.id,
+        relationship_type=RelationshipType.BLOCK,
     ).first()
 
     relationship_from = Relationship.query.filter_by(
-        from_id=current_user.id,
-        to_id=user.id,
+        requester_id=current_user.id,
+        addressee_id=user.id,
         relationship_type=RelationshipType.FRIEND,
     ).first()
 
     relationship_to = Relationship.query.filter_by(
-        from_id=user.id,
-        to_id=current_user.id,
+        requester_id=user.id,
+        addressee_id=current_user.id,
         relationship_type=RelationshipType.FRIEND,
     ).first()
 
@@ -101,9 +106,9 @@ def search_all():
 
     users = User.query.filter(User.__ts_vector__.match(term)).all()
     blocked = Relationship.query.filter_by(
-        to_id=current_user.id, relationship_type=RelationshipType.BLOCK
+        addressee_id=current_user.id, relationship_type=RelationshipType.BLOCK
     ).all()
-    blocked_ids = {val.from_id for val in blocked}
+    blocked_ids = {val.requester_id for val in blocked}
 
     results["users"] = {
         "name": "users",

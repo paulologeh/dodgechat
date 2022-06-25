@@ -1,5 +1,4 @@
 import logging
-import time
 from flask import Blueprint, abort, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow.exceptions import ValidationError
