@@ -3,8 +3,8 @@ import logging
 from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 
-from app.api.relationships import get_friendships
-from app.models.relationship import Relationship, RelationshipType
+from app.api.relationships import _get_friends
+from app.models.relationship import Relationship, RelationshipType, FriendState
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -52,19 +52,14 @@ def search_user(username):
     ).first()
 
     # determine relationship state
-    # FRIEND
-    # FRIEND_REQUEST_SENT
-    # FRIEND_REQUEST_RECEIVED
-    # BLOCKED_USER
-
     if relationship_from and relationship_to:
-        relationship_state = "FRIEND"
+        relationship_state = FriendState.ACCEPTED
     elif relationship_from:
-        relationship_state = "FRIEND_REQUEST_SENT"
+        relationship_state = FriendState.REQUESTED
     elif relationship_to:
-        relationship_state = "FRIEND_REQUEST_RECEIVED"
+        relationship_state = FriendState.REQUESTEE
     elif block:
-        relationship_state = "BLOCKED"
+        relationship_state = FriendState.BLOCKED
     else:
         relationship_state = None
 
@@ -77,8 +72,8 @@ def search_user(username):
     }
 
     if relationship_state == "FRIEND":
-        friendships = get_friendships(current_user.id)
-        number_of_friends = len(friendships["friends"])
+        friends = _get_friends(current_user.id, include_requests=False)
+        number_of_friends = len(friends["friends"])
         return {
             **profile,
             "aboutMe": user.about_me,

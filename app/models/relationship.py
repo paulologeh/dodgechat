@@ -5,6 +5,13 @@ from enum import Enum
 from app import db
 
 
+class FriendState(Enum):
+    REQUESTEE = "REQUESTEE"
+    REQUESTED = "REQUESTED"
+    ACCEPTED = "ACCEPTED"
+    BLOCKED = "BLOCKED"
+
+
 class RelationshipType(Enum):
     FRIEND = "FRIEND"
     BLOCK = "BLOCK"

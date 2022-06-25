@@ -11,7 +11,6 @@ from app.errors import (
     unauthorized,
     unprocessable_entity,
 )
-from .relationships import get_friendships
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ api = Blueprint("api", __name__, url_prefix="/api")
 def handle_before_request():
     if current_app.config.get("DEVELOPMENT"):
         time.sleep(2)
-        # Intentionally delay responses to assess user experience
+    # Intentionally delay responses to assess user experience
     pass
 
 
