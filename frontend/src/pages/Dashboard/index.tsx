@@ -45,7 +45,7 @@ export const Dashboard = () => {
       console.error(error)
       setDashboardStore((prevState) => ({
         ...prevState,
-        modalError: 'Server error. please try again',
+        modalError: 'Something went wrong. Please try again',
         openErrorModal: true,
         loading: false,
         loadingMessage: '',
@@ -91,7 +91,7 @@ export const Dashboard = () => {
         ...prevState,
         loading: false,
         openErrorModal: true,
-        modalError: 'Server error. please try again',
+        modalError: 'Something went wrong. Please try again',
       }))
     }
   }

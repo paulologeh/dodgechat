@@ -68,10 +68,10 @@ def search_user(username):
         "username": user.username,
         "location": user.location,
         "gravatar": user.gravatar(size=400),
-        "relationshipState": relationship_state.value,
+        "relationshipState": relationship_state.value if relationship_state else relationship_state,
     }
 
-    if relationship_state == "FRIEND":
+    if relationship_state is FriendState.ACCEPTED:
         friends = _get_friends(current_user.id, include_requests=False)
         number_of_friends = len(friends["friends"])
         return {

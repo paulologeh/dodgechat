@@ -55,7 +55,7 @@ export const UserMenu = ({ logout }: propTypes) => {
       console.error(error)
       setDashboardStore((prevState) => ({
         ...prevState,
-        modalError: 'Server error. please try again',
+        modalError: 'Something went wrong. Please try again',
         openErrorModal: true,
         loading: false,
         loadingMessage: '',
@@ -93,7 +93,7 @@ export const UserMenu = ({ logout }: propTypes) => {
       setDashboardStore((prevState) => ({
         ...prevState,
         searchResults: [],
-        searchError: 'Server error. Please try again',
+        searchError: 'Something went wrong. Please try again',
         isSearching: false,
       }))
     }

@@ -10,44 +10,56 @@ type propTypes = {
   selectedUserProfile: userProfileType | null
 }
 
-type loadingStateType = {
+type buttonGroupType = {
   add: boolean
   delete: boolean
   block: boolean
 }
 
-export const UserProfileModal = ({
-  open,
-
-  selectedUserProfile,
-}: propTypes) => {
-  const [loading, setLoading] = useState<loadingStateType>({
+export const UserProfileModal = ({ open, selectedUserProfile }: propTypes) => {
+  const [loading, setLoading] = useState<buttonGroupType>({
+    add: false,
+    delete: false,
+    block: false,
+  })
+  const [disabled, setDisabled] = useState<buttonGroupType>({
     add: false,
     delete: false,
     block: false,
   })
   const { setDashboardStore } = useDashboardStore()
 
-  const handleBlock = async () => {
+  const handleClick = async (button: string) => {
     if (!selectedUserProfile?.username) return
 
-    setLoading({ ...loading, block: true })
+    setLoading({ ...loading, [button]: true })
     try {
-      const response = await Relationships.deleteUser(
-        selectedUserProfile.username
-      )
+      let response
+
+      if (button === 'add')
+        response = await Relationships.addUser(selectedUserProfile.username)
+      if (button === 'delete')
+        response = await Relationships.deleteUser(selectedUserProfile.username)
+      if (button === 'block')
+        response = await Relationships.blockUser(selectedUserProfile.username)
+
+      if (!response) throw new Error('undefined response ')
+
       if (response.status === 200) {
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          selectedUserProfile: {
-            ...selectedUserProfile,
-            relationshipState: 'BLOCKED',
-          },
-        }))
-        setLoading({ ...loading, block: false })
+        const refetchResponse = await Relationships.getFriends()
+        if (refetchResponse.status === 200) {
+          const data = await refetchResponse.json()
+          setDashboardStore((prevState) => ({
+            ...prevState,
+            friendRequests: data.friendRequests,
+            friends: data.friends,
+          }))
+        }
+        setLoading({ ...loading, [button]: false })
+        setDisabled({ ...disabled, [button]: true })
       } else {
         const data = await response.json()
-        setLoading({ ...loading, block: false })
+        setLoading({ ...loading, [button]: false })
         setDashboardStore((prevState) => ({
           ...prevState,
           modalError: data.message,
@@ -56,67 +68,13 @@ export const UserProfileModal = ({
       }
     } catch (error) {
       console.error(error)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedUserProfile?.username) return
-
-    setLoading({ ...loading, delete: true })
-    try {
-      const response = await Relationships.deleteUser(
-        selectedUserProfile.username
-      )
-      if (response.status === 200) {
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          selectedUserProfile: {
-            ...selectedUserProfile,
-            relationshipState: null,
-          },
-        }))
-        setLoading({ ...loading, delete: false })
-      } else {
-        const data = await response.json()
-        setLoading({ ...loading, delete: false })
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: data.message,
-          openErrorModal: true,
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const handleAdd = async () => {
-    if (!selectedUserProfile?.username) return
-
-    setLoading({ ...loading, add: true })
-    try {
-      const response = await Relationships.addUser(selectedUserProfile.username)
-      if (response.status === 200) {
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          selectedUserProfile: {
-            ...selectedUserProfile,
-            relationshipState: 'REQUESTED',
-          },
-        }))
-
-        setLoading({ ...loading, add: false })
-      } else {
-        const data = await response.json()
-        setLoading({ ...loading, add: false })
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: data.message,
-          openErrorModal: true,
-        }))
-      }
-    } catch (error) {
-      console.error(error)
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        modalError: 'Something went wrong. Please try again',
+        openErrorModal: true,
+      }))
+    } finally {
+      setLoading({ ...loading, [button]: false })
     }
   }
 
@@ -202,7 +160,8 @@ export const UserProfileModal = ({
             icon
             labelPosition="right"
             loading={loading.add}
-            onClick={handleAdd}
+            disabled={disabled.add}
+            onClick={() => handleClick('add')}
           >
             Add
             <Icon name="add user" />
@@ -214,7 +173,8 @@ export const UserProfileModal = ({
             icon
             labelPosition="right"
             loading={loading.delete}
-            onClick={handleDelete}
+            disabled={disabled.delete}
+            onClick={() => handleClick('delete')}
           >
             Delete
             <Icon name="user delete" />
@@ -225,10 +185,12 @@ export const UserProfileModal = ({
           icon
           labelPosition="right"
           disabled={
-            selectedUserProfile?.relationshipState === 'BLOCKED' ?? false
+            (disabled.block ||
+              selectedUserProfile?.relationshipState === 'BLOCKED') ??
+            false
           }
           loading={loading.block}
-          onClick={handleBlock}
+          onClick={() => handleClick('block')}
         >
           {selectedUserProfile?.relationshipState === 'BLOCKED'
             ? 'Blocked'
