@@ -21,7 +21,7 @@ api = Blueprint("api", __name__, url_prefix="/api")
 @api.before_request
 def handle_before_request():
     if current_app.config.get("DEVELOPMENT"):
-        time.sleep(2)
+        time.sleep(1)
     # Intentionally delay responses to assess user experience
     pass
 

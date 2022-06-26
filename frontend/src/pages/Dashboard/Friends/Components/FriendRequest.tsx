@@ -18,12 +18,9 @@ export const FriendRequest = ({ data }: propTypes) => {
 
   const handleClick = async (button: string) => {
     const cleanUp = () => {
-      if (button === 'accept') setLoading({ ...loading, accept: false })
-      if (button === 'decline') setLoading({ ...loading, decline: false })
+      setLoading({ ...loading, [button]: false })
     }
-
-    if (button === 'accept') setLoading({ ...loading, accept: true })
-    if (button === 'decline') setLoading({ ...loading, decline: true })
+    setLoading({ ...loading, [button]: true })
 
     try {
       let response
