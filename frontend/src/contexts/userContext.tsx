@@ -2,13 +2,25 @@ import { useContext, useState, useEffect, createContext, FC } from 'react'
 import { Auth } from 'services'
 import { Loader, Dimmer } from 'semantic-ui-react'
 
+type currentUserType = {
+  aboutMe?: string
+  avatarHash?: string
+  email?: string
+  id?: string
+  lastSeen?: Date
+  location?: string
+  memberSince?: Date
+  name?: string
+  username?: string
+}
+
 const UserContext = createContext({
   loggedIn: false,
   setLoggedIn: (loggedIn: boolean) => {
     loggedIn
   },
   currentUser: {},
-  setCurrentUser: (data: unknown) => {
+  setCurrentUser: (data: currentUserType) => {
     data
   },
 })
@@ -18,7 +30,7 @@ export function useAuth() {
 }
 
 export const UserProvider: FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<unknown>({})
+  const [currentUser, setCurrentUser] = useState<currentUserType>({})
   const [loggedIn, setLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
 

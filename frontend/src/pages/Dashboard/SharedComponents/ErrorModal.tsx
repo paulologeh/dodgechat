@@ -1,18 +1,18 @@
 import { Button, Modal } from 'semantic-ui-react'
-import { dashboardStateType } from 'pages/Dashboard/index'
-import { SetStateAction, Dispatch } from 'react'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 type propTypes = {
   open: boolean
-  setState: Dispatch<SetStateAction<dashboardStateType>>
   message: string
 }
 
-export const ErrorModal = ({ open, setState, message }: propTypes) => {
+export const ErrorModal = ({ open, message }: propTypes) => {
+  const { setDashboardStore } = useDashboardStore()
+
   return (
     <Modal
       onClose={() =>
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           openErrorModal: false,
         }))
@@ -28,7 +28,7 @@ export const ErrorModal = ({ open, setState, message }: propTypes) => {
       <Modal.Actions>
         <Button
           onClick={() =>
-            setState((prevState) => ({
+            setDashboardStore((prevState) => ({
               ...prevState,
               openErrorModal: false,
             }))

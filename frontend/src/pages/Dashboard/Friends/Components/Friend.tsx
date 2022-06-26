@@ -13,10 +13,6 @@ export const Friend = ({ data }: { data: friendMinimalType }) => {
           <span className="date">{memberSince}</span>
         </Item.Meta>
         <Item.Description>{aboutMe}</Item.Description>
-        {/* <Item.Extra>
-          <Icon name="user" />
-          {noOfFriends} Friends
-        </Item.Extra> */}
       </Item.Content>
     </Item>
   )

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { RequireAuth, RequireNoAuth } from 'navigation/RequireAuth'
-
+import { DashboardStoreProvider } from 'contexts/dashboardContext'
 import {
   LoginForm,
   RegisterForm,
@@ -23,7 +23,9 @@ const RouterConfig = () => {
           path="/"
           element={
             <RequireAuth redirectTo="/login">
-              <Dashboard />
+              <DashboardStoreProvider>
+                <Dashboard />
+              </DashboardStoreProvider>
             </RequireAuth>
           }
         />

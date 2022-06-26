@@ -17,10 +17,10 @@ export const ChangeEmail = () => {
     try {
       const response = await Auth.changeEmail(token)
 
-      if (response.status !== 200) {
-        setError('The link is invalid or has expired')
-      } else {
+      if (response.status === 200) {
         setSuccess('Your email has been changed. Thanks!')
+      } else {
+        setError('The link is invalid or has expired')
       }
     } catch (error) {
       setError('Server error, please try again later')

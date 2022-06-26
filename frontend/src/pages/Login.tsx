@@ -34,14 +34,14 @@ export const LoginForm = () => {
 
     try {
       const response = await Auth.login(state.emailOrUsername, state.password)
-      if (response.status !== 200) {
+      if (response.status === 200) {
+        const data = await response.json()
+        setLoggedIn(true)
+        setCurrentUser(data)
+      } else {
         setError('Failed to login')
         setLoading(false)
-        return
       }
-      const data = await response.json()
-      setLoggedIn(true)
-      setCurrentUser(data)
     } catch (error) {
       setError('Server error, please try again later')
       setLoading(false)

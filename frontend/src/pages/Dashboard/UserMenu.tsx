@@ -10,69 +10,50 @@ import {
 import logo from 'assets/logo.png'
 import { debounce } from 'lodash'
 import { Search as SearchService } from 'services/search'
-import { dashboardStateType } from 'pages/Dashboard/index'
-import { friendMinimalType, searchResultsType } from 'types/apiTypes'
-import {
-  SyntheticEvent,
-  useMemo,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import { friendMinimalType } from 'types/apiTypes'
+import { SyntheticEvent, useCallback, useEffect } from 'react'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 type propTypes = {
-  activeItem: string
-  unreadCount: number
-  setState: Dispatch<SetStateAction<dashboardStateType>>
   logout: () => void
-  friendRequestsCount: number
-  isSearching: boolean
-  searchValue: string
-  searchResults: searchResultsType | Array<never>
-  searchError: string
 }
 
-export const UserMenu = ({
-  activeItem,
-  setState,
-  unreadCount,
-  logout,
-  friendRequestsCount,
-  isSearching,
-  searchValue,
-  searchResults,
-  searchError,
-}: propTypes) => {
+export const UserMenu = ({ logout }: propTypes) => {
+  const { dashboardStore, setDashboardStore } = useDashboardStore()
+
   const handleResultSelect = async (
     _e: SyntheticEvent,
     data: { result: { title: string } }
   ) => {
+    setDashboardStore((prevState) => ({
+      ...prevState,
+      loading: true,
+      loadingMessage: 'Fetching user',
+    }))
+
     try {
-      setState((prevState) => ({
-        ...prevState,
-        loading: true,
-        loadingMessage: 'Fetching user',
-      }))
-      const result = await SearchService.searchUser(data.result.title)
-      const response = await result.json()
-      if (result.status === 200) {
-        setState((prevState) => ({
+      const response = await SearchService.searchUser(data.result.title)
+      const responseData = await response.json()
+      if (response.status === 200) {
+        setDashboardStore((prevState) => ({
           ...prevState,
           openUserProfileModal: true,
-          selectedUserProfile: response,
+          selectedUserProfile: responseData,
           loading: false,
+          loadingMessage: '',
         }))
       } else {
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
-          modalError: response.message,
+          modalError: responseData.message,
           openErrorModal: true,
           loading: false,
+          loadingMessage: '',
         }))
       }
     } catch (error) {
       console.error(error)
-      setState((prevState) => ({
+      setDashboardStore((prevState) => ({
         ...prevState,
         modalError: 'Server error. please try again',
         openErrorModal: true,
@@ -85,42 +66,35 @@ export const UserMenu = ({
   const search = async (term: string) => {
     try {
       const response = await SearchService.searchAll(term)
-      const result = await response.json()
-      if (response.status !== 200) {
-        setState((prevState) => ({
+      const data = await response.json()
+      if (response.status === 200) {
+        const userResults = data.users.results
+        data.users.results = userResults.map((item: friendMinimalType) => ({
+          title: item.username,
+          description: item.name,
+          image: item.gravatar,
+        }))
+
+        setDashboardStore((prevState) => ({
           ...prevState,
-          searchResults: [],
-          searchError: result.message,
+          searchResults: data,
           isSearching: false,
         }))
       } else {
-        const userResults = result.users.results
-        if (userResults.length === 0) {
-          setState((prevState) => ({
-            ...prevState,
-            searchResults: [],
-            isSearching: false,
-          }))
-        } else {
-          result.users.results = userResults.map((item: friendMinimalType) => ({
-            title: item.username,
-            description: item.name,
-            image: item.gravatar,
-          }))
-          setState((prevState) => ({
-            ...prevState,
-            searchResults: result,
-            isSearching: false,
-          }))
-        }
+        setDashboardStore((prevState) => ({
+          ...prevState,
+          searchResults: [],
+          searchError: data.message,
+          isSearching: false,
+        }))
       }
     } catch (error) {
       console.error(error)
-      setState((prevState) => ({
+      setDashboardStore((prevState) => ({
         ...prevState,
         searchResults: [],
-        isSearching: false,
         searchError: 'Server error. Please try again',
+        isSearching: false,
       }))
     }
   }
@@ -130,17 +104,19 @@ export const UserMenu = ({
     { value }: { value?: string | undefined }
   ) => {
     if (value === undefined) {
-      setState((prevState) => ({
+      setDashboardStore((prevState) => ({
         ...prevState,
         searchValue: '',
         isSearching: false,
       }))
+      debouncedSearch.cancel()
     } else {
-      setState((prevState) => ({
+      setDashboardStore((prevState) => ({
         ...prevState,
         searchValue: value,
         isSearching: true,
       }))
+
       debouncedSearch(value)
     }
   }
@@ -152,16 +128,23 @@ export const UserMenu = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const debouncedSearch = useMemo(() => {
-    return debounce(
-      (term) => {
-        search(term)
-      },
-      1000,
-      { trailing: true }
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      search(value)
+    }, 500),
+    []
+  )
+
+  const {
+    activeItem,
+    unreadCount,
+    friendRequestsCount,
+    isSearching,
+    searchResults,
+    searchError,
+    searchValue,
+  } = dashboardStore
 
   return (
     <Menu fixed="top" inverted borderless>
@@ -178,7 +161,7 @@ export const UserMenu = ({
         <Menu.Item
           active={activeItem === 'home'}
           onClick={() =>
-            setState((prevState) => ({
+            setDashboardStore((prevState) => ({
               ...prevState,
               activeItem: 'home',
             }))
@@ -190,7 +173,7 @@ export const UserMenu = ({
         <Menu.Item
           active={activeItem === 'messages'}
           onClick={() =>
-            setState((prevState) => ({
+            setDashboardStore((prevState) => ({
               ...prevState,
               activeItem: 'messages',
             }))
@@ -203,7 +186,7 @@ export const UserMenu = ({
         <Menu.Item
           active={activeItem === 'friends'}
           onClick={() =>
-            setState((prevState) => ({
+            setDashboardStore((prevState) => ({
               ...prevState,
               activeItem: 'friends',
             }))

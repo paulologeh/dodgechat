@@ -1,13 +1,12 @@
 import { Button, Image, Modal, Header, Icon } from 'semantic-ui-react'
-import { useState, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { userProfileType } from 'types/apiTypes'
 import { Relationships } from 'services'
 import { months } from 'utils/index'
-import { dashboardStateType } from 'pages/Dashboard/index'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 type propTypes = {
   open: boolean
-  setState: Dispatch<SetStateAction<dashboardStateType>>
   selectedUserProfile: userProfileType | null
 }
 
@@ -19,7 +18,7 @@ type loadingStateType = {
 
 export const UserProfileModal = ({
   open,
-  setState,
+
   selectedUserProfile,
 }: propTypes) => {
   const [loading, setLoading] = useState<loadingStateType>({
@@ -27,6 +26,7 @@ export const UserProfileModal = ({
     delete: false,
     block: false,
   })
+  const { setDashboardStore } = useDashboardStore()
 
   const handleBlock = async () => {
     if (!selectedUserProfile?.username) return
@@ -37,7 +37,7 @@ export const UserProfileModal = ({
         selectedUserProfile.username
       )
       if (response.status === 200) {
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           selectedUserProfile: {
             ...selectedUserProfile,
@@ -48,7 +48,7 @@ export const UserProfileModal = ({
       } else {
         const data = await response.json()
         setLoading({ ...loading, block: false })
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           modalError: data.message,
           openErrorModal: true,
@@ -68,7 +68,7 @@ export const UserProfileModal = ({
         selectedUserProfile.username
       )
       if (response.status === 200) {
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           selectedUserProfile: {
             ...selectedUserProfile,
@@ -79,7 +79,7 @@ export const UserProfileModal = ({
       } else {
         const data = await response.json()
         setLoading({ ...loading, delete: false })
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           modalError: data.message,
           openErrorModal: true,
@@ -97,11 +97,11 @@ export const UserProfileModal = ({
     try {
       const response = await Relationships.addUser(selectedUserProfile.username)
       if (response.status === 200) {
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           selectedUserProfile: {
             ...selectedUserProfile,
-            relationshipState: 'FRIEND_REQUEST_SENT',
+            relationshipState: 'REQUESTED',
           },
         }))
 
@@ -109,7 +109,7 @@ export const UserProfileModal = ({
       } else {
         const data = await response.json()
         setLoading({ ...loading, add: false })
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           modalError: data.message,
           openErrorModal: true,
@@ -150,7 +150,7 @@ export const UserProfileModal = ({
     <Modal
       closeIcon
       onClose={() =>
-        setState((prevState) => ({
+        setDashboardStore((prevState) => ({
           ...prevState,
           openUserProfileModal: false,
         }))
@@ -208,7 +208,7 @@ export const UserProfileModal = ({
             <Icon name="add user" />
           </Button>
         )}
-        {selectedUserProfile?.relationshipState === 'FRIEND' && (
+        {selectedUserProfile?.relationshipState === 'ACCEPTED' && (
           <Button
             primary
             icon

@@ -17,10 +17,10 @@ export const ConfirmForm = () => {
     try {
       const response = await Auth.confirm(token)
 
-      if (response.status !== 200) {
-        setError('The confirmation link is invalid or has expired')
-      } else {
+      if (response.status === 200) {
         setSuccess('Your account has been confirmed. Thanks!')
+      } else {
+        setError('The confirmation link is invalid or has expired')
       }
     } catch (error) {
       setError('Server error, please try again later')
