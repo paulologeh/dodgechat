@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from sqlalchemy.dialects.postgresql import UUID
 
 
 from app import db
@@ -19,8 +20,8 @@ class RelationshipType(Enum):
 
 class Relationship(db.Model):
     __tablename__ = "relationships"
-    requester_id = db.Column(db.Integer, db.ForeignKey("users.id"))  # requester
-    addressee_id = db.Column(db.Integer, index=True)  # requestee
+    requester_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"))  # requester
+    addressee_id = db.Column(UUID(as_uuid=True), index=True)  # requestee
     user = db.relationship("User")
     relationship_type = db.Column(db.Enum(RelationshipType))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)

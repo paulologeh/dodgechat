@@ -1,10 +1,12 @@
 import hashlib
+import uuid
 from datetime import datetime
 
 from flask import current_app
 from .ts_vector import TSVector
 from flask_login import UserMixin
 from sqlalchemy import Index
+from sqlalchemy.dialects.postgresql import UUID
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -13,7 +15,7 @@ from app import db, login_manager
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
