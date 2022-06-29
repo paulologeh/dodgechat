@@ -68,7 +68,9 @@ def search_user(username):
         "username": user.username,
         "location": user.location,
         "gravatar": user.gravatar(size=400),
-        "relationshipState": relationship_state.value if relationship_state else relationship_state,
+        "relationshipState": relationship_state.value
+        if relationship_state
+        else relationship_state,
     }
 
     if relationship_state is FriendState.ACCEPTED:
