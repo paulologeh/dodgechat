@@ -7,12 +7,19 @@ import uuid
 from app import db
 
 
+class UniqueConstraint(Exception):
+    pass
+
+
 class Conversation(db.Model):
     __tablename__ = "conversations"
     id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    sender_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"))
-    recipient_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"))
+    _sender_id = db.Column("sender_id", db.Integer, db.ForeignKey("users.id"))
+    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
+    message = db.relationship("Message")
+    sender = db.relationship("User", foreign_keys=[_sender_id])
+    recipient = db.relationship("User", foreign_keys=[recipient_id])
 
     @classmethod
     def conversation_exists(cls, sender_id: UUID, recipient_id: UUID) -> bool:
@@ -29,5 +36,19 @@ class Conversation(db.Model):
 
         if results:
             return True
-        else:
-            return False
+
+        return False
+
+    @property
+    def sender_id(self):
+        return self._sender_id
+
+    @sender_id.setter
+    def sender_id(self, id: UUID):
+        if not self.recipient_id:
+            raise AttributeError("recipient_id is not set")
+
+        if self.conversation_exists(id, self.recipient_id):
+            raise UniqueConstraint("Conversation already exists")
+
+        self._sender_id = id
