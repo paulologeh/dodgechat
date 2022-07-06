@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
@@ -25,6 +26,7 @@ def create_app(config_name):
     mail.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    SocketIO.init_app(app)
 
     from app.api import api as api_blueprint
     from app.api.auth import auth as auth_blueprint
