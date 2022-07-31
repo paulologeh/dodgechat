@@ -5,8 +5,9 @@ import {
   friendMinimalType,
 } from 'types/apiTypes'
 import { Relationships } from 'services'
+import { io } from 'socket.io-client'
 
-export type dashboardStoreType = {
+type dashboardStoreType = {
   activeItem: string
   unreadCount: number
   friendRequestsCount: number
@@ -49,15 +50,24 @@ const DashboardContext = createContext({
   ) => {
     data
   },
+  isConnected: false,
+  lastPong: '',
+  sendPing: () => {
+    null
+  },
 })
 
 export function useDashboardStore() {
   return useContext(DashboardContext)
 }
 
+const socket = io(`${process.env.API_URI}`)
+
 export const DashboardStoreProvider: FC = ({ children }) => {
   const [dashboardStore, setDashboardStore] =
     useState<dashboardStoreType>(initialStore)
+  const [isConnected, setIsConnected] = useState(socket.connected)
+  const [lastPong, setLastPong] = useState<string>('')
 
   const fetchAllData = async () => {
     setDashboardStore((prevState) => ({ ...prevState, loading: true }))
@@ -99,11 +109,35 @@ export const DashboardStoreProvider: FC = ({ children }) => {
 
   useEffect(() => {
     fetchAllData()
+    socket.on('connect', () => {
+      setIsConnected(true)
+    })
+
+    socket.on('disconnect', () => {
+      setIsConnected(false)
+    })
+
+    socket.on('pong', () => {
+      setLastPong(new Date().toISOString())
+    })
+
+    return () => {
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('pong')
+    }
   }, [])
+
+  const sendPing = () => {
+    socket.emit('ping')
+  }
 
   const value = {
     dashboardStore,
     setDashboardStore,
+    isConnected,
+    lastPong,
+    sendPing,
   }
 
   return (

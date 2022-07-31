@@ -9,6 +9,7 @@ from config import config
 
 mail = Mail()
 db = SQLAlchemy()
+socketio = SocketIO()
 
 login_manager = LoginManager()
 
@@ -26,7 +27,7 @@ def create_app(config_name):
     mail.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
-    SocketIO.init_app(app)
+    socketio.init_app(app)
 
     from app.api import api as api_blueprint
     from app.api.auth import auth as auth_blueprint

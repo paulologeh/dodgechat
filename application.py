@@ -38,6 +38,6 @@ flask_cors_logger = logging.getLogger("flask_cors")
 flask_cors_logger.level = logging.ERROR
 
 
-app = create_app(os.getenv("FLASK_CONFIG"))
+app = create_app(os.getenv("ENVIRONMENT"))
 migrate = Migrate(app, db)
 app.logger.setLevel(logging.DEBUG)
