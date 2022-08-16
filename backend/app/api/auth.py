@@ -1,4 +1,5 @@
 import logging
+
 from flask import Blueprint, abort, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow.exceptions import ValidationError
@@ -14,7 +15,7 @@ from app.serde import (
     ResetPasswordSchema,
 )
 from app.serde.user import UserSchema
-from app.utils import get_front_end
+from app.utils import get_front_end, extract_all_errors
 from app.utils.email import send_email
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def delete_user():
     try:
         data = DeleteAccountSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     if not current_user.verify_password(data["password"]):
         abort(400, "Invalid credentials")
@@ -63,7 +64,7 @@ def login():
     try:
         user = LoginSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     login_user(user)
 
@@ -77,7 +78,7 @@ def register():
     try:
         user = UserSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     # check if username or email exists
     user1 = User.query.filter_by(email=user.email).first()
@@ -150,7 +151,7 @@ def change_password():
     try:
         data = ChangePasswordSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     if not current_user.verify_password(data["old_password"]):
         abort(400, "Invalid credentials")
@@ -174,7 +175,7 @@ def password_reset_request():
     try:
         data = PasswordResetRequestSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     user = User.query.filter_by(email=data["email"].lower()).first()
     if user:
@@ -205,7 +206,7 @@ def password_reset(token):
     try:
         data = ResetPasswordSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     if not User.reset_password(token, data["password"]):
         abort(400, "Invalid token")
@@ -222,7 +223,7 @@ def change_email_request():
     try:
         data = ChangeEmailSchema().load(payload)
     except ValidationError as err:
-        abort(422, err.messages)
+        abort(422, extract_all_errors(err))
 
     if not current_user.verify_password(data["password"]):
         abort(400, "Invalid email or password")

@@ -1,6 +1,7 @@
+import json
 import logging
-import time
-from flask import Blueprint, current_app
+
+from flask import Blueprint, current_app, request
 
 from app.errors import (
     bad_request,
@@ -13,7 +14,6 @@ from app.errors import (
 )
 
 logger = logging.getLogger(__name__)
-
 
 api = Blueprint("api", __name__, url_prefix="/api")
 

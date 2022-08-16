@@ -2,10 +2,10 @@ from marshmallow import Schema, ValidationError, fields, post_load, pre_load
 
 from app.models.user import User
 from app.serde.utils import (
+    camelcase,
     lower_strip_email,
     must_not_be_blank,
     password_must_match,
-    camelcase,
 )
 
 

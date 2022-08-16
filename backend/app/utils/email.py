@@ -13,8 +13,7 @@ def send_async_email(app, msg):
 
 def send_email(to, subject, template, **kwargs):
     app = current_app._get_current_object()
-    testing = app.config.get("TESTING")
-    if testing:
+    if app.config.get("PRODUCTION") is None:
         return
 
     msg = Message(

@@ -3,14 +3,15 @@ import uuid
 from datetime import datetime
 
 from flask import current_app
-from .ts_vector import TSVector
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import UUID
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login_manager
+
+from .ts_vector import TSVector
 
 
 class User(UserMixin, db.Model):

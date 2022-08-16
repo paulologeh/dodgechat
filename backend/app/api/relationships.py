@@ -2,12 +2,11 @@ import logging
 
 from flask import Blueprint, abort, jsonify
 from flask_login import current_user, login_required
-from sqlalchemy import or_, and_
+from sqlalchemy import and_, or_
 
 from app import db
-from app.models.relationship import Relationship, RelationshipType, FriendState
+from app.models.relationship import FriendState, Relationship, RelationshipType
 from app.models.user import User
-
 
 logger = logging.getLogger(__name__)
 

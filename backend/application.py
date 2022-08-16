@@ -10,9 +10,11 @@ from app.models import *
 
 load_dotenv()
 
+LOG_LEVEL = int(os.getenv("LOG_LEVEL", 10))
+
 logging.basicConfig(
     filename="flask.log",
-    level=logging.DEBUG,
+    level=LOG_LEVEL,
     format="%(asctime)s - [%(container_id)s] [%(levelname)s] %(name)s "
     "[%(module)s.%(funcName)s:%(lineno)d]: %("
     "message)s",
@@ -31,13 +33,12 @@ def record_factory(*args, **kwargs):
 
 logging.setLogRecordFactory(record_factory)
 
-werkzeug_logger = logging.getLogger("werkzeug")
-werkzeug_logger.level = logging.DEBUG
-
-flask_cors_logger = logging.getLogger("flask_cors")
-flask_cors_logger.level = logging.ERROR
-
-
 app = create_app(os.getenv("ENVIRONMENT"))
 migrate = Migrate(app, db)
-app.logger.setLevel(logging.DEBUG)
+
+for logger in (
+    app.logger,
+    logging.getLogger("werkzeug"),
+    logging.getLogger("flask_cors"),
+):
+    logger.setLevel(LOG_LEVEL)

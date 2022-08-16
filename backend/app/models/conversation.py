@@ -1,8 +1,8 @@
-from datetime import datetime
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import or_, and_
 import uuid
+from datetime import datetime
 
+from sqlalchemy import and_, or_
+from sqlalchemy.dialects.postgresql import UUID
 
 from app import db
 

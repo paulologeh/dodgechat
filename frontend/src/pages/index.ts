@@ -1,4 +1,4 @@
-export { LoginForm } from './Login'
+export { LoginForm } from './LoginForm'
 export { RegisterForm } from './Register'
 export { ForgotPasswordForm } from './PasswordResetRequest'
 export { Dashboard } from './Dashboard'

@@ -4,7 +4,7 @@ from flask import Blueprint, abort, request
 from flask_login import current_user, login_required
 
 from app.api.relationships import _get_friends
-from app.models.relationship import Relationship, RelationshipType, FriendState
+from app.models.relationship import FriendState, Relationship, RelationshipType
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
