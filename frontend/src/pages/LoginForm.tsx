@@ -17,6 +17,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useState } from 'react'
+import { Link as ReactRouterLink } from 'react-router-dom'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
 import logo from 'assets/logo.png'
@@ -87,7 +88,6 @@ export const LoginForm = () => {
         setCurrentUser(data)
       } else {
         const data = await response.json()
-        console.log('data', data)
         const errorMessage = data['messages'][0] ?? data['message']
         setError((prevState) => ({ ...prevState, request: errorMessage }))
         setLoading(false)
@@ -103,33 +103,37 @@ export const LoginForm = () => {
 
   return (
     <Flex
-      minH={'100vh'}
-      align={'center'}
-      justify={'center'}
+      minH="100vh"
+      align="center"
+      justify="center"
       bg={useColorModeValue('gray.50', 'gray.800')}
     >
-      <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-        <Stack align={'center'}>
-          <Image
-            borderRadius="full"
-            boxSize="100px"
-            src={logo}
-            alt="dodgecat-logo"
-          />
-          <Heading fontSize={'4xl'}>Sign in to your account</Heading>
+      <Stack spacing={8} mx="auto" maxW="lg" minW="md" py={12} px={6}>
+        <Stack align="center">
+          <Heading fontSize="4xl">Sign in</Heading>
         </Stack>
         <Box
-          rounded={'lg'}
+          rounded="lg"
           bg={useColorModeValue('white', 'gray.700')}
-          boxShadow={'lg'}
+          boxShadow="lg"
           p={8}
         >
-          {error.request && (
-            <Alert status="error">
-              <AlertIcon />
-              {error.request}
-            </Alert>
-          )}
+          <Stack align="center">
+            <Image
+              borderRadius="full"
+              boxSize="100px"
+              src={logo}
+              alt="dodgechat-logo"
+            />
+          </Stack>
+          <Stack py={2}>
+            {error.request && (
+              <Alert status="error">
+                <AlertIcon />
+                {error.request}
+              </Alert>
+            )}
+          </Stack>
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl
@@ -176,15 +180,21 @@ export const LoginForm = () => {
               <Stack spacing={10}>
                 <Stack
                   direction={{ base: 'column', sm: 'row' }}
-                  align={'start'}
-                  justify={'space-between'}
+                  align="start"
+                  justify="space-between"
                 >
                   <Checkbox>Remember me</Checkbox>
-                  <Link color={'blue.400'}>Forgot password?</Link>
+                  <Link
+                    as={ReactRouterLink}
+                    color="blue.400"
+                    to="/passwordresetrequest"
+                  >
+                    Forgot password?
+                  </Link>
                 </Stack>
                 <Button
-                  bg={'blue.400'}
-                  color={'white'}
+                  bg="blue.400"
+                  color="white"
                   _hover={{
                     bg: 'blue.500',
                   }}
@@ -196,8 +206,11 @@ export const LoginForm = () => {
               </Stack>
 
               <Stack pt={6}>
-                <Text align={'center'}>
-                  New to us ? <Link color={'blue.400'}>Register</Link>
+                <Text align="center">
+                  New to us ?{' '}
+                  <Link as={ReactRouterLink} color="blue.400" to="/register">
+                    Register
+                  </Link>
                 </Text>
               </Stack>
             </Stack>

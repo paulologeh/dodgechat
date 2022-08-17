@@ -13,6 +13,7 @@
   "author": "paul ologeh",
   "license": "ISC",
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.8",
     "@chakra-ui/react": "^2.2.6",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",

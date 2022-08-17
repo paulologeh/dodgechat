@@ -1,5 +1,5 @@
 export { LoginForm } from './LoginForm'
-export { RegisterForm } from './Register'
+export { RegisterForm } from './RegisterForm'
 export { ForgotPasswordForm } from './PasswordResetRequest'
 export { Dashboard } from './Dashboard'
 export { NotFound } from './NotFound'
