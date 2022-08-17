@@ -11,7 +11,7 @@ import {
   ConfirmForm,
   DeleteAccountForm,
   ChangePasswordForm,
-  ChangeEmail,
+  VerifyEmailToken,
 } from 'pages'
 
 const RouterConfig = () => {
@@ -38,10 +38,10 @@ const RouterConfig = () => {
           }
         />
         <Route
-          path="changeemail"
+          path="verifyemail"
           element={
             <RequireAuth redirectTo="/login">
-              <ChangeEmail />
+              <VerifyEmailToken />
             </RequireAuth>
           }
         />
