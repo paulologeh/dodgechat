@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { Auth } from 'services'
 import { SuccessResult, ErrorResult, PageLoading } from 'components'
 
-const title = 'Email Verification'
+const title = 'Account Confirmation'
 
-export const VerifyEmailToken = () => {
+export const ConfirmAccountToken = () => {
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
@@ -16,12 +16,12 @@ export const VerifyEmailToken = () => {
   useEffect(() => {
     const confirmToken = async () => {
       try {
-        const response = await Auth.changeEmail(token)
+        const response = await Auth.confirm(token)
 
         if (response.status === 200) {
-          setSuccess('Your email has been changed. Thanks!')
+          setSuccess('Your account has been confirmed. Thanks!')
         } else {
-          setError('The link is invalid or has expired')
+          setError('The confirmation link is invalid or has expired')
         }
       } catch (error) {
         setError('Server error, please try again later')
@@ -29,6 +29,7 @@ export const VerifyEmailToken = () => {
     }
 
     setLoading(true)
+
     if (token) {
       confirmToken().catch(console.error)
     } else {

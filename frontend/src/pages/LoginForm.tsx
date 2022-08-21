@@ -12,7 +12,6 @@ import {
   Link,
   Button,
   Heading,
-  Image,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -20,7 +19,6 @@ import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
-import logo from 'assets/logo.png'
 import { validateEmail } from '../utils'
 
 type StateType = {
@@ -109,8 +107,11 @@ export const LoginForm = () => {
       bg={useColorModeValue('gray.50', 'gray.800')}
     >
       <Stack spacing={8} mx="auto" maxW="lg" minW="md" py={12} px={6}>
-        <Stack align="center">
-          <Heading fontSize="4xl">Sign in</Heading>
+        <Stack align={'center'}>
+          <Heading fontSize={'4xl'}>Sign in to your account</Heading>
+          <Text fontSize={'lg'} color={'gray.600'}>
+            to start chatting and dodging ✌️
+          </Text>
         </Stack>
         <Box
           rounded="lg"
@@ -118,14 +119,6 @@ export const LoginForm = () => {
           boxShadow="lg"
           p={8}
         >
-          <Stack align="center">
-            <Image
-              borderRadius="full"
-              boxSize="100px"
-              src={logo}
-              alt="dodgechat-logo"
-            />
-          </Stack>
           <Stack py={2}>
             {error.request && (
               <Alert status="error">
@@ -135,7 +128,7 @@ export const LoginForm = () => {
             )}
           </Stack>
           <form onSubmit={handleSubmit}>
-            <Stack spacing={4}>
+            <Stack spacing={6}>
               <FormControl
                 id="email-username"
                 isRequired
@@ -187,7 +180,7 @@ export const LoginForm = () => {
                   <Link
                     as={ReactRouterLink}
                     color="blue.400"
-                    to="/passwordresetrequest"
+                    to="/forgotpassword"
                   >
                     Forgot password?
                   </Link>

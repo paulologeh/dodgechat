@@ -12,7 +12,6 @@ import {
   Text,
   useColorModeValue,
   Link,
-  Image,
   Alert,
   AlertIcon,
   FormErrorMessage,
@@ -21,7 +20,6 @@ import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
 import { Auth } from 'services'
-import logo from 'assets/logo.png'
 
 type StateType = {
   email: string
@@ -111,25 +109,21 @@ export const RegisterForm = () => {
       bg={useColorModeValue('gray.50', 'gray.800')}
     >
       <Stack spacing={8} mx="auto" maxW="lg" minW="md" py={12} px={6}>
-        <Stack align="center">
-          <Heading fontSize="4xl" textAlign="center">
+        <Stack align={'center'}>
+          <Heading fontSize={'4xl'} textAlign={'center'}>
             Sign up
           </Heading>
+          <Text fontSize={'lg'} color={'gray.600'}>
+            to enjoy all of our cool features ✌️
+          </Text>
         </Stack>
+
         <Box
           rounded="lg"
           bg={useColorModeValue('white', 'gray.700')}
           boxShadow="lg"
           p={8}
         >
-          <Stack align="center">
-            <Image
-              borderRadius="full"
-              boxSize="100px"
-              src={logo}
-              alt="dodgechat-logo"
-            />
-          </Stack>
           <Stack py={2}>
             {success && (
               <Alert status="success">

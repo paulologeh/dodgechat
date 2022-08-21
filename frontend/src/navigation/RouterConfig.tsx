@@ -8,9 +8,7 @@ import {
   ResetPasswordForm,
   Dashboard,
   NotFound,
-  ConfirmForm,
-  DeleteAccountForm,
-  ChangePasswordForm,
+  ConfirmAccountToken,
   VerifyEmailToken,
 } from 'pages'
 
@@ -30,14 +28,6 @@ const RouterConfig = () => {
           }
         />
         <Route
-          path="delete"
-          element={
-            <RequireAuth redirectTo="/login">
-              <DeleteAccountForm />
-            </RequireAuth>
-          }
-        />
-        <Route
           path="verifyemail"
           element={
             <RequireAuth redirectTo="/login">
@@ -49,15 +39,7 @@ const RouterConfig = () => {
           path="confirm"
           element={
             <RequireAuth redirectTo="/login">
-              <ConfirmForm />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="change-password"
-          element={
-            <RequireAuth redirectTo="/login">
-              <ChangePasswordForm />
+              <ConfirmAccountToken />
             </RequireAuth>
           }
         />
@@ -78,7 +60,7 @@ const RouterConfig = () => {
           }
         />
         <Route
-          path="passwordresetrequest"
+          path="forgotpassword"
           element={
             <RequireNoAuth redirectTo="/">
               <ForgotPasswordForm />

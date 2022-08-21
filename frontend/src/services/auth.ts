@@ -54,7 +54,7 @@ export class Auth {
     })
   }
 
-  static passwordResetRequest(email: string) {
+  static forgotpassword(email: string) {
     return fetcher(`${AUTH_ROUTE}/reset`, 'POST', {
       email,
     })
