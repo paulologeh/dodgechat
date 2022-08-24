@@ -10,6 +10,7 @@ import {
   NotFound,
   ConfirmAccountToken,
   VerifyEmailToken,
+  Home,
 } from 'pages'
 
 const RouterConfig = () => {
@@ -23,6 +24,16 @@ const RouterConfig = () => {
             <RequireAuth redirectTo="/login">
               <DashboardStoreProvider>
                 <Dashboard />
+              </DashboardStoreProvider>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="home"
+          element={
+            <RequireAuth redirectTo="/login">
+              <DashboardStoreProvider>
+                <Home />
               </DashboardStoreProvider>
             </RequireAuth>
           }

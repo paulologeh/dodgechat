@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, createContext, FC } from 'react'
 import { Auth } from 'services'
-import { Loader, Dimmer } from 'semantic-ui-react'
+import { PageLoading } from 'components'
 
 type currentUserType = {
   aboutMe?: string
@@ -14,12 +14,14 @@ type currentUserType = {
   username?: string
 }
 
+const initialUser: currentUserType = {}
+
 const UserContext = createContext({
   loggedIn: false,
   setLoggedIn: (loggedIn: boolean) => {
     loggedIn
   },
-  currentUser: {},
+  currentUser: initialUser,
   setCurrentUser: (data: currentUserType) => {
     data
   },
@@ -49,7 +51,7 @@ export const UserProvider: FC = ({ children }) => {
   }
 
   useEffect(() => {
-    getUserSession()
+    getUserSession().catch(console.error)
   }, [])
 
   const value = { currentUser, setCurrentUser, loggedIn, setLoggedIn }
@@ -57,11 +59,7 @@ export const UserProvider: FC = ({ children }) => {
   return (
     <UserContext.Provider value={value}>
       {!loading && children}
-      {loading && (
-        <Dimmer active>
-          <Loader />
-        </Dimmer>
-      )}
+      {loading && <PageLoading />}
     </UserContext.Provider>
   )
 }
