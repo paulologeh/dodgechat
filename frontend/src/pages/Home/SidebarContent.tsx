@@ -11,6 +11,7 @@ import { FiHome, FiSettings, FiSearch, FiMessageCircle } from 'react-icons/fi'
 import { FaUserFriends } from 'react-icons/fa'
 import { NavItem } from './NavItem'
 import { IconType } from 'react-icons'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 interface LinkItemProps {
   name: string
@@ -30,6 +31,8 @@ interface SidebarProps extends BoxProps {
 }
 
 export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { setDashboardStore } = useDashboardStore()
+
   return (
     <Box
       transition="3s ease"
