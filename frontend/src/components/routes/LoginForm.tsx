@@ -1,17 +1,17 @@
 import {
   Alert,
   AlertIcon,
-  Flex,
   Box,
-  FormErrorMessage,
-  FormControl,
-  FormLabel,
-  Input,
-  Checkbox,
-  Stack,
-  Link,
   Button,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Heading,
+  Input,
+  Link,
+  Stack,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -21,12 +21,12 @@ import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
 import { validateEmail } from '../../utils'
 
-type StateType = {
+type LoginFormState = {
   emailOrUsername: string
   password: string
 }
 
-type ErrorType = {
+type LoginFormError = {
   emailOrUsername: string
   password: string
   request: string
@@ -39,13 +39,13 @@ const emptyError = {
 }
 
 export const LoginForm = () => {
-  const [state, setState] = useState<StateType>({
+  const [state, setState] = useState<LoginFormState>({
     emailOrUsername: '',
     password: '',
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState<ErrorType>(emptyError)
+  const [error, setError] = useState<LoginFormError>(emptyError)
   const { setLoggedIn, setCurrentUser } = useAuth()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {

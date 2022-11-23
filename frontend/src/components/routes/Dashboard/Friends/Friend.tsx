@@ -1,10 +1,10 @@
 type UserViewType = 'VIEW_ONLY' | 'INTERACT'
 
-type FriendPropType = {
+type FriendProps = {
   view: UserViewType
 }
 
-export const Friend = ({ view }: FriendPropType) => {
+export const Friend = ({ view }: FriendProps) => {
   return (
     <>
       {view === 'VIEW_ONLY' && <div>VIEW ONLY</div>}

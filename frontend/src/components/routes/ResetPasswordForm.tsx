@@ -10,17 +10,17 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Auth } from 'services'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-type StateType = {
+type ResetPasswordFormState = {
   password: string
   confirmPassword: string
 }
 
 export const ResetPasswordForm = () => {
-  const [state, setState] = useState<StateType>({
+  const [state, setState] = useState<ResetPasswordFormState>({
     password: '',
     confirmPassword: '',
   })

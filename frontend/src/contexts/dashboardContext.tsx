@@ -2,7 +2,7 @@ import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { FriendMinimal, SearchResults, UserProfile } from 'types/api'
 import { Relationships } from 'services'
 
-type dashboardStoreType = {
+type DashboardStore = {
   activeItem: string
   unreadCount: number
   friendRequestsCount: number
@@ -20,7 +20,7 @@ type dashboardStoreType = {
   selectedUserProfile: UserProfile | null
 }
 
-const initialStore: dashboardStoreType = {
+const initialStore: DashboardStore = {
   activeItem: 'friends',
   unreadCount: 0,
   friendRequestsCount: 0,
@@ -40,9 +40,7 @@ const initialStore: dashboardStoreType = {
 
 const DashboardContext = createContext({
   dashboardStore: initialStore,
-  setDashboardStore: (
-    data: (prevState: dashboardStoreType) => dashboardStoreType
-  ) => {
+  setDashboardStore: (data: (prevState: DashboardStore) => DashboardStore) => {
     data
   },
 })
@@ -53,7 +51,7 @@ export function useDashboardStore() {
 
 export const DashboardStoreProvider: FC = ({ children }) => {
   const [dashboardStore, setDashboardStore] =
-    useState<dashboardStoreType>(initialStore)
+    useState<DashboardStore>(initialStore)
 
   const fetchAllData = async () => {
     setDashboardStore((prevState) => ({ ...prevState, loading: true }))

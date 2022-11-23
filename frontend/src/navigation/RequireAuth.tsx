@@ -1,12 +1,12 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from 'contexts/userContext'
 
-type Props = {
+type AuthProps = {
   children: React.ReactNode
   redirectTo: string
 }
 
-export const RequireAuth: React.FC<Props> = ({ children, redirectTo }) => {
+export const RequireAuth: React.FC<AuthProps> = ({ children, redirectTo }) => {
   const { loggedIn } = useAuth()
   const location = useLocation()
   return loggedIn ? (
@@ -16,7 +16,10 @@ export const RequireAuth: React.FC<Props> = ({ children, redirectTo }) => {
   )
 }
 
-export const RequireNoAuth: React.FC<Props> = ({ children, redirectTo }) => {
+export const RequireNoAuth: React.FC<AuthProps> = ({
+  children,
+  redirectTo,
+}) => {
   const { loggedIn } = useAuth()
   const location = useLocation()
   return !loggedIn ? (

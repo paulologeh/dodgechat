@@ -1,27 +1,27 @@
 import {
-  Flex,
+  Alert,
+  AlertIcon,
   Box,
+  Button,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  Heading,
   Input,
   InputGroup,
   InputRightElement,
+  Link,
   Stack,
-  Button,
-  Heading,
   Text,
   useColorModeValue,
-  Link,
-  Alert,
-  AlertIcon,
-  FormErrorMessage,
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
 import { Auth } from 'services'
 
-type StateType = {
+type RegisterFormState = {
   email: string
   password: string
   name: string
@@ -29,7 +29,7 @@ type StateType = {
   confirmPassword: string
 }
 
-type ErrorType = {
+type RegisterFormError = {
   password: string
   request: string
 }
@@ -43,7 +43,7 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [state, setState] = useState<StateType>({
+  const [state, setState] = useState<RegisterFormState>({
     email: '',
     password: '',
     confirmPassword: '',
@@ -51,7 +51,7 @@ export const RegisterForm = () => {
     username: '',
   })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<ErrorType>(emptyError)
+  const [error, setError] = useState<RegisterFormError>(emptyError)
   const [success, setSuccess] = useState('')
   const navigate = useNavigate()
 

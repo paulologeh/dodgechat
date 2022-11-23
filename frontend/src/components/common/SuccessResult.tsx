@@ -1,12 +1,12 @@
 import { Box, Heading, Text, useColorModeValue } from '@chakra-ui/react'
 import { CheckCircleIcon } from '@chakra-ui/icons'
 
-type SuccessPropType = {
+type SuccessResultProps = {
   title: string
   message: string
 }
 
-export const SuccessResult = ({ title, message }: SuccessPropType) => {
+export const SuccessResult = ({ title, message }: SuccessResultProps) => {
   return (
     <Box
       textAlign="center"

@@ -2,7 +2,7 @@ import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Auth } from 'services'
 import { PageLoading } from 'components/common'
 
-type currentUserType = {
+type CurrentUser = {
   aboutMe?: string
   avatarHash?: string
   email?: string
@@ -14,7 +14,7 @@ type currentUserType = {
   username?: string
 }
 
-const initialUser: currentUserType = {}
+const initialUser: CurrentUser = {}
 
 const UserContext = createContext({
   loggedIn: false,
@@ -22,7 +22,7 @@ const UserContext = createContext({
     loggedIn
   },
   currentUser: initialUser,
-  setCurrentUser: (data: currentUserType) => {
+  setCurrentUser: (data: CurrentUser) => {
     data
   },
 })
@@ -32,7 +32,7 @@ export function useAuth() {
 }
 
 export const UserProvider: FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<currentUserType>({})
+  const [currentUser, setCurrentUser] = useState<CurrentUser>({})
   const [loggedIn, setLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
 

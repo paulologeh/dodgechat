@@ -10,12 +10,12 @@ import {
 } from '@chakra-ui/react'
 import { useDashboardStore } from 'contexts/dashboardContext'
 
-type ErrorModalPropTypes = {
+type ErrorModalProps = {
   open: boolean
   message: string
 }
 
-export const ErrorModal = ({ open, message }: ErrorModalPropTypes) => {
+export const ErrorModal = ({ open, message }: ErrorModalProps) => {
   const { setDashboardStore } = useDashboardStore()
 
   const handleClose = () =>

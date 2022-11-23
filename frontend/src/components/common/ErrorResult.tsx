@@ -1,12 +1,12 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 import { CloseIcon } from '@chakra-ui/icons'
 
-type ErrorPropType = {
+type ErrorResultProps = {
   title: string
   message: string
 }
 
-export const ErrorResult = ({ title, message }: ErrorPropType) => {
+export const ErrorResult = ({ title, message }: ErrorResultProps) => {
   return (
     <Box textAlign="center" py={10} px={6}>
       <Box display="inline-block">
