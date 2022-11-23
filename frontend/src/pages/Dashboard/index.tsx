@@ -1,14 +1,14 @@
-import { Container, Loader, Dimmer } from 'semantic-ui-react'
+import { Container, Dimmer, Loader } from 'semantic-ui-react'
 import { useEffect } from 'react'
 import { UserMenu } from './UserMenu'
 import { HomeFeed } from './HomeFeed'
 import { Friends } from './Friends'
 import { Messages } from './Messages'
-import { UserProfileModal, ErrorModal } from './SharedComponents'
+import { ErrorModal, UserProfileModal } from './SharedComponents'
 import { Auth, Relationships } from 'services'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useAuth } from 'contexts/userContext'
-import { friendMinimalType } from 'types/apiTypes'
+import { FriendMinimal } from '../../types/api'
 
 export const Dashboard = () => {
   const { dashboardStore, setDashboardStore } = useDashboardStore()
@@ -67,8 +67,8 @@ export const Dashboard = () => {
           friendRequests,
           friends,
         }: {
-          friendRequests: friendMinimalType[]
-          friends: friendMinimalType[]
+          friendRequests: FriendMinimal[]
+          friends: FriendMinimal[]
         } = data
 
         setDashboardStore((prevState) => ({

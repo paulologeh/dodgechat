@@ -1,13 +1,13 @@
-import { Button, Image, Modal, Header, Icon } from 'semantic-ui-react'
+import { Button, Header, Icon, Image, Modal } from 'semantic-ui-react'
 import { useState } from 'react'
-import { userProfileType } from 'types/apiTypes'
+import { UserProfile } from 'types/api'
 import { Relationships } from 'services'
 import { months } from 'utils/index'
 import { useDashboardStore } from 'contexts/dashboardContext'
 
 type propTypes = {
   open: boolean
-  selectedUserProfile: userProfileType | null
+  selectedUserProfile: UserProfile | null
 }
 
 type buttonGroupType = {
@@ -43,9 +43,14 @@ export const UserProfileModal = ({ open, selectedUserProfile }: propTypes) => {
       if (button === 'block')
         response = await Relationships.blockUser(selectedUserProfile.username)
 
-      if (!response) throw new Error('undefined response ')
-
-      if (response.status === 200) {
+      if (!response) {
+        console.error('undefined response')
+        setDashboardStore((prevState) => ({
+          ...prevState,
+          modalError: 'Something went wrong. Please try again',
+          openErrorModal: true,
+        }))
+      } else if (response.status === 200) {
         const refetchResponse = await Relationships.getFriends()
         if (refetchResponse.status === 200) {
           const data = await refetchResponse.json()

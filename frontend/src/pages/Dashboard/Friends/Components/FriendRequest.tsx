@@ -1,11 +1,11 @@
-import { Card, Image, Button } from 'semantic-ui-react'
-import { friendMinimalType } from 'types/apiTypes'
+import { Button, Card, Image } from 'semantic-ui-react'
+import { FriendMinimal } from 'types/api'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { Relationships } from 'services'
 import { useState } from 'react'
 
 type propTypes = {
-  data: friendMinimalType
+  data: FriendMinimal
 }
 
 export const FriendRequest = ({ data }: propTypes) => {
@@ -31,7 +31,16 @@ export const FriendRequest = ({ data }: propTypes) => {
       if (button === 'decline') {
         response = await Relationships.deleteUser(username)
       }
-      if (!response) throw new Error('unrecognised button')
+      if (!response) {
+        console.error('unrecognised button')
+        cleanUp()
+        setDashboardStore((prevState) => ({
+          ...prevState,
+          modalError: 'Something went wrong. Please try again',
+          openErrorModal: true,
+        }))
+        return
+      }
 
       if (response.status === 200) {
         const refetchResponse = await Relationships.getFriends()

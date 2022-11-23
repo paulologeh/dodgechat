@@ -19,7 +19,7 @@ import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Auth } from 'services'
 import { useAuth } from 'contexts/userContext'
-import { validateEmail } from '../utils'
+import { validateEmail } from '../../utils'
 
 type StateType = {
   emailOrUsername: string

@@ -1,6 +1,6 @@
 import { fetcher } from 'utils'
 
-type registerType = {
+type NewUser = {
   email: string
   username: string
   password: string
@@ -27,7 +27,7 @@ export class Auth {
     return fetcher(`${AUTH_ROUTE}/delete`, 'DELETE', { password })
   }
 
-  static register(user: registerType) {
+  static register(user: NewUser) {
     return fetcher(`${AUTH_ROUTE}/register`, 'POST', user)
   }
   static logout() {

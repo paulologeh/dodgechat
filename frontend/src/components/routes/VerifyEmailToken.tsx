@@ -1,7 +1,7 @@
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Auth } from 'services'
-import { SuccessResult, ErrorResult, PageLoading } from 'components'
+import { ErrorResult, PageLoading, SuccessResult } from 'components/common'
 
 const title = 'Email Verification'
 

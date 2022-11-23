@@ -1,0 +1,8 @@
+export { LoginForm } from 'components/routes/LoginForm'
+export { RegisterForm } from 'components/routes/RegisterForm'
+export { ForgotPasswordForm } from 'components/routes/ForgotPasswordForm'
+export { NotFound } from 'components/routes/NotFound'
+export { ResetPasswordForm } from 'components/routes/ResetPasswordForm'
+export { ConfirmAccountToken } from 'components/routes/ConfirmAccountToken'
+export { VerifyEmailToken } from 'components/routes/VerifyEmailToken'
+export { Dashboard } from 'components/routes/Dashboard'

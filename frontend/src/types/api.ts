@@ -1,11 +1,11 @@
-type relationshipStateType =
+type RelationshipState =
   | 'ACCEPTED'
   | 'REQUESTED'
   | 'REQUESTEE'
   | 'BLOCKED'
   | null
 
-export type userProfileType = {
+export type UserProfile = {
   name: string
   username: string
   location: string
@@ -14,25 +14,25 @@ export type userProfileType = {
   lastSeen: Date
   memberSince: Date
   numberOfFriends: number
-  relationshipState: relationshipStateType
+  relationshipState: RelationshipState
 }
 
-export type searchResultShape = {
+export type UserResult = {
   title: string
   image: string
   description: string
 }
 
-type userResult = {
+type UserResults = {
   name: string
-  results: Array<searchResultShape>
+  results: UserResult[]
 }
 
-export type searchResultsType = {
-  users: userResult
+export type SearchResults = {
+  users: UserResults
 }
 
-export type friendMinimalType = {
+export type FriendMinimal = {
   username: string
   name: string
   location: string

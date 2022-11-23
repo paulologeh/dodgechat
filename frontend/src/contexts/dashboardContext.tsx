@@ -1,9 +1,5 @@
-import { useState, createContext, useContext, FC, useEffect } from 'react'
-import {
-  userProfileType,
-  searchResultsType,
-  friendMinimalType,
-} from 'types/apiTypes'
+import { createContext, FC, useContext, useEffect, useState } from 'react'
+import { FriendMinimal, SearchResults, UserProfile } from 'types/api'
 import { Relationships } from 'services'
 
 type dashboardStoreType = {
@@ -12,16 +8,16 @@ type dashboardStoreType = {
   friendRequestsCount: number
   loading: boolean
   loadingMessage: string
-  friendRequests: friendMinimalType[]
-  friends: friendMinimalType[]
+  friendRequests: FriendMinimal[]
+  friends: FriendMinimal[]
   isSearching: boolean
   searchValue: string
   searchError: string
-  searchResults: searchResultsType[]
+  searchResults: SearchResults[]
   openErrorModal: boolean
   modalError: string
   openUserProfileModal: boolean
-  selectedUserProfile: userProfileType | null
+  selectedUserProfile: UserProfile | null
 }
 
 const initialStore: dashboardStoreType = {
@@ -69,8 +65,8 @@ export const DashboardStoreProvider: FC = ({ children }) => {
           friendRequests,
           friends,
         }: {
-          friendRequests: friendMinimalType[]
-          friends: friendMinimalType[]
+          friendRequests: FriendMinimal[]
+          friends: FriendMinimal[]
         } = data
         setDashboardStore((prevState) => ({
           ...prevState,

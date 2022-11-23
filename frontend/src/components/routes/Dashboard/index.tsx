@@ -1,3 +1,3 @@
 import { SidebarWithHeader } from './SidebarWithHeader'
 
-export { SidebarWithHeader as Home }
+export { SidebarWithHeader as Dashboard }

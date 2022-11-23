@@ -1,7 +1,7 @@
 import { Image, Item } from 'semantic-ui-react'
-import { friendMinimalType } from 'types/apiTypes'
+import { FriendMinimal } from 'types/api'
 
-export const Friend = ({ data }: { data: friendMinimalType }) => {
+export const Friend = ({ data }: { data: FriendMinimal }) => {
   const { name, memberSince, aboutMe, gravatar } = data
 
   return (

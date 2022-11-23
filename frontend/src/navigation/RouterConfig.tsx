@@ -1,17 +1,17 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { RequireAuth, RequireNoAuth } from 'navigation/RequireAuth'
 import { DashboardStoreProvider } from 'contexts/dashboardContext'
 import {
-  LoginForm,
-  RegisterForm,
-  ForgotPasswordForm,
-  ResetPasswordForm,
-  Dashboard,
-  NotFound,
   ConfirmAccountToken,
+  Dashboard,
+  ForgotPasswordForm,
+  LoginForm,
+  NotFound,
+  RegisterForm,
+  ResetPasswordForm,
   VerifyEmailToken,
-  Home,
-} from 'pages'
+} from 'components/routes'
+import { DashboardOld } from 'pages'
 
 const RouterConfig = () => {
   return (
@@ -23,7 +23,7 @@ const RouterConfig = () => {
           element={
             <RequireAuth redirectTo="/login">
               <DashboardStoreProvider>
-                <Dashboard />
+                <DashboardOld />
               </DashboardStoreProvider>
             </RequireAuth>
           }
@@ -33,7 +33,7 @@ const RouterConfig = () => {
           element={
             <RequireAuth redirectTo="/login">
               <DashboardStoreProvider>
-                <Home />
+                <Dashboard />
               </DashboardStoreProvider>
             </RequireAuth>
           }

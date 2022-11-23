@@ -1,8 +1,8 @@
 import {
   Box,
-  useColorModeValue,
   Drawer,
   DrawerContent,
+  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
 import { SidebarContent } from './SidebarContent'
@@ -10,7 +10,7 @@ import { MobileNav } from './MobileNav'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useAuth } from 'contexts/userContext'
 import { Auth } from 'services'
-import { Friends } from 'pages/Home/Friends/Friends'
+import { Friends } from './Friends/Friends'
 import { ErrorModal } from './ErrorModal'
 import { LoadingModal } from './LoadingModal'
 

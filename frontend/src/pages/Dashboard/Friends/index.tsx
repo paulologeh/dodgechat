@@ -1,11 +1,11 @@
-import { Card, Container, Item, Tab, Header } from 'semantic-ui-react'
+import { Card, Container, Header, Item, Tab } from 'semantic-ui-react'
 import { FriendRequest } from './Components/FriendRequest'
 import { Friend } from './Components/Friend'
-import { friendMinimalType } from 'types/apiTypes'
+import { FriendMinimal } from 'types/api'
 
 type propTypes = {
-  friendRequests: friendMinimalType[]
-  friends: friendMinimalType[]
+  friendRequests: FriendMinimal[]
+  friends: FriendMinimal[]
 }
 
 export const Friends = ({ friendRequests, friends }: propTypes) => {

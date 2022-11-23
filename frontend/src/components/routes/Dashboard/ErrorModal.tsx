@@ -1,14 +1,14 @@
 import {
+  Button,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from '@chakra-ui/react'
-import { useDashboardStore } from '../../contexts/dashboardContext'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 type ErrorModalPropTypes = {
   open: boolean

@@ -1,8 +1,8 @@
 import {
-  Image,
+  Container,
   Dropdown,
   Icon,
-  Container,
+  Image,
   Label,
   Menu,
   Search,
@@ -10,7 +10,6 @@ import {
 import logo from 'assets/logo.png'
 import { debounce } from 'lodash'
 import { Search as SearchService } from 'services/search'
-import { friendMinimalType } from 'types/apiTypes'
 import { SyntheticEvent, useCallback, useEffect } from 'react'
 import { useDashboardStore } from 'contexts/dashboardContext'
 
@@ -69,7 +68,7 @@ export const UserMenu = ({ logout }: propTypes) => {
       const data = await response.json()
       if (response.status === 200) {
         const userResults = data.users.results
-        data.users.results = userResults.map((item: friendMinimalType) => ({
+        data.users.results = userResults.map((item: FriendMinimal) => ({
           title: item.username,
           description: item.name,
           image: item.gravatar,

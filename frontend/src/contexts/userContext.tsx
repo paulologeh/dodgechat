@@ -1,6 +1,6 @@
-import { useContext, useState, useEffect, createContext, FC } from 'react'
+import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Auth } from 'services'
-import { PageLoading } from 'components'
+import { PageLoading } from 'components/common'
 
 type currentUserType = {
   aboutMe?: string
