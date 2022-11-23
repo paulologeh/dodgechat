@@ -10,7 +10,7 @@ import { MobileNav } from './MobileNav'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useAuth } from 'contexts/userContext'
 import { Auth } from 'services'
-import { Friends } from './Friends/Friends'
+import { Friends } from './Friends'
 import { ErrorModal } from './ErrorModal'
 import { LoadingModal } from './LoadingModal'
 
@@ -58,8 +58,23 @@ export const SidebarWithHeader = () => {
     }
   }
 
-  const { openErrorModal, modalError, loading, loadingMessage, activeItem } =
-    dashboardStore
+  const {
+    openErrorModal,
+    modalError,
+    loading,
+    loadingMessage,
+    activeItem,
+    friends = [],
+  } = dashboardStore
+
+  const renderActiveMenu = () => {
+    switch (activeItem) {
+      case 'friends':
+        return <Friends friends={friends} />
+      default:
+        return null
+    }
+  }
 
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
@@ -83,7 +98,7 @@ export const SidebarWithHeader = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />
-        {activeItem === 'friends' && <Friends />}
+        {!loading && renderActiveMenu()}
       </Box>
     </Box>
   )
