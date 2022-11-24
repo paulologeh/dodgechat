@@ -65,6 +65,7 @@ export const SidebarWithHeader = () => {
     loadingMessage,
     activeItem,
     friends = [],
+    friendRequests = [],
   } = dashboardStore
 
   const renderActiveMenu = () => {
@@ -94,7 +95,11 @@ export const SidebarWithHeader = () => {
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} logout={logout} />
+      <MobileNav
+        onOpen={onOpen}
+        logout={logout}
+        friendRequests={friendRequests}
+      />
       <Box ml={{ base: 0, md: 60 }} p="4">
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />

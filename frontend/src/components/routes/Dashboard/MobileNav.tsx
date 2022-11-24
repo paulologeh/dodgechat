@@ -10,18 +10,33 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Text,
   useColorModeValue,
   VStack,
 } from '@chakra-ui/react'
 import { FiBell, FiChevronDown, FiMenu } from 'react-icons/fi'
 import { useAuth } from 'contexts/userContext'
+import { FriendMinimal } from 'types/api'
+import { FriendRequest } from './FriendRequest'
 
 interface MobileProps extends FlexProps {
   onOpen: () => void
   logout: () => void
+  friendRequests: FriendMinimal[]
 }
-export const MobileNav = ({ onOpen, logout, ...rest }: MobileProps) => {
+export const MobileNav = ({
+  onOpen,
+  logout,
+  friendRequests,
+  ...rest
+}: MobileProps) => {
   const { currentUser } = useAuth()
 
   const { avatarHash, name, username } = currentUser
@@ -57,12 +72,34 @@ export const MobileNav = ({ onOpen, logout, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<FiBell />}
-        />
+        <Popover>
+          <PopoverTrigger>
+            <IconButton
+              size="lg"
+              variant="ghost"
+              aria-label="open menu"
+              icon={<FiBell />}
+            />
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverHeader pt={4} fontWeight="bold">
+              Friend Requests
+            </PopoverHeader>
+            <PopoverArrow />
+            <PopoverCloseButton />
+            <PopoverBody>
+              <div>
+                {friendRequests.map(({ username, gravatar }) => (
+                  <FriendRequest
+                    username={username}
+                    gravatar={gravatar}
+                    key={username}
+                  />
+                ))}
+              </div>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton
