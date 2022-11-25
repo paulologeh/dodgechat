@@ -122,7 +122,7 @@ export const Friend = ({ friendData }: FriendProp) => {
           bg={useColorModeValue('gray.50', 'gray.800')}
           fontWeight={'400'}
         >
-          {location}
+          {location ?? 'Unknown'}
         </Badge>
       </Stack>
 

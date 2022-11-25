@@ -24,6 +24,7 @@ import { FiBell, FiChevronDown, FiMenu } from 'react-icons/fi'
 import { useAuth } from 'contexts/userContext'
 import { FriendMinimal } from 'types/api'
 import { FriendRequest } from './FriendRequest'
+import { UserSearch } from './Search/SearchModal'
 
 interface MobileProps extends FlexProps {
   onOpen: () => void
@@ -40,6 +41,40 @@ export const MobileNav = ({
 
   const { avatarHash, name, username } = currentUser
   const displayName = name ?? username ?? 'Unknown user'
+
+  const renderFriendRequests = () => (
+    <Popover>
+      <PopoverTrigger>
+        <IconButton
+          size="lg"
+          variant="ghost"
+          aria-label="open menu"
+          icon={<FiBell />}
+        />
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverHeader pt={4} fontWeight="bold">
+          Notifications
+        </PopoverHeader>
+        <PopoverArrow />
+        <PopoverBody>
+          <div>
+            {friendRequests && friendRequests.length > 0 ? (
+              friendRequests.map(({ username, gravatar }) => (
+                <FriendRequest
+                  username={username}
+                  gravatar={gravatar}
+                  key={username}
+                />
+              ))
+            ) : (
+              <Text>Nothing to see here!</Text>
+            )}
+          </div>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  )
 
   return (
     <Flex
@@ -71,37 +106,8 @@ export const MobileNav = ({
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <Popover>
-          <PopoverTrigger>
-            <IconButton
-              size="lg"
-              variant="ghost"
-              aria-label="open menu"
-              icon={<FiBell />}
-            />
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverHeader pt={4} fontWeight="bold">
-              Friend Requests
-            </PopoverHeader>
-            <PopoverArrow />
-            <PopoverBody>
-              <div>
-                {friendRequests && friendRequests.length > 0 ? (
-                  friendRequests.map(({ username, gravatar }) => (
-                    <FriendRequest
-                      username={username}
-                      gravatar={gravatar}
-                      key={username}
-                    />
-                  ))
-                ) : (
-                  <Text>Nothing to see here!</Text>
-                )}
-              </div>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
+        <UserSearch />
+        {renderFriendRequests()}
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

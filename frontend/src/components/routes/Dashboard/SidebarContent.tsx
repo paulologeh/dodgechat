@@ -7,7 +7,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import React from 'react'
-import { FiHome, FiSettings, FiSearch, FiMessageCircle } from 'react-icons/fi'
+import { FiHome, FiMessageCircle, FiSettings } from 'react-icons/fi'
 import { FaUserFriends } from 'react-icons/fa'
 import { NavItem } from './NavItem'
 import { IconType } from 'react-icons'
@@ -21,7 +21,6 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome },
   { name: 'Messages', icon: FiMessageCircle },
-  { name: 'Search', icon: FiSearch },
   { name: 'Friends', icon: FaUserFriends },
   { name: 'Settings', icon: FiSettings },
 ]

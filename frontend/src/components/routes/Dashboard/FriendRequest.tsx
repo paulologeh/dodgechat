@@ -70,7 +70,7 @@ export const FriendRequest = ({ username, gravatar }: FriendRequestProps) => {
   return (
     <Box w={'full'} p={2} textAlign={'center'}>
       <Avatar src={gravatar} pos={'relative'} mb={2} />
-      <Text mb={2}>{username}</Text>
+      <Text mb={2}>{username} added you as a friend</Text>
       <ButtonGroup gap="2" size={'sm'}>
         <Button
           colorScheme="green"
