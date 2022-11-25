@@ -3,12 +3,14 @@ import {
   Box,
   Center,
   chakra,
+  ChakraProps,
   Flex,
   IconButton,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
+  OmitCommonProps,
   useDisclosure,
   useEventListener,
   useUpdateEffect,
@@ -25,29 +27,35 @@ interface OptionTextProps {
   textToHighlight: string
 }
 
-function OptionText({ searchWords, textToHighlight }: OptionTextProps) {
+const OptionText = ({ searchWords, textToHighlight }: OptionTextProps) => {
   const chunks = findAll({
     searchWords,
     textToHighlight,
     autoEscape: true,
   })
 
-  return chunks.map((chunk) => {
-    const { end, highlight, start } = chunk
-    const text = textToHighlight.substr(start, end - start)
-    if (highlight) {
-      return (
-        <Box as="mark" bg="transparent" color="teal.500">
-          {text}
-        </Box>
-      )
-    } else {
-      return text
+  return chunks.map(
+    (chunk: { end: number; highlight: number; start: number }) => {
+      const { end, highlight, start } = chunk
+      const text = textToHighlight.substring(start, end - start)
+      if (highlight) {
+        return (
+          <Box as="mark" bg="transparent" color="teal.500">
+            {text}
+          </Box>
+        )
+      } else {
+        return text
+      }
     }
-  })
+  )
 }
 
-function DocIcon(props) {
+const DocIcon = (
+  props: JSX.IntrinsicAttributes &
+    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
+    ChakraProps & { as?: 'svg' | undefined }
+) => {
   return (
     <chakra.svg
       strokeWidth="2px"
@@ -67,7 +75,11 @@ function DocIcon(props) {
   )
 }
 
-function EnterIcon(props) {
+const EnterIcon = (
+  props: JSX.IntrinsicAttributes &
+    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
+    ChakraProps & { as?: 'svg' | undefined }
+) => {
   return (
     <chakra.svg
       strokeWidth="2px"
@@ -90,7 +102,11 @@ function EnterIcon(props) {
   )
 }
 
-function HashIcon(props) {
+const HashIcon = (
+  props: JSX.IntrinsicAttributes &
+    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
+    ChakraProps & { as?: 'svg' | undefined }
+) => {
   return (
     <chakra.svg
       strokeWidth="2px"
@@ -119,10 +135,10 @@ export const UserSearch = () => {
   const modal = useDisclosure()
   const [menuNodes] = React.useState(() => new MultiRef<number, HTMLElement>())
   const menuRef = React.useRef<HTMLDivElement>(null)
-  const eventRef = React.useRef<'mouse' | 'keyboard'>(null)
+  const eventRef = React.useRef<'mouse' | 'keyboard' | null>(null)
 
   useEventListener('keydown', (event) => {
-    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator?.platform)
+    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator?.userAgent)
     const hotkey = isMac ? 'metaKey' : 'ctrlKey'
     if (event?.key?.toLowerCase() === 'k' && event[hotkey]) {
       event.preventDefault()
