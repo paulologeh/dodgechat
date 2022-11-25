@@ -1,5 +1,5 @@
 import { Friend } from './Friend'
-import { SimpleGrid, Text } from '@chakra-ui/react'
+import { Text, Wrap, WrapItem } from '@chakra-ui/react'
 import { FriendMinimal } from 'types/api'
 
 type FriendsProps = {
@@ -10,15 +10,17 @@ export const Friends = ({ friends }: FriendsProps) => {
   return (
     <>
       {friends && (
-        <SimpleGrid minChildWidth={320} spacing={10}>
+        <Wrap spacing="30px">
           {friends.length === 0 ? (
             <Text>{"You don't have any friends"}</Text>
           ) : (
             friends.map((friendData, index) => (
-              <Friend key={index} friendData={friendData} />
+              <WrapItem key={index}>
+                <Friend friendData={friendData} />
+              </WrapItem>
             ))
           )}
-        </SimpleGrid>
+        </Wrap>
       )}
     </>
   )

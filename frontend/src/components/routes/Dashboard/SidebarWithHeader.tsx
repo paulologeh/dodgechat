@@ -13,6 +13,7 @@ import { Auth } from 'services'
 import { Friends } from './Friends'
 import { ErrorModal } from './ErrorModal'
 import { LoadingModal } from './LoadingModal'
+import { UserProfileModal } from 'components/common/UserProfile'
 
 export const SidebarWithHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -66,6 +67,8 @@ export const SidebarWithHeader = () => {
     activeItem,
     friends = [],
     friendRequests = [],
+    openUserProfileModal,
+    selectedUserProfile,
   } = dashboardStore
 
   const renderActiveMenu = () => {
@@ -103,6 +106,10 @@ export const SidebarWithHeader = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />
+        <UserProfileModal
+          open={openUserProfileModal}
+          selectedUserProfile={selectedUserProfile}
+        />
         {!loading && renderActiveMenu()}
       </Box>
     </Box>

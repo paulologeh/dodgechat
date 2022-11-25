@@ -1,8 +1,5 @@
 export const validateEmail = (email: string) => {
-  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-    return true
-  }
-  return false
+  return /^\w+(-?\w+)*@\w+(-?\w+)*(\.\w{2,3})+$/.test(email)
 }
 
 export const fetcher = (url: string, method: string, body: unknown = null) => {
@@ -44,4 +41,22 @@ export const months: any = {
   9: 'October',
   10: 'November',
   11: 'December',
+}
+
+export const getLastSeen = (date: Date) => {
+  const datetime = new Date(date)
+  const now = new Date()
+  const diff = now.getTime() - datetime.getTime()
+  if (diff <= 600000) {
+    // 10 minutes
+    return 'Now'
+  } else if (diff <= 86400000) {
+    const time = Math.round(diff / 3600000)
+    if (time === 1) {
+      return `${time} hour ago`
+    }
+    return `${time} hours ago`
+  } else {
+    return 'Over a day ago'
+  }
 }

@@ -13,7 +13,6 @@ import {
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
@@ -86,16 +85,19 @@ export const MobileNav = ({
               Friend Requests
             </PopoverHeader>
             <PopoverArrow />
-            <PopoverCloseButton />
             <PopoverBody>
               <div>
-                {friendRequests.map(({ username, gravatar }) => (
-                  <FriendRequest
-                    username={username}
-                    gravatar={gravatar}
-                    key={username}
-                  />
-                ))}
+                {friendRequests && friendRequests.length > 0 ? (
+                  friendRequests.map(({ username, gravatar }) => (
+                    <FriendRequest
+                      username={username}
+                      gravatar={gravatar}
+                      key={username}
+                    />
+                  ))
+                ) : (
+                  <Text>Nothing to see here!</Text>
+                )}
               </div>
             </PopoverBody>
           </PopoverContent>
