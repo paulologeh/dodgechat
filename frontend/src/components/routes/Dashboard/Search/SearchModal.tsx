@@ -67,10 +67,10 @@ export const UserSearch = () => {
   useEffect(() => {
     if (modal.isOpen && query.length > 0) {
       setQuery('')
-      setResults(null)
-      setError('')
-      setLoading(false)
     }
+    setResults(null)
+    setError('')
+    setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modal.isOpen])
 
