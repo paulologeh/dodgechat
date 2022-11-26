@@ -11,7 +11,6 @@ import {
   ResetPasswordForm,
   VerifyEmailToken,
 } from 'components/routes'
-import { DashboardOld } from 'pages'
 
 const RouterConfig = () => {
   return (
@@ -20,16 +19,6 @@ const RouterConfig = () => {
         <Route path="*" element={<NotFound />} />
         <Route
           path="/"
-          element={
-            <RequireAuth redirectTo="/login">
-              <DashboardStoreProvider>
-                <DashboardOld />
-              </DashboardStoreProvider>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="home"
           element={
             <RequireAuth redirectTo="/login">
               <DashboardStoreProvider>
