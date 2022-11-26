@@ -1,141 +1,59 @@
 import { SearchIcon } from '@chakra-ui/icons'
 import {
+  Alert,
+  Avatar,
   Box,
   Center,
   chakra,
-  ChakraProps,
   Flex,
   IconButton,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
-  OmitCommonProps,
+  Spinner,
   useDisclosure,
   useEventListener,
+  useToast,
   useUpdateEffect,
 } from '@chakra-ui/react'
-import { findAll } from 'highlight-words-core'
-import { matchSorter } from 'match-sorter'
-import * as React from 'react'
 import MultiRef from 'react-multi-ref'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import searchData from './search-meta.json'
+import {
+  KeyboardEvent,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { FriendMinimal } from 'types/api'
+import { Search as SearchService } from 'services/search'
+import { debounce, isEmpty } from 'lodash'
+import { useDashboardStore } from 'contexts/dashboardContext'
+import './SearchModal.css'
 
-interface OptionTextProps {
-  searchWords: string[]
-  textToHighlight: string
-}
+const SearchNoResults = () => <Alert status="warning">No results found</Alert>
 
-const OptionText = ({ searchWords, textToHighlight }: OptionTextProps) => {
-  const chunks = findAll({
-    searchWords,
-    textToHighlight,
-    autoEscape: true,
-  })
-
-  return chunks.map(
-    (chunk: { end: number; highlight: number; start: number }) => {
-      const { end, highlight, start } = chunk
-      const text = textToHighlight.substring(start, end - start)
-      if (highlight) {
-        return (
-          <Box as="mark" bg="transparent" color="teal.500">
-            {text}
-          </Box>
-        )
-      } else {
-        return text
-      }
-    }
-  )
-}
-
-const DocIcon = (
-  props: JSX.IntrinsicAttributes &
-    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
-    ChakraProps & { as?: 'svg' | undefined }
-) => {
-  return (
-    <chakra.svg
-      strokeWidth="2px"
-      width="20px"
-      height="20px"
-      viewBox="0 0 20 20"
-      {...props}
-    >
-      <path
-        d="M17 6v12c0 .52-.2 1-1 1H4c-.7 0-1-.33-1-1V2c0-.55.42-1 1-1h8l5 5zM14 8h-3.13c-.51 0-.87-.34-.87-.87V4"
-        stroke="currentColor"
-        fill="none"
-        fillRule="evenodd"
-        strokeLinejoin="round"
-      />
-    </chakra.svg>
-  )
-}
-
-const EnterIcon = (
-  props: JSX.IntrinsicAttributes &
-    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
-    ChakraProps & { as?: 'svg' | undefined }
-) => {
-  return (
-    <chakra.svg
-      strokeWidth="2px"
-      width="16px"
-      height="16px"
-      viewBox="0 0 20 20"
-      {...props}
-    >
-      <g
-        stroke="currentColor"
-        fill="none"
-        fillRule="evenodd"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M18 3v4c0 2-2 4-4 4H2" />
-        <path d="M8 17l-6-6 6-6" />
-      </g>
-    </chakra.svg>
-  )
-}
-
-const HashIcon = (
-  props: JSX.IntrinsicAttributes &
-    OmitCommonProps<React.SVGProps<SVGSVGElement>, keyof ChakraProps> &
-    ChakraProps & { as?: 'svg' | undefined }
-) => {
-  return (
-    <chakra.svg
-      strokeWidth="2px"
-      width="20px"
-      height="20px"
-      viewBox="0 0 20 20"
-      {...props}
-    >
-      <path
-        d="M13 13h4-4V8H7v5h6v4-4H7V8H3h4V3v5h6V3v5h4-4v5zm-6 0v4-4H3h4z"
-        stroke="currentColor"
-        fill="none"
-        fillRule="evenodd"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </chakra.svg>
-  )
-}
+const SearchError = ({ message }: { message: string }) => (
+  <Alert status="error">{message}</Alert>
+)
 
 export const UserSearch = () => {
-  const [query, setQuery] = React.useState('')
-  const [active, setActive] = React.useState(0)
-  const [shouldCloseModal, setShouldCloseModal] = React.useState(true)
+  const [query, setQuery] = useState('')
+  const [active, setActive] = useState(0)
+  const [shouldCloseModal, setShouldCloseModal] = useState(true)
+  const [menuNodes] = useState(() => new MultiRef<number, HTMLElement>())
+  const [results, setResults] = useState<FriendMinimal[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const menu = useDisclosure()
   const modal = useDisclosure()
-  const [menuNodes] = React.useState(() => new MultiRef<number, HTMLElement>())
-  const menuRef = React.useRef<HTMLDivElement>(null)
-  const eventRef = React.useRef<'mouse' | 'keyboard' | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
+  const { setDashboardStore } = useDashboardStore()
+  const toast = useToast()
+  const resultsLength = results?.length ?? 0
 
   useEventListener('keydown', (event) => {
     const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator?.userAgent)
@@ -146,30 +64,74 @@ export const UserSearch = () => {
     }
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (modal.isOpen && query.length > 0) {
       setQuery('')
+      setResults(null)
+      setError('')
+      setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modal.isOpen])
 
-  const results = React.useMemo(
-    function getResults() {
-      if (query.length < 2) return []
-      return matchSorter(searchData, query, {
-        keys: ['hierarchy.lvl1', 'hierarchy.lvl2', 'hierarchy.lvl3', 'content'],
-      }).slice(0, 20)
-    },
-    [query]
+  const search = async (term: string) => {
+    try {
+      const response = await SearchService.searchAll(term)
+      const data = await response.json()
+      if (response.status === 200) {
+        const userResults: FriendMinimal[] = [...data.users.results]
+        setResults(userResults)
+      } else {
+        setError(data.message ?? 'Something went wrong. Try again later')
+        setResults(null)
+      }
+    } catch (error) {
+      console.error(error)
+      setError('Something went wrong. Try again later')
+      setResults(null)
+    }
+    setLoading(false)
+  }
+
+  const handleSearchChange = async (e: {
+    target: { value: SetStateAction<string> }
+  }) => {
+    setError('')
+    if (isEmpty(e.target.value)) {
+      setLoading(false)
+      setResults([])
+      setQuery('')
+      debouncedSearch.cancel()
+    } else {
+      setQuery(e.target.value)
+      setLoading(true)
+      debouncedSearch(e.target.value)
+    }
+    menu.onOpen()
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      search(value).then()
+    }, 500),
+    []
   )
 
-  const onKeyDown = React.useCallback(
-    (e: React.KeyboardEvent) => {
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
       eventRef.current = 'keyboard'
       switch (e.key) {
         case 'ArrowDown': {
           e.preventDefault()
-          if (active + 1 < results.length) {
+          if (active + 1 < resultsLength) {
             setActive(active + 1)
           }
           break
@@ -189,7 +151,7 @@ export const UserSearch = () => {
           break
         }
         case 'Enter': {
-          if (results?.length <= 0) {
+          if (resultsLength <= 0) {
             break
           }
 
@@ -201,7 +163,7 @@ export const UserSearch = () => {
     [active, modal, results]
   )
 
-  const onKeyUp = React.useCallback((e: React.KeyboardEvent) => {
+  const onKeyUp = useCallback((e: KeyboardEvent) => {
     eventRef.current = 'keyboard'
     switch (e.key) {
       case 'Control':
@@ -229,7 +191,46 @@ export const UserSearch = () => {
     })
   }, [active])
 
-  const open = menu.isOpen && results.length > 0
+  const handleSearchSelect = (username: string) => {
+    const fetchAndViewProfile = async () => {
+      try {
+        const response = await SearchService.searchUser(username)
+        const responseData = await response.json()
+        if (response.status === 200) {
+          setDashboardStore((prevState) => ({
+            ...prevState,
+            openUserProfileModal: true,
+            selectedUserProfile: responseData,
+          }))
+        } else {
+          toast({
+            title: 'Unable to view profile',
+            description: responseData.message,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          })
+        }
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: 'Unable to view profile',
+          description:
+            "We've cannot view this user's profile right now. Try again later",
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+      }
+    }
+
+    if (shouldCloseModal) {
+      modal.onClose()
+    }
+    fetchAndViewProfile().then()
+  }
+
+  const open = menu.isOpen && resultsLength > 0
 
   return (
     <>
@@ -243,6 +244,8 @@ export const UserSearch = () => {
         scrollBehavior="inside"
         isOpen={modal.isOpen}
         onClose={modal.onClose}
+        blockScrollOnMount={false} // prevents react-remove-scroll error when mounting multiple modals
+        // see -> https://github.com/chakra-ui/chakra-ui/issues/6213
       >
         <ModalOverlay />
         <ModalContent
@@ -274,18 +277,21 @@ export const UserSearch = () => {
               }}
               placeholder="Search for users"
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-                menu.onOpen()
-              }}
+              onChange={handleSearchChange}
               onKeyDown={onKeyDown}
               onKeyUp={onKeyUp}
             />
             <Center pos="absolute" left={7} h="68px">
-              <SearchIcon color="teal.500" boxSize="20px" />
+              {loading ? (
+                <Spinner color="teal.500" />
+              ) : (
+                <SearchIcon color="teal.500" boxSize="20px" />
+              )}
             </Center>
           </Flex>
           <ModalBody maxH="66vh" p="0" ref={menuRef}>
+            {resultsLength === 0 && results !== null && <SearchNoResults />}
+            {error && <SearchError message={error} />}
             {open && (
               <Box
                 sx={{
@@ -295,12 +301,11 @@ export const UserSearch = () => {
                 }}
               >
                 <Box as="ul" role="listbox" borderTopWidth="1px" pt={2} pb={4}>
-                  {results.map((item, index) => {
+                  {(results ?? []).map((item, index) => {
                     const selected = index === active
-                    const isLvl1 = item.type === 'lvl1'
 
                     return (
-                      <a key={index} href="/">
+                      <span key={index} className="fake-link">
                         <Box
                           id={`search-item-${index}`}
                           as="li"
@@ -309,14 +314,10 @@ export const UserSearch = () => {
                             setActive(index)
                             eventRef.current = 'mouse'
                           }}
-                          onClick={() => {
-                            if (shouldCloseModal) {
-                              modal.onClose()
-                            }
-                          }}
+                          onClick={() => handleSearchSelect(item.username)}
                           ref={menuNodes.ref(index)}
                           role="option"
-                          key={item.id}
+                          key={item.username}
                           sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -337,33 +338,20 @@ export const UserSearch = () => {
                             },
                           }}
                         >
-                          {isLvl1 ? (
-                            <DocIcon opacity={0.4} />
-                          ) : (
-                            <HashIcon opacity={0.4} />
-                          )}
-
+                          <Avatar size="sm" src={item.gravatar} />
                           <Box flex="1" ml="4">
-                            {!isLvl1 && (
-                              <Box
-                                fontWeight="medium"
-                                fontSize="xs"
-                                opacity={0.7}
-                              >
-                                {item.hierarchy.lvl1}
-                              </Box>
-                            )}
-                            <Box fontWeight="semibold">
-                              <OptionText
-                                searchWords={[query]}
-                                textToHighlight={item.content}
-                              />
+                            <Box
+                              fontWeight="medium"
+                              fontSize="xs"
+                              opacity={0.7}
+                            >
+                              {'@'}
+                              {item.username}
                             </Box>
+                            <Box fontWeight="semibold">{item.name}</Box>
                           </Box>
-
-                          <EnterIcon opacity={0.5} />
                         </Box>
-                      </a>
+                      </span>
                     )
                   })}
                 </Box>

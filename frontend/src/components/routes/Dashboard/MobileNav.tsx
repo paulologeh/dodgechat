@@ -24,7 +24,7 @@ import { FiBell, FiChevronDown, FiMenu } from 'react-icons/fi'
 import { useAuth } from 'contexts/userContext'
 import { FriendMinimal } from 'types/api'
 import { FriendRequest } from './FriendRequest'
-import { UserSearch } from './Search/SearchModal'
+import { UserSearch } from './Search'
 
 interface MobileProps extends FlexProps {
   onOpen: () => void
