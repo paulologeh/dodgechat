@@ -1,16 +1,13 @@
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Heading,
-  Icon,
   Stack,
   Text,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react'
-import { GrLocationPin } from 'react-icons/gr'
 import { FriendMinimal } from 'types/api'
 import { useState } from 'react'
 import { Search as SearchService } from 'services'
@@ -34,7 +31,7 @@ export const Friend = ({ friendData }: FriendProp) => {
   const { setDashboardStore } = useDashboardStore()
   const toast = useToast()
 
-  const { gravatar, name, username, aboutMe, location, lastSeen } = friendData
+  const { gravatar, name, username, lastSeen } = friendData
 
   const handleFriendView = async () => {
     setLoading((prevState) => ({ ...prevState, view: true }))
@@ -107,26 +104,7 @@ export const Friend = ({ friendData }: FriendProp) => {
         {'@'}
         {username}
       </Text>
-      <Text
-        textAlign={'center'}
-        color={useColorModeValue('gray.700', 'gray.400')}
-        px={3}
-      >
-        {aboutMe}
-      </Text>
-      <Stack align={'center'} justify={'center'} direction={'row'} mt={6}>
-        <Icon as={GrLocationPin} />
-        <Badge
-          px={2}
-          py={1}
-          bg={useColorModeValue('gray.50', 'gray.800')}
-          fontWeight={'400'}
-        >
-          {location ?? 'Unknown'}
-        </Badge>
-      </Stack>
-
-      <Stack mt={8} direction={'row'} spacing={4}>
+      <Stack mt={8} direction={'row'} spacing={4} align={'end'}>
         <Button
           flex={1}
           fontSize={'sm'}

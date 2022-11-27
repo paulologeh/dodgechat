@@ -12,7 +12,6 @@ import {
   ModalOverlay,
   Stack,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react'
 import { UserProfile } from 'types/api'
 import { useDashboardStore } from 'contexts/dashboardContext'
@@ -153,68 +152,40 @@ export const UserProfileModal = ({
                   {'@'}
                   {selectedUserProfile?.username}
                 </Text>
-                <Text
-                  textAlign={'center'}
-                  color={useColorModeValue('gray.700', 'gray.400')}
-                  px={3}
-                >
-                  <i>{selectedUserProfile?.aboutMe}</i>
-                </Text>
+                {selectedUserProfile?.aboutMe && (
+                  <Text textAlign={'center'} px={3}>
+                    <i>{selectedUserProfile.aboutMe}</i>
+                  </Text>
+                )}
                 <Stack
                   align={'center'}
                   justify={'center'}
                   direction={'column'}
                   mt={6}
                 >
-                  <Badge
-                    px={2}
-                    py={1}
-                    bg={useColorModeValue('gray.50', 'gray.800')}
-                    fontWeight={'400'}
-                  >
-                    {selectedUserProfile?.numberOfFriends ? (
-                      <>
-                        {selectedUserProfile.numberOfFriends}
-                        {' friends'}
-                      </>
-                    ) : null}
-                  </Badge>
-                  <Badge
-                    px={2}
-                    py={1}
-                    bg={useColorModeValue('gray.50', 'gray.800')}
-                    fontWeight={'400'}
-                  >
-                    {selectedUserProfile?.lastSeen ? (
-                      <>
-                        {'Last seen: '}
-                        {getLastSeen(selectedUserProfile?.lastSeen)}
-                      </>
-                    ) : null}
-                  </Badge>
-                  <Badge
-                    px={2}
-                    py={1}
-                    bg={useColorModeValue('gray.50', 'gray.800')}
-                    fontWeight={'400'}
-                  >
-                    {selectedUserProfile?.memberSince
-                      ? getJoined(selectedUserProfile.memberSince)
-                      : null}
-                  </Badge>
-                  <Badge
-                    px={2}
-                    py={1}
-                    bg={useColorModeValue('gray.50', 'gray.800')}
-                    fontWeight={'400'}
-                  >
-                    {selectedUserProfile?.location ? (
-                      <>
-                        {'Location: '}
-                        {selectedUserProfile.location}
-                      </>
-                    ) : null}
-                  </Badge>
+                  {selectedUserProfile?.numberOfFriends && (
+                    <Badge px={2} py={1} fontWeight={'400'}>
+                      {selectedUserProfile.numberOfFriends}
+                      {' friends'}
+                    </Badge>
+                  )}
+                  {selectedUserProfile?.lastSeen && (
+                    <Badge px={2} py={1} fontWeight={'400'}>
+                      {'Last seen: '}
+                      {getLastSeen(selectedUserProfile.lastSeen)}
+                    </Badge>
+                  )}
+                  {selectedUserProfile?.memberSince && (
+                    <Badge px={2} py={1} fontWeight={'400'}>
+                      {getJoined(selectedUserProfile.memberSince)}
+                    </Badge>
+                  )}
+                  {selectedUserProfile?.location && (
+                    <Badge px={2} py={1} fontWeight={'400'}>
+                      {'Location: '}
+                      {selectedUserProfile.location}
+                    </Badge>
+                  )}
                 </Stack>
                 <Stack
                   width={'100%'}
