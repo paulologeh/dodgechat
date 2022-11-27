@@ -28,9 +28,8 @@
 ### About The Project
 
 ![[product-screenshot]](./product_screenshot.png)
-Flexforms is a flexible form builder which can be used to build any form of your choice in any way you like.
-
-Whether its to setup a guest list or to send out birthday/wedding invites and view the data collected, FlexForms has got you covered!
+Dodgechat is an app to help you connect with friends while keeping up with the latest
+on dodge coin
 
 ### Built With
 
