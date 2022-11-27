@@ -31,8 +31,8 @@ def whoami():
     return jsonify(UserSchema().dump(current_user))
 
 
-@login_required
 @auth.route("/delete", methods=["DELETE"])
+@login_required
 def delete_user():
     payload = request.get_json()
 

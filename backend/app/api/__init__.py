@@ -2,7 +2,10 @@ import json
 import logging
 
 from flask import Blueprint, current_app, request
+from flask_login import current_user
 
+from datetime import datetime
+from app import db
 from app.errors import (
     bad_request,
     conflict,
@@ -20,7 +23,10 @@ api = Blueprint("api", __name__, url_prefix="/api")
 
 @api.before_request
 def handle_before_request():
-    pass
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.add(current_user)
+        db.session.commit()
 
 
 @api.after_request
