@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 relationships = Blueprint("relationships", __name__, url_prefix="/relationships")
 
 
-def _remove_all_relationships(current_user_id, user_id):
-    relationships = (
+def remove_all_relationships(current_user_id, user_id):
+    """Removes all relationships between two users"""
+    _relationships = (
         db.session.query(Relationship)
         .filter(
             or_(
@@ -32,7 +33,7 @@ def _remove_all_relationships(current_user_id, user_id):
     )
 
     # remove all relationships
-    for relationship in relationships:
+    for relationship in _relationships:
         if relationship.relationship_type is RelationshipType.BLOCK:
             if relationship.requester_id == current_user_id:
                 abort(400, "User blocked")
@@ -43,7 +44,7 @@ def _remove_all_relationships(current_user_id, user_id):
 
 
 def _get_friends(user_id, include_requests=True):
-    relationships = (
+    _relationships = (
         db.session.query(Relationship)
         .filter(
             or_(
@@ -57,7 +58,7 @@ def _get_friends(user_id, include_requests=True):
 
     candidates = {}
 
-    for relationship in relationships:
+    for relationship in _relationships:
         if relationship.requester_id == user_id:
             if relationship.addressee_id not in candidates:
                 candidates[relationship.addressee_id] = FriendState.REQUESTED
@@ -111,7 +112,7 @@ def block_user(username):
     if user is None:
         abort(404, "User not found")
 
-    _remove_all_relationships(current_user.id, user.id)
+    remove_all_relationships(current_user.id, user.id)
 
     block = Relationship(
         requester_id=current_user.id,
@@ -123,6 +124,24 @@ def block_user(username):
     db.session.commit()
 
     return jsonify({"message": f"Blocked {username}"})
+
+
+@relationships.route("/unblock/<username>", methods=["POST"])
+@login_required
+def unblock_user(username):
+    if username == current_user.username:
+        abort(400, "Cannot unblock yourself")
+
+    user = User.query.filter_by(username=username).first()
+
+    if user is None:
+        abort(404, "User not found")
+
+    remove_all_relationships(current_user.id, user.id)
+
+    db.session.commit()
+
+    return jsonify({"message": f"Unblocked {username}"})
 
 
 @relationships.route("/add/<username>", methods=["POST"])
@@ -178,7 +197,7 @@ def delete_user(username):
     if user is None:
         abort(404, "User not found")
 
-    _remove_all_relationships(current_user.id, user.id)
+    remove_all_relationships(current_user.id, user.id)
 
     db.session.commit()
 
