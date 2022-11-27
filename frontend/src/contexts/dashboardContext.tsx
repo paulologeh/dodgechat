@@ -1,5 +1,5 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
-import { FriendMinimal, SearchResults, UserProfile } from 'types/api'
+import { FriendMinimal, UserProfile } from 'types/api'
 import { Relationships } from 'services'
 
 type DashboardStore = {
@@ -10,10 +10,6 @@ type DashboardStore = {
   loadingMessage: string
   friendRequests: FriendMinimal[]
   friends: FriendMinimal[]
-  isSearching: boolean
-  searchValue: string
-  searchError: string
-  searchResults: SearchResults[]
   openErrorModal: boolean
   modalError: string
   openUserProfileModal: boolean
@@ -28,10 +24,6 @@ const initialStore: DashboardStore = {
   loadingMessage: '',
   friendRequests: [],
   friends: [],
-  isSearching: false,
-  searchValue: '',
-  searchError: '',
-  searchResults: [],
   openErrorModal: false,
   modalError: '',
   openUserProfileModal: false,

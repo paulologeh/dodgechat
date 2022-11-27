@@ -23,15 +23,6 @@ export type UserResult = {
   description: string
 }
 
-type UserResults = {
-  name: string
-  results: UserResult[]
-}
-
-export type SearchResults = {
-  users: UserResults
-}
-
 export type FriendMinimal = {
   username: string
   name: string

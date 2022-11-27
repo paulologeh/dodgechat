@@ -14,7 +14,6 @@ import {
   Spinner,
   useDisclosure,
   useEventListener,
-  useToast,
   useUpdateEffect,
 } from '@chakra-ui/react'
 import MultiRef from 'react-multi-ref'
@@ -52,7 +51,6 @@ export const UserSearch = () => {
   const menuRef = useRef<HTMLDivElement>(null)
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
   const { setDashboardStore } = useDashboardStore()
-  const toast = useToast()
   const resultsLength = results?.length ?? 0
 
   useEventListener('keydown', (event) => {
@@ -193,6 +191,11 @@ export const UserSearch = () => {
 
   const handleSearchSelect = (username: string) => {
     const fetchAndViewProfile = async () => {
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        loading: true,
+        loadingMessage: 'Fetching user',
+      }))
       try {
         const response = await SearchService.searchUser(username)
         const responseData = await response.json()
@@ -201,26 +204,27 @@ export const UserSearch = () => {
             ...prevState,
             openUserProfileModal: true,
             selectedUserProfile: responseData,
+            loading: false,
+            loadingMessage: '',
           }))
         } else {
-          toast({
-            title: 'Unable to view profile',
-            description: responseData.message,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          })
+          setDashboardStore((prevState) => ({
+            ...prevState,
+            loading: false,
+            loadingMessage: '',
+            openErrorModal: true,
+            modalError: responseData.message,
+          }))
         }
       } catch (error) {
         console.error(error)
-        toast({
-          title: 'Unable to view profile',
-          description:
-            "We've cannot view this user's profile right now. Try again later",
-          status: 'error',
-          duration: 9000,
-          isClosable: true,
-        })
+        setDashboardStore((prevState) => ({
+          ...prevState,
+          loading: false,
+          loadingMessage: '',
+          openErrorModal: true,
+          modalError: 'We cannot view this user right now. Try again later',
+        }))
       }
     }
 
