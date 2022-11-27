@@ -13,7 +13,7 @@ type DashboardStore = {
   openErrorModal: boolean
   modalError: string
   openUserProfileModal: boolean
-  selectedUserProfile: UserProfile | null
+  selectedUser: UserProfile | null
 }
 
 const initialStore: DashboardStore = {
@@ -27,7 +27,7 @@ const initialStore: DashboardStore = {
   openErrorModal: false,
   modalError: '',
   openUserProfileModal: false,
-  selectedUserProfile: null,
+  selectedUser: null,
 }
 
 const DashboardContext = createContext({

@@ -5,7 +5,7 @@
     <img src="./frontend/public/android-chrome-512x512.png" alt="Logo" width="100" height="100">
   </a>
 
-  <h3 align="center">Flex-Forms</h3>
+  <h3 align="center">DodgeChat</h3>
 
   <p align="center">
     Keep up with dodgecoin while you chat
@@ -14,7 +14,6 @@
     <br />
     <br />
   </p>
-</p>
 
 ### Table of Contents
 

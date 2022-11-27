@@ -16,13 +16,6 @@ export type UserProfile = {
   numberOfFriends: number
   relationshipState: RelationshipState
 }
-
-export type UserResult = {
-  title: string
-  image: string
-  description: string
-}
-
 export type FriendMinimal = {
   username: string
   name: string

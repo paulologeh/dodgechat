@@ -68,7 +68,6 @@ export const SidebarWithHeader = () => {
     friends = [],
     friendRequests = [],
     openUserProfileModal,
-    selectedUserProfile,
   } = dashboardStore
 
   const renderActiveMenu = () => {
@@ -106,10 +105,7 @@ export const SidebarWithHeader = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />
-        <UserProfileModal
-          open={openUserProfileModal}
-          selectedUserProfile={selectedUserProfile}
-        />
+        <UserProfileModal open={openUserProfileModal} />
         {!loading && renderActiveMenu()}
       </Box>
     </Box>

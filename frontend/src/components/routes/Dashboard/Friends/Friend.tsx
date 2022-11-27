@@ -42,7 +42,7 @@ export const Friend = ({ friendData }: FriendProp) => {
         setDashboardStore((prevState) => ({
           ...prevState,
           openUserProfileModal: true,
-          selectedUserProfile: responseData,
+          selectedUser: responseData,
         }))
       } else {
         toast({

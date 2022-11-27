@@ -203,7 +203,7 @@ export const UserSearch = () => {
           setDashboardStore((prevState) => ({
             ...prevState,
             openUserProfileModal: true,
-            selectedUserProfile: responseData,
+            selectedUser: responseData,
             loading: false,
             loadingMessage: '',
           }))

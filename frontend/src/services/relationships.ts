@@ -18,4 +18,8 @@ export class Relationships {
   static blockUser(username: string) {
     return fetcher(`${ROOT}/block/${username}`, 'POST')
   }
+
+  static unBlockUser(username: string) {
+    return fetcher(`${ROOT}/unblock/${username}`, 'POST')
+  }
 }

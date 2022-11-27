@@ -13,60 +13,83 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { UserProfile } from 'types/api'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { getLastSeen, months } from 'utils/index'
 import { useState } from 'react'
-import { Relationships } from 'services'
+import { Relationships, Search as SearchService } from 'services'
 
 type UserProfileModalProps = {
   open: boolean
-  selectedUserProfile: UserProfile | null
 }
 
 type UserProfileButtonGroup = {
   add: boolean
   delete: boolean
   block: boolean
+  unblock: boolean
 }
 
-export const UserProfileModal = ({
-  open,
-  selectedUserProfile,
-}: UserProfileModalProps) => {
+const getJoined = (date: Date) => {
+  const d = new Date(date)
+  const year = d.getFullYear() // 2019
+  const month = d.getMonth() // 12
+  if (month > 12 || month < 1) return ''
+  return `Joined ${months[month - 1]} ${year}`
+}
+
+export const UserProfileModal = ({ open }: UserProfileModalProps) => {
   const [loading, setLoading] = useState<UserProfileButtonGroup>({
     add: false,
     delete: false,
     block: false,
+    unblock: false,
   })
-  const [disabled, setDisabled] = useState<UserProfileButtonGroup>({
-    add: false,
-    delete: false,
-    block: false,
-  })
-  const { setDashboardStore } = useDashboardStore()
+  const { dashboardStore, setDashboardStore } = useDashboardStore()
+  const { selectedUser } = dashboardStore
 
-  const getJoined = (date: Date) => {
-    const d = new Date(date)
-    const year = d.getFullYear() // 2019
-    const month = d.getMonth() // 12
-    if (month > 12 || month < 1) return ''
-    return `Joined ${months[month - 1]} ${year}`
+  const refetch = async (username: string) => {
+    setDashboardStore((prevState) => ({
+      ...prevState,
+      loading: true,
+      loadingMessage: 'Refetching User',
+    }))
+    const response = await SearchService.searchUser(username)
+
+    if (response.status === 200) {
+      const user = await response.json()
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        selectedUser: user,
+        loading: false,
+        loadingMessage: '',
+      }))
+    } else {
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        modalError: 'Something went wrong. Please try again later',
+        openErrorModal: true,
+        loading: false,
+        loadingMessage: '',
+      }))
+    }
   }
 
   const handleClick = async (button: string) => {
-    if (!selectedUserProfile?.username) return
+    if (!selectedUser?.username) return
 
     setLoading({ ...loading, [button]: true })
+
     try {
       let response
 
       if (button === 'add')
-        response = await Relationships.addUser(selectedUserProfile.username)
-      if (button === 'delete')
-        response = await Relationships.deleteUser(selectedUserProfile.username)
-      if (button === 'block')
-        response = await Relationships.blockUser(selectedUserProfile.username)
+        response = await Relationships.addUser(selectedUser.username)
+      else if (button === 'delete')
+        response = await Relationships.deleteUser(selectedUser.username)
+      else if (button === 'block')
+        response = await Relationships.blockUser(selectedUser.username)
+      else if (button === 'unblock')
+        response = await Relationships.unBlockUser(selectedUser.username)
 
       if (!response) {
         console.error('undefined response')
@@ -75,19 +98,7 @@ export const UserProfileModal = ({
           modalError: 'Something went wrong. Please try again',
           openErrorModal: true,
         }))
-      } else if (response.status === 200) {
-        const refetchResponse = await Relationships.getFriends()
-        if (refetchResponse.status === 200) {
-          const data = await refetchResponse.json()
-          setDashboardStore((prevState) => ({
-            ...prevState,
-            friendRequests: data.friendRequests,
-            friends: data.friends,
-          }))
-        }
-        setLoading({ ...loading, [button]: false })
-        setDisabled({ ...disabled, [button]: true })
-      } else {
+      } else if (response.status !== 200) {
         const data = await response.json()
         setLoading({ ...loading, [button]: false })
         setDashboardStore((prevState) => ({
@@ -105,9 +116,11 @@ export const UserProfileModal = ({
       }))
     } finally {
       setLoading({ ...loading, [button]: false })
+      await refetch(selectedUser.username)
     }
   }
 
+  const isBlocked = selectedUser?.relationshipState === 'BLOCKED'
   return (
     <Modal
       isOpen={open}
@@ -134,7 +147,7 @@ export const UserProfileModal = ({
                 <Image
                   objectFit="cover"
                   boxSize="100%"
-                  src={selectedUserProfile?.gravatar}
+                  src={selectedUser?.gravatar}
                 />
               </Flex>
               <Stack
@@ -146,15 +159,15 @@ export const UserProfileModal = ({
                 pt={2}
               >
                 <Heading fontSize={'2xl'} fontFamily={'body'}>
-                  {selectedUserProfile?.name}
+                  {selectedUser?.name}
                 </Heading>
                 <Text fontWeight={600} color={'gray.500'} size="sm" mb={4}>
                   {'@'}
-                  {selectedUserProfile?.username}
+                  {selectedUser?.username}
                 </Text>
-                {selectedUserProfile?.aboutMe && (
+                {selectedUser?.aboutMe && (
                   <Text textAlign={'center'} px={3}>
-                    <i>{selectedUserProfile.aboutMe}</i>
+                    <i>{selectedUser.aboutMe}</i>
                   </Text>
                 )}
                 <Stack
@@ -163,27 +176,27 @@ export const UserProfileModal = ({
                   direction={'column'}
                   mt={6}
                 >
-                  {selectedUserProfile?.numberOfFriends && (
+                  {selectedUser?.numberOfFriends && (
                     <Badge px={2} py={1} fontWeight={'400'}>
-                      {selectedUserProfile.numberOfFriends}
+                      {selectedUser.numberOfFriends}
                       {' friends'}
                     </Badge>
                   )}
-                  {selectedUserProfile?.lastSeen && (
+                  {selectedUser?.lastSeen && (
                     <Badge px={2} py={1} fontWeight={'400'}>
                       {'Last seen: '}
-                      {getLastSeen(selectedUserProfile.lastSeen)}
+                      {getLastSeen(selectedUser.lastSeen)}
                     </Badge>
                   )}
-                  {selectedUserProfile?.memberSince && (
+                  {selectedUser?.memberSince && (
                     <Badge px={2} py={1} fontWeight={'400'}>
-                      {getJoined(selectedUserProfile.memberSince)}
+                      {getJoined(selectedUser.memberSince)}
                     </Badge>
                   )}
-                  {selectedUserProfile?.location && (
+                  {selectedUser?.location && (
                     <Badge px={2} py={1} fontWeight={'400'}>
                       {'Location: '}
-                      {selectedUserProfile.location}
+                      {selectedUser.location}
                     </Badge>
                   )}
                 </Stack>
@@ -195,27 +208,25 @@ export const UserProfileModal = ({
                   justifyContent={'space-between'}
                   alignItems={'center'}
                 >
-                  {selectedUserProfile?.relationshipState === null && (
+                  {selectedUser?.relationshipState === null && (
                     <Button
                       flex={1}
                       fontSize={'sm'}
                       rounded={'full'}
                       colorScheme={'blue'}
                       isLoading={loading.add}
-                      isDisabled={disabled.add}
                       onClick={() => handleClick('add')}
                     >
                       Add
                     </Button>
                   )}
-                  {selectedUserProfile?.relationshipState === 'ACCEPTED' && (
+                  {selectedUser?.relationshipState === 'ACCEPTED' && (
                     <Button
                       flex={1}
                       fontSize={'sm'}
                       rounded={'full'}
                       colorScheme={'red'}
                       isLoading={loading.delete}
-                      isDisabled={disabled.delete}
                       onClick={() => handleClick('delete')}
                     >
                       Delete
@@ -226,17 +237,10 @@ export const UserProfileModal = ({
                     fontSize={'sm'}
                     rounded={'full'}
                     colorScheme={'gray'}
-                    isLoading={loading.block}
-                    isDisabled={
-                      (disabled.block ||
-                        selectedUserProfile?.relationshipState === 'BLOCKED') ??
-                      false
-                    }
-                    onClick={() => handleClick('block')}
+                    isLoading={loading.block || loading.unblock}
+                    onClick={() => handleClick(isBlocked ? 'unblock' : 'block')}
                   >
-                    {selectedUserProfile?.relationshipState === 'BLOCKED'
-                      ? 'Blocked'
-                      : 'Block'}
+                    {isBlocked ? 'Unblock' : 'Block'}
                   </Button>
                 </Stack>
               </Stack>
