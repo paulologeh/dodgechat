@@ -54,12 +54,16 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
       loadingMessage: 'Refetching User',
     }))
     const response = await SearchService.searchUser(username)
+    const friendsResponse = await Relationships.getFriends()
 
-    if (response.status === 200) {
+    if (response.status === 200 && friendsResponse.status === 200) {
       const user = await response.json()
+      const friends = await friendsResponse.json()
       setDashboardStore((prevState) => ({
         ...prevState,
         selectedUser: user,
+        friendRequests: friends.friendRequests,
+        friends: friends.friends,
         loading: false,
         loadingMessage: '',
       }))
