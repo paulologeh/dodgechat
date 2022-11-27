@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 relationships = Blueprint("relationships", __name__, url_prefix="/relationships")
 
 
-def remove_all_relationships(current_user_id, user_id):
+def remove_all_relationships(current_user_id, user_id, is_unblock=False):
     """Removes all relationships between two users"""
     _relationships = (
         db.session.query(Relationship)
@@ -35,8 +35,10 @@ def remove_all_relationships(current_user_id, user_id):
     # remove all relationships
     for relationship in _relationships:
         if relationship.relationship_type is RelationshipType.BLOCK:
-            if relationship.requester_id == current_user_id:
+            if relationship.requester_id == current_user_id and not is_unblock:
                 abort(400, "User blocked")
+
+            # can't block or unblock someone that has already blocked you
             if relationship.requester_id == user_id:
                 abort(404, "User not found")
 
@@ -137,7 +139,7 @@ def unblock_user(username):
     if user is None:
         abort(404, "User not found")
 
-    remove_all_relationships(current_user.id, user.id)
+    remove_all_relationships(current_user.id, user.id, True)
 
     db.session.commit()
 
