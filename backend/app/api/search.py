@@ -101,7 +101,11 @@ def search_all():
     if not term:
         abort(400, "No search term supplied")
 
-    users = User.query.filter(User.__ts_vector__.match(term)).all()
+    for _term in set(term.split(" ")):
+        users = User.query.filter(User.__ts_vector__.match(_term)).all()
+        if users is not None:
+            break
+
     blocked = Relationship.query.filter_by(
         addressee_id=current_user.id, relationship_type=RelationshipType.BLOCK
     ).all()
