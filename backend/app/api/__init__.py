@@ -1,10 +1,10 @@
-import json
 import logging
+import time
+from datetime import datetime
 
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app
 from flask_login import current_user
 
-from datetime import datetime
 from app import db
 from app.errors import (
     bad_request,
@@ -27,6 +27,10 @@ def handle_before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.add(current_user)
         db.session.commit()
+
+    app = current_app._get_current_object()
+    if app.config.get("DEVELOPMENT") is not None:
+        time.sleep(1)  # delay all requests by 1 second
 
 
 @api.after_request
