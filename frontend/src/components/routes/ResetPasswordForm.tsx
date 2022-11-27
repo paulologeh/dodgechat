@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 type ResetPasswordFormState = {
@@ -43,7 +43,7 @@ export const ResetPasswordForm = () => {
     setError('')
 
     try {
-      const response = await Auth.passwordReset(state.password, token)
+      const response = await Users.passwordReset(state.password, token)
 
       if (response.status === 200) {
         setSuccess(

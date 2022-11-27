@@ -19,7 +19,7 @@ import {
 import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
-import { Auth } from 'services'
+import { Users } from 'services'
 
 type RegisterFormState = {
   email: string
@@ -79,7 +79,7 @@ export const RegisterForm = () => {
         password: state.password,
         name: state.name,
       }
-      const response = await Auth.register(user)
+      const response = await Users.register(user)
 
       if (response.status !== 201) {
         setError((prevState) => ({

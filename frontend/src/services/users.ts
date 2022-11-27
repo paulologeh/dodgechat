@@ -9,9 +9,9 @@ type NewUser = {
   aboutMe?: string
 }
 
-const AUTH_ROUTE = `${process.env.API_URI}/api/auth`
+const AUTH_ROUTE = `${process.env.API_URI}/api/users`
 
-export class Auth {
+export class Users {
   static whoami() {
     return fetcher(`${AUTH_ROUTE}/whoami`, 'GET')
   }

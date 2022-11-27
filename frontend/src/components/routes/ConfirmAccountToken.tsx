@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { ErrorResult, PageLoading, SuccessResult } from 'components/common'
 
 const title = 'Account Confirmation'
@@ -16,7 +16,7 @@ export const ConfirmAccountToken = () => {
   useEffect(() => {
     const confirmToken = async () => {
       try {
-        const response = await Auth.confirm(token)
+        const response = await Users.confirm(token)
 
         if (response.status === 200) {
           setSuccess('Your account has been confirmed. Thanks!')

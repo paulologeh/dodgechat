@@ -1,17 +1,17 @@
 import {
+  Alert,
+  AlertIcon,
   Button,
-  FormControl,
   Flex,
+  FormControl,
   Heading,
   Input,
   Stack,
   Text,
   useColorModeValue,
-  Alert,
-  AlertIcon,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { validateEmail } from 'utils'
 
 export const ForgotPasswordForm = () => {
@@ -33,7 +33,7 @@ export const ForgotPasswordForm = () => {
     }
 
     try {
-      const response = await Auth.forgotpassword(email)
+      const response = await Users.forgotpassword(email)
 
       if (response.status === 200) {
         setSuccess('Request sent')

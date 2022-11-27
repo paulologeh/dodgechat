@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { ErrorResult, PageLoading, SuccessResult } from 'components/common'
 
 const title = 'Email Verification'
@@ -16,7 +16,7 @@ export const VerifyEmailToken = () => {
   useEffect(() => {
     const confirmToken = async () => {
       try {
-        const response = await Auth.changeEmail(token)
+        const response = await Users.changeEmail(token)
 
         if (response.status === 200) {
           setSuccess('Your email has been changed. Thanks!')

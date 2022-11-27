@@ -1,5 +1,5 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { PageLoading } from 'components/common'
 
 type CurrentUser = {
@@ -38,7 +38,7 @@ export const UserProvider: FC = ({ children }) => {
 
   const getUserSession = async () => {
     try {
-      const response = await Auth.whoami()
+      const response = await Users.whoami()
       if (response.status === 200) {
         const userData = await response.json()
         setCurrentUser(userData)

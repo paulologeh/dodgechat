@@ -30,12 +30,12 @@ def create_app(config_name):
     # socketio.init_app(app)
 
     from app.api import api as api_blueprint
-    from app.api.auth import auth as auth_blueprint
+    from app.api.users import users as users_blueprint
     from app.api.health import health as health_blueprint
     from app.api.relationships import relationships as relationships_blueprint
     from app.api.search import search as search_blueprint
 
-    api_blueprint.register_blueprint(auth_blueprint)
+    api_blueprint.register_blueprint(users_blueprint)
     api_blueprint.register_blueprint(health_blueprint)
     api_blueprint.register_blueprint(relationships_blueprint)
     api_blueprint.register_blueprint(search_blueprint)

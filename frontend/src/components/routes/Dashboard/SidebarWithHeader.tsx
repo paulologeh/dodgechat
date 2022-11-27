@@ -9,7 +9,7 @@ import { SidebarContent } from './SidebarContent'
 import { MobileNav } from './MobileNav'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useAuth } from 'contexts/userContext'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { Friends } from './Friends'
 import { ErrorModal } from './ErrorModal'
 import { LoadingModal } from './LoadingModal'
@@ -27,7 +27,7 @@ export const SidebarWithHeader = () => {
       loadingMessage: 'Logging out',
     }))
     try {
-      const response = await Auth.logout()
+      const response = await Users.logout()
       const data = await response.json()
 
       if (response.status === 200) {

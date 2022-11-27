@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
-import { Auth } from 'services'
+import { Users } from 'services'
 import { useAuth } from 'contexts/userContext'
 import { validateEmail } from '../../utils'
 
@@ -79,7 +79,7 @@ export const LoginForm = () => {
     setLoading(true)
 
     try {
-      const response = await Auth.login(state.emailOrUsername, state.password)
+      const response = await Users.login(state.emailOrUsername, state.password)
       if (response.status === 200) {
         const data = await response.json()
         setLoggedIn(true)
