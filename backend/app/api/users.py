@@ -22,16 +22,16 @@ logger = logging.getLogger(__name__)
 
 FRONT_END_URI = f"{get_front_end()}"
 
-auth = Blueprint("auth", __name__, url_prefix="/auth")
+users = Blueprint("auth", __name__, url_prefix="/users")
 
 
-@auth.route("/whoami", methods=["GET"])
+@users.route("/whoami", methods=["GET"])
 @login_required
 def whoami():
     return jsonify(UserSchema().dump(current_user))
 
 
-@auth.route("/delete", methods=["DELETE"])
+@users.route("/delete", methods=["DELETE"])
 @login_required
 def delete_user():
     payload = request.get_json()
@@ -50,14 +50,14 @@ def delete_user():
     return jsonify({"message": "Deleted user"})
 
 
-@auth.route("/logout", methods=["POST"])
+@users.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out"})
 
 
-@auth.route("/login", methods=["POST"])
+@users.route("/login", methods=["POST"])
 def login():
     payload = request.get_json()
 
@@ -71,7 +71,7 @@ def login():
     return jsonify(UserSchema().dump(user))
 
 
-@auth.route("/register", methods=["POST"])
+@users.route("/register", methods=["POST"])
 def register():
     payload = request.get_json()
 
@@ -110,7 +110,7 @@ def register():
     return response
 
 
-@auth.route("/confirm/<token>", methods=["POST"])
+@users.route("/confirm/<token>", methods=["POST"])
 @login_required
 def confirm(token):
     if current_user.confirmed:
@@ -123,7 +123,7 @@ def confirm(token):
     return jsonify({"message": "You have confirmed your account. Thanks!"})
 
 
-@auth.route("/confirm", methods=["POST"])
+@users.route("/confirm", methods=["POST"])
 @login_required
 def resend_confirmation():
     if current_user.confirmed:
@@ -143,7 +143,7 @@ def resend_confirmation():
     return jsonify({"message": "A confirmation email will be sent to you by email"})
 
 
-@auth.route("/change-password", methods=["POST"])
+@users.route("/change-password", methods=["POST"])
 @login_required
 def change_password():
     payload = request.get_json()
@@ -163,7 +163,7 @@ def change_password():
     return jsonify({"message": "Successfully changed password"})
 
 
-@auth.route("/reset", methods=["POST"])
+@users.route("/reset", methods=["POST"])
 def password_reset_request():
     if not current_user.is_anonymous:
         abort(
@@ -197,7 +197,7 @@ def password_reset_request():
     )
 
 
-@auth.route("/reset/<token>", methods=["POST"])
+@users.route("/reset/<token>", methods=["POST"])
 def password_reset(token):
     if not current_user.is_anonymous:
         abort(400, "Cannot reset password while you are logged in.")
@@ -215,7 +215,7 @@ def password_reset(token):
     return jsonify({"message": "Your password has been updated"})
 
 
-@auth.route("/change_email", methods=["POST"])
+@users.route("/change_email", methods=["POST"])
 @login_required
 def change_email_request():
     payload = request.get_json()
@@ -245,7 +245,7 @@ def change_email_request():
     )
 
 
-@auth.route("/change_email/<token>", methods=["POST"])
+@users.route("/change_email/<token>", methods=["POST"])
 @login_required
 def change_email(token):
     if not current_user.change_email(token):
