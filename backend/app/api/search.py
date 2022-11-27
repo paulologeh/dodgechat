@@ -113,7 +113,11 @@ def search_all():
 
     results["users"] = {
         "name": "users",
-        "results": [user.to_minimal() for user in users if user.id not in blocked_ids],
+        "results": [
+            user.to_minimal()
+            for user in users
+            if user.id not in blocked_ids and user.id != current_user.id
+        ],
     }
 
     return results
