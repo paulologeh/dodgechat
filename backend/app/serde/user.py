@@ -3,12 +3,13 @@ from datetime import datetime
 from marshmallow import Schema, fields, post_load, pre_load
 
 from app.models.user import User
+from .basic_schema import BasicSchema
 
-from .utils import camelcase, must_not_be_blank, validate_user_email
+from .utils import must_not_be_blank, validate_user_email
 
 
 # noinspection PyTypeChecker
-class UserSchema(Schema):
+class UserSchema(BasicSchema):
     id = fields.Int(dump_only=True)
     email = fields.Email(required=True, validate=validate_user_email)
     username = fields.Str(validate=must_not_be_blank)
@@ -20,9 +21,6 @@ class UserSchema(Schema):
     member_since = fields.DateTime(dump_only=True)
     last_seen = fields.DateTime(load_default=datetime.utcnow)
     avatar_hash = fields.Str()
-
-    def on_bind_field(self, field_name, field_obj):
-        field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
     @pre_load
     def lowerstrip_email(self, data, **kwargs):

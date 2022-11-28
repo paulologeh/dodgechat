@@ -13,6 +13,7 @@ from app.serde import (
     LoginSchema,
     PasswordResetRequestSchema,
     ResetPasswordSchema,
+    UserUpdateSchema,
 )
 from app.serde.user import UserSchema
 from app.utils import get_front_end, extract_all_errors
@@ -108,6 +109,30 @@ def register():
     )
 
     return response
+
+
+@users.route("/update", methods=["PATCH"])
+@login_required
+def update_user():
+    if not current_user.confirmed:
+        abort(400, "Confirm your email address first")
+
+    payload = request.get_json()
+
+    try:
+        user_updates = UserUpdateSchema().load(payload)
+    except ValidationError as err:
+        abort(422, extract_all_errors(err))
+
+    user = User.query.filter_by(username=current_user.username).first()
+
+    for key, value in user_updates.items():
+        setattr(user, key, value)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(UserSchema().dump(user))
 
 
 @users.route("/confirm/<token>", methods=["POST"])
