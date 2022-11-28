@@ -24,8 +24,7 @@ api = Blueprint("api", __name__, url_prefix="/api")
 @api.before_request
 def handle_before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
-        db.session.add(current_user)
+        current_user.ping()
         db.session.commit()
 
     app = current_app._get_current_object()
