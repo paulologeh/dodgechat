@@ -19,7 +19,7 @@ import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Users } from 'services'
 import { useAuth } from 'contexts/userContext'
-import { validateEmail } from '../../utils'
+import { validateEmail } from 'utils'
 
 type LoginFormState = {
   emailOrUsername: string
@@ -32,12 +32,6 @@ type LoginFormError = {
   request: string
 }
 
-const emptyError = {
-  emailOrUsername: '',
-  password: '',
-  request: '',
-}
-
 export const LoginForm = () => {
   const [state, setState] = useState<LoginFormState>({
     emailOrUsername: '',
@@ -45,7 +39,11 @@ export const LoginForm = () => {
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState<LoginFormError>(emptyError)
+  const [error, setError] = useState<LoginFormError>({
+    emailOrUsername: '',
+    password: '',
+    request: '',
+  })
   const { setLoggedIn, setCurrentUser } = useAuth()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -55,7 +53,11 @@ export const LoginForm = () => {
       setSubmitted(true)
     }
 
-    setError(emptyError)
+    setError({
+      emailOrUsername: '',
+      password: '',
+      request: '',
+    })
 
     if (
       state.emailOrUsername.includes('@') &&
@@ -93,7 +95,7 @@ export const LoginForm = () => {
     } catch (error) {
       setError((prevState) => ({
         ...prevState,
-        result: 'Server error, please try again later',
+        request: 'Server error, please try again later',
       }))
       setLoading(false)
     }
