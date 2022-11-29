@@ -20,9 +20,11 @@ class RelationshipType(Enum):
 
 class Relationship(db.Model):
     __tablename__ = "relationships"
-    requester_id = db.Column(db.Integer, db.ForeignKey("users.id"))  # requester
+    requester_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE")
+    )  # requester
     addressee_id = db.Column(db.Integer, index=True)  # requestee
-    user = db.relationship("User")
+    user = db.relationship("User", back_populates="relationship")
     relationship_type = db.Column(db.Enum(RelationshipType))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
 

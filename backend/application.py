@@ -67,10 +67,6 @@ def setup_test_accounts():
             _user = user.User.query.filter_by(email=_email).first()
 
             if _user:
-                # find and remove all relationships
-                _relationships = relationship.Relationship.query.filter_by(
-                    requester_id=_user.id
-                ).delete()
                 db.session.delete(_user)
 
             db.session.commit()
