@@ -2,7 +2,7 @@ import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Users } from 'services'
 import { PageLoading } from 'components/common'
 
-type CurrentUser = {
+export type CurrentUser = {
   aboutMe?: string
   avatarHash?: string
   email?: string

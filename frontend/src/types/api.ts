@@ -25,3 +25,11 @@ export type FriendMinimal = {
   memberSince?: Date
   lastSeen?: Date
 }
+
+export type UserUpdate = {
+  name?: string
+  username?: string
+  avatarHash?: string
+  location?: string
+  aboutMe?: string
+}

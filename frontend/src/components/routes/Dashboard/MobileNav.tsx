@@ -25,6 +25,7 @@ import { useAuth } from 'contexts/userContext'
 import { FriendMinimal } from 'types/api'
 import { FriendRequest } from './FriendRequest'
 import { UserSearch } from './Search'
+import { ProfileEdit } from './ProfileEdit'
 
 interface MobileProps extends FlexProps {
   onOpen: () => void
@@ -137,7 +138,7 @@ export const MobileNav = ({
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>Profile</MenuItem>
+              <ProfileEdit currentUser={currentUser} />
               <MenuDivider />
               <MenuItem onClick={logout}>Sign out</MenuItem>
             </MenuList>

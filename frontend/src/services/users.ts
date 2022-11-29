@@ -1,4 +1,5 @@
 import { fetcher } from 'utils'
+import { UserUpdate } from 'types/api'
 
 type NewUser = {
   email: string
@@ -9,37 +10,42 @@ type NewUser = {
   aboutMe?: string
 }
 
-const AUTH_ROUTE = `${process.env.API_URI}/api/users`
+const USERS_ROUTE = `${process.env.API_URI}/api/users`
 
 export class Users {
   static whoami() {
-    return fetcher(`${AUTH_ROUTE}/whoami`, 'GET')
+    return fetcher(`${USERS_ROUTE}/whoami`, 'GET')
   }
 
   static login(emailOrUsername: string, password: string) {
-    return fetcher(`${AUTH_ROUTE}/login`, 'POST', {
+    return fetcher(`${USERS_ROUTE}/login`, 'POST', {
       emailOrUsername,
       password,
     })
   }
 
   static delete(password: string) {
-    return fetcher(`${AUTH_ROUTE}/delete`, 'DELETE', { password })
+    return fetcher(`${USERS_ROUTE}/delete`, 'DELETE', { password })
   }
 
   static register(user: NewUser) {
-    return fetcher(`${AUTH_ROUTE}/register`, 'POST', user)
+    return fetcher(`${USERS_ROUTE}/register`, 'POST', user)
   }
+
+  static update(userUpdate: UserUpdate) {
+    return fetcher(`${USERS_ROUTE}/update`, 'PATCH', userUpdate)
+  }
+
   static logout() {
-    return fetcher(`${AUTH_ROUTE}/logout`, 'POST')
+    return fetcher(`${USERS_ROUTE}/logout`, 'POST')
   }
 
   static resendConfirmation() {
-    return fetcher(`${AUTH_ROUTE}/confirm`, 'POST')
+    return fetcher(`${USERS_ROUTE}/confirm`, 'POST')
   }
 
   static confirm(token: string) {
-    return fetcher(`${AUTH_ROUTE}/confirm/${token}`, 'POST')
+    return fetcher(`${USERS_ROUTE}/confirm/${token}`, 'POST')
   }
 
   static changePassword(
@@ -47,7 +53,7 @@ export class Users {
     password: string,
     confirmPassword: string
   ) {
-    return fetcher(`${AUTH_ROUTE}/change-password`, 'POST', {
+    return fetcher(`${USERS_ROUTE}/change-password`, 'POST', {
       oldPassword,
       password,
       confirmPassword,
@@ -55,23 +61,23 @@ export class Users {
   }
 
   static forgotpassword(email: string) {
-    return fetcher(`${AUTH_ROUTE}/reset`, 'POST', {
+    return fetcher(`${USERS_ROUTE}/reset`, 'POST', {
       email,
     })
   }
 
   static passwordReset(password: string, token: string) {
-    return fetcher(`${AUTH_ROUTE}/reset/${token}`, 'POST', { password })
+    return fetcher(`${USERS_ROUTE}/reset/${token}`, 'POST', { password })
   }
 
   static changeEmailRequest(email: string, password: string) {
-    return fetcher(`${AUTH_ROUTE}/change_email`, 'POST', {
+    return fetcher(`${USERS_ROUTE}/change_email`, 'POST', {
       email,
       password,
     })
   }
 
   static changeEmail(token: string) {
-    return fetcher(`${AUTH_ROUTE}/change_email/${token}`, 'POST')
+    return fetcher(`${USERS_ROUTE}/change_email/${token}`, 'POST')
   }
 }

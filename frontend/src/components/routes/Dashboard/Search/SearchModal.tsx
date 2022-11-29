@@ -111,7 +111,7 @@ export const UserSearch = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
-      search(value).then()
+      search(value).catch(console.error)
     }, 500),
     []
   )
@@ -231,7 +231,7 @@ export const UserSearch = () => {
     if (shouldCloseModal) {
       modal.onClose()
     }
-    fetchAndViewProfile().then()
+    fetchAndViewProfile().catch(console.error)
   }
 
   const open = menu.isOpen && resultsLength > 0
