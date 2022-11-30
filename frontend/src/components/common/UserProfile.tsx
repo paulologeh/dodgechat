@@ -183,7 +183,9 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                   {selectedUser?.numberOfFriends && (
                     <Badge px={2} py={1} fontWeight={'400'}>
                       {selectedUser.numberOfFriends}
-                      {' friends'}
+                      {selectedUser.numberOfFriends === 1
+                        ? ' friend'
+                        : ' friends'}
                     </Badge>
                   )}
                   {selectedUser?.lastSeen && (

@@ -7,7 +7,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import React from 'react'
-import { FiHome, FiMessageCircle, FiSettings } from 'react-icons/fi'
+import { FiHome, FiMessageCircle } from 'react-icons/fi'
 import { FaUserFriends } from 'react-icons/fa'
 import { NavItem } from './NavItem'
 import { IconType } from 'react-icons'
@@ -22,7 +22,6 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome },
   { name: 'Messages', icon: FiMessageCircle },
   { name: 'Friends', icon: FaUserFriends },
-  { name: 'Settings', icon: FiSettings },
 ]
 
 interface SidebarProps extends BoxProps {
