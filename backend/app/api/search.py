@@ -74,7 +74,7 @@ def search_user(username):
     }
 
     if relationship_state is FriendState.ACCEPTED:
-        friends = _get_friends(current_user.id, include_requests=False)
+        friends = _get_friends(user.id, include_requests=False)
         number_of_friends = len(friends["friends"])
         return {
             **profile,
