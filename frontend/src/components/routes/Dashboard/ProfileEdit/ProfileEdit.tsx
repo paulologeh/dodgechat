@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Avatar,
   Button,
   Center,
@@ -14,7 +16,6 @@ import {
   Textarea,
   useColorModeValue,
   useDisclosure,
-  useToast,
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import type { CurrentUser } from 'contexts/userContext'
@@ -26,9 +27,10 @@ import { isEmpty } from 'lodash'
 export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [formData, setFormData] = useState<CurrentUser>({ ...currentUser })
   const [isSubmitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
   const { setCurrentUser } = useAuth()
   const modal = useDisclosure()
-  const toast = useToast()
   const handleSubmit = async () => {
     const userUpdate: UserUpdate = {
       ...(formData.name !== currentUser.name && { name: formData.name }),
@@ -42,39 +44,27 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
         location: formData.location,
       }),
     }
+    setSuccess(false)
+    setError('')
+
     if (isEmpty(userUpdate)) {
-      toast({
-        title: 'Cannot submit updates',
-        description: 'No changes made',
-        status: 'warning',
-        duration: 9000,
-        isClosable: true,
-      })
+      setError('No changes were made')
+      return
     }
+
     setSubmitting(true)
     try {
       const response = await Users.update(userUpdate)
       const data = await response.json()
       if (response.status === 200) {
         setCurrentUser(data)
+        setSuccess(true)
       } else {
-        toast({
-          title: 'Unable to submit updates',
-          description: data.message,
-          status: 'error',
-          duration: 9000,
-          isClosable: true,
-        })
+        setError(data.message ?? 'Something went wrong. Please try again later')
       }
     } catch (error) {
       console.error(error)
-      toast({
-        title: 'Unable to submit updates',
-        description: 'Something went wrong. Please try again later',
-        status: 'error',
-        duration: 9000,
-        isClosable: true,
-      })
+      setError('Something went wrong. Please try again later')
     }
     setSubmitting(false)
   }
@@ -126,6 +116,18 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
                   </Center>
                 </Stack>
               </FormControl>
+              {error && (
+                <Alert status="error">
+                  <AlertIcon />
+                  {error}
+                </Alert>
+              )}
+              {success && (
+                <Alert status="success">
+                  <AlertIcon />
+                  {'Successfully updated'}
+                </Alert>
+              )}
               <FormControl id="userName">
                 <FormLabel>Username</FormLabel>
                 <Input
