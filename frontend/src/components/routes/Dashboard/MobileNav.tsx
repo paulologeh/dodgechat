@@ -10,73 +10,35 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
   Text,
   useColorModeValue,
   VStack,
 } from '@chakra-ui/react'
-import { FiBell, FiChevronDown, FiMenu } from 'react-icons/fi'
+import { FiChevronDown, FiMenu } from 'react-icons/fi'
 import { useAuth } from 'contexts/userContext'
 import { FriendMinimal } from 'types/api'
-import { FriendRequest } from './FriendRequest'
 import { UserSearch } from './Search'
 import { ProfileEdit } from './ProfileEdit'
 import { Settings } from './Settings'
+import { Notifications } from './Notifications'
 
 interface MobileProps extends FlexProps {
   onOpen: () => void
   logout: () => void
   friendRequests: FriendMinimal[]
+  friends: FriendMinimal[]
 }
 export const MobileNav = ({
   onOpen,
   logout,
   friendRequests,
+  friends,
   ...rest
 }: MobileProps) => {
   const { currentUser } = useAuth()
 
   const { avatarHash, name, username } = currentUser
   const displayName = name ?? username ?? 'Unknown user'
-
-  const renderFriendRequests = () => (
-    <Popover>
-      <PopoverTrigger>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<FiBell />}
-        />
-      </PopoverTrigger>
-      <PopoverContent>
-        <PopoverHeader pt={4} fontWeight="bold">
-          Notifications
-        </PopoverHeader>
-        <PopoverArrow />
-        <PopoverBody>
-          <div>
-            {friendRequests && friendRequests.length > 0 ? (
-              friendRequests.map(({ username, gravatar }) => (
-                <FriendRequest
-                  username={username}
-                  gravatar={gravatar}
-                  key={username}
-                />
-              ))
-            ) : (
-              <Text>Nothing to see here!</Text>
-            )}
-          </div>
-        </PopoverBody>
-      </PopoverContent>
-    </Popover>
-  )
 
   return (
     <Flex
@@ -108,8 +70,9 @@ export const MobileNav = ({
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <UserSearch />
-        {renderFriendRequests()}
+        <UserSearch key="friends" friends={friends} isFriendSearch={true} />
+        <UserSearch key="search" />
+        <Notifications friendRequests={friendRequests} />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

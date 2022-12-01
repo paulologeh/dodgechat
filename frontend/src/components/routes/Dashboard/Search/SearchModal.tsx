@@ -18,19 +18,13 @@ import {
 } from '@chakra-ui/react'
 import MultiRef from 'react-multi-ref'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import {
-  KeyboardEvent,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { FriendMinimal } from 'types/api'
 import { Search as SearchService } from 'services/search'
 import { debounce, isEmpty } from 'lodash'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import './SearchModal.css'
+import { FaUserFriends } from 'react-icons/fa'
 
 const SearchNoResults = () => <Alert status="warning">No results found</Alert>
 
@@ -38,12 +32,20 @@ const SearchError = ({ message }: { message: string }) => (
   <Alert status="error">{message}</Alert>
 )
 
-export const UserSearch = () => {
+type UserSearchProps = {
+  friends?: FriendMinimal[]
+  isFriendSearch?: boolean
+}
+
+export const UserSearch = ({
+  friends,
+  isFriendSearch = false,
+}: UserSearchProps) => {
+  const [results, setResults] = useState<FriendMinimal[] | null>(null)
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [shouldCloseModal, setShouldCloseModal] = useState(true)
   const [menuNodes] = useState(() => new MultiRef<number, HTMLElement>())
-  const [results, setResults] = useState<FriendMinimal[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const menu = useDisclosure()
@@ -66,9 +68,14 @@ export const UserSearch = () => {
     if (modal.isOpen && query.length > 0) {
       setQuery('')
     }
-    setResults(null)
-    setError('')
-    setLoading(false)
+
+    if (isFriendSearch) {
+      setResults(friends ?? [])
+    } else {
+      setResults(null)
+      setError('')
+      setLoading(false)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modal.isOpen])
 
@@ -91,9 +98,17 @@ export const UserSearch = () => {
     setLoading(false)
   }
 
-  const handleSearchChange = async (e: {
-    target: { value: SetStateAction<string> }
-  }) => {
+  const handleSearchChange = (e: { target: { value: string } }) => {
+    if (isFriendSearch) {
+      setQuery(e.target.value)
+      if (isEmpty(e.target.value)) {
+        setResults(friends ?? [])
+      } else {
+        searchFriends(e.target.value)
+      }
+      return
+    }
+
     setError('')
     if (isEmpty(e.target.value)) {
       setLoading(false)
@@ -108,6 +123,15 @@ export const UserSearch = () => {
     menu.onOpen()
   }
 
+  const searchFriends = (term: string) => {
+    const results = (friends ?? []).filter(
+      ({ username, name }) =>
+        username.toLowerCase().includes(term.toLowerCase()) ||
+        name.toLowerCase().includes(term.toLowerCase())
+    )
+    setResults(results)
+  }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -117,6 +141,9 @@ export const UserSearch = () => {
   )
 
   useEffect(() => {
+    if (isFriendSearch) {
+      menu.onOpen()
+    }
     return () => {
       debouncedSearch.cancel()
     }
@@ -189,7 +216,7 @@ export const UserSearch = () => {
     })
   }, [active])
 
-  const handleSearchSelect = (username: string) => {
+  const handleUserSelect = (username: string) => {
     const fetchAndViewProfile = async () => {
       setDashboardStore((prevState) => ({
         ...prevState,
@@ -240,8 +267,8 @@ export const UserSearch = () => {
     <>
       <IconButton
         variant="ghost"
-        aria-label="Search users"
-        icon={<SearchIcon />}
+        aria-label={isFriendSearch ? 'Search friends' : 'Search users'}
+        icon={isFriendSearch ? <FaUserFriends /> : <SearchIcon />}
         onClick={modal.onOpen}
       />
       <Modal
@@ -279,7 +306,7 @@ export const UserSearch = () => {
                 bg: 'white',
                 '.chakra-ui-dark &': { bg: 'gray.700' },
               }}
-              placeholder="Search for users"
+              placeholder={isFriendSearch ? 'Search friends' : 'Search users'}
               value={query}
               onChange={handleSearchChange}
               onKeyDown={onKeyDown}
@@ -318,7 +345,7 @@ export const UserSearch = () => {
                             setActive(index)
                             eventRef.current = 'mouse'
                           }}
-                          onClick={() => handleSearchSelect(item.username)}
+                          onClick={() => handleUserSelect(item.username)}
                           ref={menuNodes.ref(index)}
                           role="option"
                           key={item.username}

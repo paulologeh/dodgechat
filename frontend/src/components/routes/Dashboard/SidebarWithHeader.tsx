@@ -10,7 +10,6 @@ import { MobileNav } from './MobileNav'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useAuth } from 'contexts/userContext'
 import { Users } from 'services'
-import { Friends } from './Friends'
 import { ErrorModal } from './ErrorModal'
 import { LoadingModal } from './LoadingModal'
 import { UserProfileModal } from 'components/common/UserProfile'
@@ -72,8 +71,6 @@ export const SidebarWithHeader = () => {
 
   const renderActiveMenu = () => {
     switch (activeItem) {
-      case 'friends':
-        return <Friends friends={friends} />
       default:
         return null
     }
@@ -101,6 +98,7 @@ export const SidebarWithHeader = () => {
         onOpen={onOpen}
         logout={logout}
         friendRequests={friendRequests}
+        friends={friends}
       />
       <Box ml={{ base: 0, md: 60 }} p="4">
         <LoadingModal open={loading} message={loadingMessage} />

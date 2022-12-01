@@ -8,7 +8,6 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 import { FiHome, FiMessageCircle } from 'react-icons/fi'
-import { FaUserFriends } from 'react-icons/fa'
 import { NavItem } from './NavItem'
 import { IconType } from 'react-icons'
 import { useDashboardStore } from 'contexts/dashboardContext'
@@ -21,7 +20,6 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome },
   { name: 'Messages', icon: FiMessageCircle },
-  { name: 'Friends', icon: FaUserFriends },
 ]
 
 interface SidebarProps extends BoxProps {
