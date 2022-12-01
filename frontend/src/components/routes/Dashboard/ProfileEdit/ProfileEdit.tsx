@@ -69,13 +69,19 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
     setSubmitting(false)
   }
 
+  const handleClose = () => {
+    setError('')
+    setSuccess(false)
+    modal.onClose()
+  }
+
   return (
     <>
       <MenuItem onClick={modal.onOpen}>Profile</MenuItem>
       <Modal
         scrollBehavior="inside"
         isOpen={modal.isOpen}
-        onClose={modal.onClose}
+        onClose={handleClose}
         blockScrollOnMount={false}
       >
         <ModalContent>
@@ -181,7 +187,7 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
                   _hover={{
                     bg: 'red.500',
                   }}
-                  onClick={modal.onClose}
+                  onClick={handleClose}
                 >
                   Cancel
                 </Button>

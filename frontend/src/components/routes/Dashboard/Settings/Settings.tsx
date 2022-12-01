@@ -123,10 +123,19 @@ export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
   const handleSelectChange = (e: {
     target: { value: SetStateAction<string> }
   }) => {
+    reset()
+    setSelected(e.target.value)
+  }
+
+  const reset = () => {
     setError('')
     setSucess('')
     setEmail(currentUser.email ?? '')
-    setSelected(e.target.value)
+  }
+
+  const handleClose = () => {
+    reset()
+    modal.onClose()
   }
 
   return (
@@ -135,7 +144,7 @@ export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
       <Modal
         scrollBehavior="inside"
         isOpen={modal.isOpen}
-        onClose={modal.onClose}
+        onClose={handleClose}
         blockScrollOnMount={false}
       >
         <ModalContent>
@@ -259,7 +268,7 @@ export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
                   _hover={{
                     bg: 'red.500',
                   }}
-                  onClick={modal.onClose}
+                  onClick={handleClose}
                 >
                   Cancel
                 </Button>
