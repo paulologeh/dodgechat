@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -20,11 +21,16 @@ import { ProfileEdit } from './ProfileEdit'
 import { Settings } from './Settings'
 import { Users } from 'services'
 import { useDashboardStore } from 'contexts/dashboardContext'
+import { LoadingModal } from './LoadingModal'
+import { ErrorModal } from './ErrorModal'
+import { UserProfileModal } from '../../common/UserProfile'
+import { Notifications } from './Notifications'
+import { UserSearch } from './Search'
 
 export const Dashboard = () => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
-  const { setDashboardStore } = useDashboardStore()
+  const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { avatarHash, name, username } = currentUser
   const displayName = name ?? username ?? 'Unknown user'
   const displayGravatar = `https://secure.gravatar.com/avatar/${avatarHash}?s=100&d=identicon&r=g`
@@ -68,6 +74,16 @@ export const Dashboard = () => {
     }
   }
 
+  const {
+    openErrorModal,
+    modalError,
+    loading,
+    loadingMessage,
+    openUserProfileModal,
+    friendRequests = [],
+    friends = [],
+  } = dashboardStore
+
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -77,7 +93,14 @@ export const Dashboard = () => {
           </Box>
 
           <Flex alignItems={'center'}>
-            <Stack direction={'row'} spacing={7}>
+            <Stack direction={'row'} spacing={8}>
+              <UserSearch
+                key="friends"
+                friends={friends}
+                isFriendSearch={true}
+              />
+              <UserSearch key="search" />
+              <Notifications friendRequests={friendRequests} />
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
@@ -92,14 +115,18 @@ export const Dashboard = () => {
                 >
                   <Avatar size={'sm'} src={displayGravatar} />
                 </MenuButton>
-                <MenuList alignItems={'center'}>
+                <MenuList
+                  alignItems={'center'}
+                  bg={useColorModeValue('white', 'gray.900')}
+                  borderColor={useColorModeValue('gray.200', 'gray.700')}
+                >
                   <br />
                   <Center>
                     <Avatar size={'2xl'} src={displayGravatar} />
                   </Center>
                   <br />
                   <Center>
-                    <p>{displayName}</p>
+                    <Text fontSize="md">{displayName}</Text>
                   </Center>
                   <br />
                   <MenuDivider />
@@ -111,6 +138,11 @@ export const Dashboard = () => {
             </Stack>
           </Flex>
         </Flex>
+      </Box>
+      <Box ml={{ base: 0, md: 60 }} p="4">
+        <LoadingModal open={loading} message={loadingMessage} />
+        <ErrorModal open={openErrorModal} message={modalError} />
+        <UserProfileModal open={openUserProfileModal} />
       </Box>
     </>
   )
