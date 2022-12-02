@@ -15,7 +15,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
-import { DodgeAlerter } from './DodgeAlerter'
 import { useAuth } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
 import { Settings } from './Settings'
@@ -88,9 +87,7 @@ export const Dashboard = () => {
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box>
-            <DodgeAlerter />
-          </Box>
+          <Box>Dodgechat</Box>
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={8}>
