@@ -10,6 +10,25 @@ from app.serde.utils import (
 )
 
 
+class MessageSchema(BasicSchema):
+    id = fields.UUID(dump_only=True)
+    sender_id = fields.Integer()
+    body = fields.Str()
+    read = fields.Boolean()
+    created_at = fields.DateTime(dump_only=True)
+
+
+class ConversationSchema(BasicSchema):
+    id = fields.UUID(dump_only=True)
+    sender_id = fields.Integer()
+    recipient_id = fields.Integer()
+
+
+class NewConversationSchema(BasicSchema):
+    recipient_id = fields.Integer()
+    message = MessageSchema()
+
+
 class DeleteAccountSchema(Schema):
     password = fields.Str(required=True, validate=must_not_be_blank)
 

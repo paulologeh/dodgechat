@@ -34,11 +34,13 @@ def create_app(config_name):
     from app.api.health import health as health_blueprint
     from app.api.relationships import relationships as relationships_blueprint
     from app.api.search import search as search_blueprint
+    from app.api.conversations import conversations as conversations_blueprint
 
     api_blueprint.register_blueprint(users_blueprint)
     api_blueprint.register_blueprint(health_blueprint)
     api_blueprint.register_blueprint(relationships_blueprint)
     api_blueprint.register_blueprint(search_blueprint)
+    api_blueprint.register_blueprint(conversations_blueprint)
 
     app.register_blueprint(api_blueprint)
 
