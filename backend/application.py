@@ -61,7 +61,8 @@ def setup_db():
 @app.cli.command("setup-test-accounts")
 def setup_test_accounts():
     try:
-        from app.utils import get_test_emails
+        from app.utils import get_test_emails, get_test_conversation
+
         test_emails = get_test_emails()
         # create users
 
@@ -74,7 +75,7 @@ def setup_test_accounts():
             db.session.commit()
 
             _username = _email.replace("@example.com", "")
-            _name = _username.replace(".", " ").capitalize()
+            _name = " ".join([name.capitalize() for name in _username.split(".")])
 
             _user = user.User(
                 email=_email,
@@ -91,30 +92,60 @@ def setup_test_accounts():
         # create relationships
         # all users add the first user
         first_user = user.User.query.filter_by(email=test_emails[0]).first()
+        blocked_email = test_emails[-1]
 
-        for idx, _email in enumerate(test_emails):
+        for idx, _email in enumerate(test_emails[1:]):
             _user = user.User.query.filter_by(email=_email).first()
 
-            # first users adds the second user and blocks the fourth user
-            if idx == 2 or idx == 4:
+            if _email == blocked_email:
                 friendship = relationship.Relationship(
                     requester_id=first_user.id,
                     addressee_id=_user.id,
-                    relationship_type=relationship.RelationshipType.FRIEND
-                    if idx == 2
-                    else relationship.RelationshipType.BLOCK,
+                    relationship_type=relationship.RelationshipType.BLOCK,
                 )
                 db.session.add(friendship)
+                continue
 
-            # all users request friendship except the fourth as they are blocked
-            if idx != 4:
+            # first user adds all even users
+            if (idx % 2) == 0:
                 friendship = relationship.Relationship(
-                    requester_id=_user.id,
-                    addressee_id=first_user.id,
+                    requester_id=first_user.id,
+                    addressee_id=_user.id,
                     relationship_type=relationship.RelationshipType.FRIEND,
                 )
                 db.session.add(friendship)
 
+            # first user is added by all users
+            friendship = relationship.Relationship(
+                requester_id=_user.id,
+                addressee_id=first_user.id,
+                relationship_type=relationship.RelationshipType.FRIEND,
+            )
+            db.session.add(friendship)
+
+        db.session.commit()
+
+        # start conversation between first and second user
+        user_1 = user.User.query.filter_by(email=test_emails[0]).first()
+        user_2 = user.User.query.filter_by(email=test_emails[1]).first()
+
+        _conversation = conversation.Conversation(
+            _sender_id=user_1.id, recipient_id=user_2.id
+        )
+        db.session.add(_conversation)
+        db.session.commit()
+
+        test_conversations = get_test_conversation()
+        messages = [
+            message.Message(
+                sender_id=user_1.id if (idx % 2) == 0 else user_2.id,
+                conversation_id=_conversation.id,
+                body=message_body,
+            )
+            for idx, message_body in enumerate(test_conversations)
+        ]
+
+        db.session.add_all(messages)
         db.session.commit()
 
         print("Successfully created test accounts")

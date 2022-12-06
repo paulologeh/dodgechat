@@ -1,4 +1,5 @@
 import os
+from flask import current_app
 
 
 def get_front_end():
@@ -13,9 +14,14 @@ def extract_all_errors(err):
 
 
 def get_test_emails():
-    from flask import current_app
-
-    with open(f"{current_app.root_path}/test_accounts.txt") as f:
+    with open(f"{current_app.root_path}/test_data/accounts.txt") as f:
         test_emails = f.read().splitlines()
 
     return test_emails
+
+
+def get_test_conversation():
+    with open(f"{current_app.root_path}/test_data/conversations.txt") as f:
+        test_conversations = f.read().splitlines()
+
+    return test_conversations
