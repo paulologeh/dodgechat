@@ -6,6 +6,7 @@ from flask_login import current_user, login_required
 from app.api.relationships import _get_friends
 from app.models.relationship import FriendState, Relationship, RelationshipType
 from app.models.user import User
+from app.utils import get_test_emails
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,9 @@ def search_user(username):
         "name": user.name,
         "username": user.username,
         "location": user.location,
-        "gravatar": user.gravatar(size=400),
+        "gravatar": user.gravatar(size=400, default="robohash", rating="x")
+        if user.email in get_test_emails()
+        else user.gravatar(size=400),
         "relationshipState": relationship_state.value
         if relationship_state
         else relationship_state,

@@ -61,9 +61,9 @@ def get_or_create_conversations():
         db.session.commit()
 
         message = Message(
-            body=data["message_body"] ,
+            body=data["message_body"],
             sender_id=current_user.id,
-            conversation_id=conversation.id
+            conversation_id=conversation.id,
         )
         db.session.add(message)
         db.session.commit()

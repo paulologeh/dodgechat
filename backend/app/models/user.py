@@ -1,17 +1,16 @@
 import hashlib
-import uuid
 from datetime import datetime
 
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import Index
-from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login_manager
 
-from .ts_vector import TSVector
+from app.models.ts_vector import TSVector
+from app.utils import get_test_emails
 
 
 class User(UserMixin, db.Model):
@@ -129,10 +128,8 @@ class User(UserMixin, db.Model):
 
     def gravatar(self, size=100, default="identicon", rating="g"):
         url = "https://secure.gravatar.com/avatar"
-        hash = self.avatar_hash or self.gravatar_hash()
-        return "{url}/{hash}?s={size}&d={default}&r={rating}".format(
-            url=url, hash=hash, size=size, default=default, rating=rating
-        )
+        _hash = self.avatar_hash or self.gravatar_hash()
+        return f"{url}/{_hash}?s={size}&d={default}&r={rating}"
 
     def to_minimal(self, private=False):
         json_user = {
@@ -140,7 +137,9 @@ class User(UserMixin, db.Model):
             "name": self.name,
             "location": self.location,
             "aboutMe": self.about_me,
-            "gravatar": self.gravatar(),
+            "gravatar": self.gravatar(default="robohash", rating="x")
+            if self.email in get_test_emails()
+            else self.gravatar(),
         }
 
         if private:

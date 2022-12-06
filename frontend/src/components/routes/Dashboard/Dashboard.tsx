@@ -25,14 +25,16 @@ import { ErrorModal } from './ErrorModal'
 import { UserProfileModal } from '../../common/UserProfile'
 import { Notifications } from './Notifications'
 import { UserSearch } from './Search'
+import { getGravatarUrl } from 'utils'
 
 export const Dashboard = () => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
   const { dashboardStore, setDashboardStore } = useDashboardStore()
-  const { avatarHash, name, username } = currentUser
+  const { avatarHash, name, username, email } = currentUser
   const displayName = name ?? username ?? 'Unknown user'
-  const displayGravatar = `https://secure.gravatar.com/avatar/${avatarHash}?s=100&d=identicon&r=g`
+  const displayGravatar =
+    avatarHash && email ? getGravatarUrl(avatarHash, email, 100) : undefined
 
   const logout = async () => {
     setDashboardStore((prevState) => ({

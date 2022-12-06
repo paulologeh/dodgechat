@@ -23,6 +23,7 @@ import { useAuth } from 'contexts/userContext'
 import { UserUpdate } from 'types/api'
 import { Users } from 'services'
 import { isEmpty } from 'lodash'
+import { getGravatarUrl } from 'utils'
 
 export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [formData, setFormData] = useState<CurrentUser>({ ...currentUser })
@@ -74,6 +75,10 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
     setSuccess(false)
     modal.onClose()
   }
+  const displayGravatar =
+    formData.avatarHash && formData.email
+      ? getGravatarUrl(formData.avatarHash, formData.email, 100)
+      : undefined
 
   return (
     <>
@@ -105,10 +110,7 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
               <FormControl id="userIcon">
                 <Stack direction={['column', 'row']} spacing={6}>
                   <Center>
-                    <Avatar
-                      size="xl"
-                      src={`https://secure.gravatar.com/avatar/${formData.avatarHash}?s=100&d=identicon&r=g`}
-                    ></Avatar>
+                    <Avatar size="xl" src={displayGravatar}></Avatar>
                   </Center>
                   <Center w="full">
                     <Button

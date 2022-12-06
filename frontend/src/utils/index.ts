@@ -25,7 +25,26 @@ export const fetcher = (url: string, method: string, body: unknown = null) => {
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
 
-export const gravatarUrl = 'https://secure.gravatar.com/avatar'
+const robotEmails = [
+  'stephen.little@example.com',
+  'oya.yildizoglu@example.com',
+  'alma.poulsen@example.com',
+  'eren.turkdogan@example.com',
+  'veeti.nurmi@example.com',
+  'zlatomira.romenskiy@example.com',
+  'umut.yetkiner@example.com',
+]
+
+export const getGravatarUrl = (
+  avatarHash: string,
+  email: string,
+  size: number
+) => {
+  const isRobohash = email && robotEmails.includes(email)
+  const d = isRobohash ? 'robohash' : 'identicon'
+  const r = isRobohash ? 'x' : 'g'
+  return `https://secure.gravatar.com/avatar/${avatarHash}?s=${size}&d=${d}&r=${r}`
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const months: any = {
