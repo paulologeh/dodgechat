@@ -321,8 +321,10 @@ export const UserSearch = ({
             </Center>
           </Flex>
           <ModalBody maxH="66vh" p="0" ref={menuRef}>
-            {resultsLength === 0 && results !== null && <SearchNoResults />}
-            {error && <SearchError message={error} />}
+            {resultsLength === 0 && results !== null && !isFriendSearch && (
+              <SearchNoResults />
+            )}
+            {error && !isFriendSearch && <SearchError message={error} />}
             {open && (
               <Box
                 sx={{
