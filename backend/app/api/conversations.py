@@ -48,7 +48,7 @@ def get_or_create_conversations():
         except ValidationError as err:
             abort(422, extract_all_errors(err))
 
-        conversation = Conversation.filter_by(
+        conversation = Conversation.query.filter_by(
             _sender_id=current_user.id, recipient_id=data["recipient_id"]
         ).first()
         if conversation:
@@ -61,7 +61,7 @@ def get_or_create_conversations():
         db.session.commit()
 
         message = Message(
-            **data["message"],
+            body=data["message_body"] ,
             sender_id=current_user.id,
             conversation_id=conversation.id
         )

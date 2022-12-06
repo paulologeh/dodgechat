@@ -26,7 +26,7 @@ class ConversationSchema(BasicSchema):
 
 class NewConversationSchema(BasicSchema):
     recipient_id = fields.Integer()
-    message = MessageSchema()
+    message_body = fields.Str()
 
 
 class DeleteAccountSchema(Schema):
