@@ -34,7 +34,7 @@ logging.setLogRecordFactory(record_factory)
 werkzeug_logger = logging.getLogger("werkzeug")
 werkzeug_logger.level = LOG_LEVEL
 
-app = create_app(os.getenv("ENVIRONMENT", "DEVELOPMENT"))
+app = create_app(os.getenv("ENVIRONMENT"))
 migrate = Migrate(app, db)
 
 for logger in (
@@ -61,9 +61,11 @@ def setup_db():
 @app.cli.command("setup-test-accounts")
 def setup_test_accounts():
     try:
+        from app.utils import get_test_emails
+        test_emails = get_test_emails()
         # create users
-        for i in range(1, 5):
-            _email = f"test_account_{i}@dodgechat.com"
+
+        for _email in test_emails:
             _user = user.User.query.filter_by(email=_email).first()
 
             if _user:
@@ -71,12 +73,15 @@ def setup_test_accounts():
 
             db.session.commit()
 
+            _username = _email.replace("@example.com", "")
+            _name = _username.replace(".", " ").capitalize()
+
             _user = user.User(
                 email=_email,
-                username=f"test_account_{i}",
+                username=_username,
                 password="password",
                 confirmed=True,
-                name=f"Test Account{i}",
+                name=_name,
                 location="London, England",
                 about_me="I am a test account",
             )
@@ -84,31 +89,28 @@ def setup_test_accounts():
             db.session.commit()
 
         # create relationships
-        # all test accounts add test_account_1
-        user_test_account_1 = user.User.query.filter_by(
-            email="test_account_1@dodgechat.com"
-        ).first()
+        # all users add the first user
+        first_user = user.User.query.filter_by(email=test_emails[0]).first()
 
-        for i in range(2, 5):
-            _email = f"test_account_{i}@dodgechat.com"
+        for idx, _email in enumerate(test_emails):
             _user = user.User.query.filter_by(email=_email).first()
 
-            # test_account_1 adds the second user and blocks the fourth user
-            if i == 2 or i == 4:
+            # first users adds the second user and blocks the fourth user
+            if idx == 2 or idx == 4:
                 friendship = relationship.Relationship(
-                    requester_id=user_test_account_1.id,
+                    requester_id=first_user.id,
                     addressee_id=_user.id,
                     relationship_type=relationship.RelationshipType.FRIEND
-                    if i == 2
+                    if idx == 2
                     else relationship.RelationshipType.BLOCK,
                 )
                 db.session.add(friendship)
 
             # all users request friendship except the fourth as they are blocked
-            if i != 4:
+            if idx != 4:
                 friendship = relationship.Relationship(
                     requester_id=_user.id,
-                    addressee_id=user_test_account_1.id,
+                    addressee_id=first_user.id,
                     relationship_type=relationship.RelationshipType.FRIEND,
                 )
                 db.session.add(friendship)
