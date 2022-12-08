@@ -35,7 +35,7 @@ def get_or_create_conversations():
             .filter(
                 or_(
                     Conversation.recipient_id == current_user.id,
-                    Conversation.sender_id == current_user.id,
+                    Conversation._sender_id == current_user.id,
                 )
             )
             .all()
@@ -48,10 +48,7 @@ def get_or_create_conversations():
         except ValidationError as err:
             abort(422, extract_all_errors(err))
 
-        conversation = Conversation.query.filter_by(
-            _sender_id=current_user.id, recipient_id=data["recipient_id"]
-        ).first()
-        if conversation:
+        if Conversation.conversation_exists(current_user.id, data["recipient_id"]):
             abort(400, "Conversation already exists")
 
         conversation = Conversation(

@@ -22,7 +22,7 @@ class Conversation(db.Model):
     recipient = db.relationship("User", foreign_keys=[recipient_id])
 
     @classmethod
-    def conversation_exists(cls, sender_id: UUID, recipient_id: UUID) -> bool:
+    def conversation_exists(cls, sender_id: int, recipient_id: int) -> bool:
         results = (
             db.session.query(cls)
             .filter(
@@ -44,7 +44,7 @@ class Conversation(db.Model):
         return self._sender_id
 
     @sender_id.setter
-    def sender_id(self, id: UUID):
+    def sender_id(self, id: int):
         if not self.recipient_id:
             raise AttributeError("recipient_id is not set")
 
