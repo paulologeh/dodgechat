@@ -19,7 +19,7 @@ import {
 import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
-import { Users } from 'services'
+import { Users } from 'api'
 
 type RegisterFormState = {
   email: string

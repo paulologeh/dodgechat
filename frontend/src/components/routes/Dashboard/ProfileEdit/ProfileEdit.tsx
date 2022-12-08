@@ -21,7 +21,7 @@ import { useState } from 'react'
 import type { CurrentUser } from 'contexts/userContext'
 import { useAuth } from 'contexts/userContext'
 import { UserUpdate } from 'types/api'
-import { Users } from 'services'
+import { Users } from 'api'
 import { isEmpty } from 'lodash'
 import { getGravatarUrl } from 'utils'
 
@@ -62,6 +62,7 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
         setSuccess(true)
       } else {
         setError(data.message ?? 'Something went wrong. Please try again later')
+        setFormData({ ...currentUser })
       }
     } catch (error) {
       console.error(error)

@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Users } from 'services'
+import { Users } from 'api'
 import { ErrorResult, PageLoading, SuccessResult } from 'components/common'
 
 const title = 'Account Confirmation'

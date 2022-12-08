@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, ButtonGroup, Text } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useDashboardStore } from 'contexts/dashboardContext'
-import { Relationships } from 'services'
+import { Relationships } from 'api'
 
 type FriendRequestProps = {
   username: string

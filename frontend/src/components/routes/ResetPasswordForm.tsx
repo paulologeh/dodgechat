@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Users } from 'services'
+import { Users } from 'api'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 type ResetPasswordFormState = {

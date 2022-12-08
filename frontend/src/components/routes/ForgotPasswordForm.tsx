@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import { Users } from 'services'
+import { Users } from 'api'
 import { validateEmail } from 'utils'
 
 export const ForgotPasswordForm = () => {

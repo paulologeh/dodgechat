@@ -18,11 +18,11 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { useAuth } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
 import { Settings } from './Settings'
-import { Users } from 'services'
+import { Users } from 'api'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { LoadingModal } from './LoadingModal'
 import { ErrorModal } from './ErrorModal'
-import { UserProfileModal } from '../../common/UserProfile'
+import { UserProfileModal } from 'components/common/UserProfile'
 import { Notifications } from './Notifications'
 import { UserSearch } from './Search'
 import { getGravatarUrl } from 'utils'
@@ -89,7 +89,7 @@ export const Dashboard = () => {
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box>Dodgechat</Box>
+          <Box>dodgechat</Box>
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={8}>
@@ -130,7 +130,7 @@ export const Dashboard = () => {
                   <br />
                   <MenuDivider />
                   <ProfileEdit currentUser={currentUser} />
-                  <Settings currentUser={currentUser} />
+                  <Settings />
                   <MenuItem onClick={logout}>Sign out</MenuItem>
                 </MenuList>
               </Menu>
@@ -138,11 +138,11 @@ export const Dashboard = () => {
           </Flex>
         </Flex>
       </Box>
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      <>
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />
         <UserProfileModal open={openUserProfileModal} />
-      </Box>
+      </>
     </>
   )
 }

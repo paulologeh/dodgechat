@@ -1,6 +1,6 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
-import { FriendMinimal, UserProfile } from 'types/api'
-import { Relationships } from 'services'
+import { Conversation, FriendMinimal, UserProfile } from 'types/api'
+import { Conversations, Relationships } from 'api'
 
 type DashboardStore = {
   activeItem: string
@@ -14,6 +14,7 @@ type DashboardStore = {
   modalError: string
   openUserProfileModal: boolean
   selectedUser: UserProfile | null
+  conversations: Conversation[]
 }
 
 const initialStore: DashboardStore = {
@@ -28,6 +29,7 @@ const initialStore: DashboardStore = {
   modalError: '',
   openUserProfileModal: false,
   selectedUser: null,
+  conversations: [],
 }
 
 const DashboardContext = createContext({
@@ -50,7 +52,9 @@ export const DashboardStoreProvider: FC = ({ children }) => {
     try {
       const response = await Relationships.getFriends()
       const data = await response.json()
-      if (response.status === 200) {
+      const responseConversations = await Conversations.getAllConversations()
+      const conversationsData = await responseConversations.json()
+      if (response.status === 200 && responseConversations.status === 200) {
         const {
           friendRequests,
           friends,
@@ -62,6 +66,7 @@ export const DashboardStoreProvider: FC = ({ children }) => {
           ...prevState,
           friendRequests: friendRequests,
           friends: friends,
+          conversations: conversationsData,
           loading: false,
         }))
       } else {

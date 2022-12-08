@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
-import { Users } from 'services'
+import { Users } from 'api'
 import { useAuth } from 'contexts/userContext'
 import { validateEmail } from 'utils'
 

@@ -1,5 +1,5 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
-import { Users } from 'services'
+import { Users } from 'api'
 import { PageLoading } from 'components/common'
 
 export type CurrentUser = {

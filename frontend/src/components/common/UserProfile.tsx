@@ -16,7 +16,7 @@ import {
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { getLastSeen, months } from 'utils/index'
 import { useState } from 'react'
-import { Relationships, Search as SearchService } from 'services'
+import { Relationships, Search as SearchService } from 'api'
 
 type UserProfileModalProps = {
   open: boolean

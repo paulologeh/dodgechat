@@ -17,12 +17,13 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { SetStateAction, useState } from 'react'
-import type { CurrentUser } from 'contexts/userContext'
-import { Users } from 'services'
+import { useAuth } from 'contexts/userContext'
+import { Users } from 'api'
 import { isEmpty } from 'lodash'
-import { useNavigate } from 'react-router-dom'
+import { delay } from '../../../../utils'
 
-export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
+export const Settings = () => {
+  const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
   const [isSubmitting, setSubmitting] = useState(false)
   const [selected, setSelected] = useState('change-email')
   const [email, setEmail] = useState(currentUser.email ?? '')
@@ -32,8 +33,8 @@ export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSucess] = useState('')
+
   const modal = useDisclosure()
-  const navigate = useNavigate()
 
   const handleSubmit = async () => {
     let response
@@ -95,7 +96,10 @@ export const Settings = ({ currentUser }: { currentUser: CurrentUser }) => {
       if (response?.status === 200) {
         switch (selected) {
           case 'delete-account':
-            navigate('../login', { replace: true })
+            setSucess('Account deleted. You will be rerouted in a moment')
+            await delay(5000)
+            setLoggedIn(false)
+            setCurrentUser({})
             break
           case 'resend-email-verification':
             setSucess('Sent verification email')
