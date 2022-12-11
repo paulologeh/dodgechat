@@ -65,7 +65,6 @@ def setup_test_accounts():
 
         test_emails = get_test_emails()
         # create users
-
         for _email in test_emails:
             _user = user.User.query.filter_by(email=_email).first()
 
@@ -125,28 +124,29 @@ def setup_test_accounts():
 
         db.session.commit()
 
-        # start conversation between first and second user
-        user_1 = user.User.query.filter_by(email=test_emails[0]).first()
-        user_2 = user.User.query.filter_by(email=test_emails[1]).first()
+        # start conversation between first_user and friends
+        for index in range(1, len(test_emails), 2):
+            _email = test_emails[index]
+            _user = user.User.query.filter_by(email=_email).first()
 
-        _conversation = conversation.Conversation(
-            _sender_id=user_1.id, recipient_id=user_2.id
-        )
-        db.session.add(_conversation)
-        db.session.commit()
-
-        test_conversations = get_test_conversation()
-        messages = [
-            message.Message(
-                sender_id=user_1.id if (idx % 2) == 0 else user_2.id,
-                conversation_id=_conversation.id,
-                body=message_body,
+            _conversation = conversation.Conversation(
+                _sender_id=first_user.id, recipient_id=_user.id
             )
-            for idx, message_body in enumerate(test_conversations)
-        ]
+            db.session.add(_conversation)
+            db.session.commit()
 
-        db.session.add_all(messages)
-        db.session.commit()
+            test_conversations = get_test_conversation()
+            messages = [
+                message.Message(
+                    sender_id=first_user.id if (idx % 2) == 0 else _user.id,
+                    conversation_id=_conversation.id,
+                    body=message_body,
+                )
+                for idx, message_body in enumerate(test_conversations)
+            ]
+
+            db.session.add_all(messages)
+            db.session.commit()
 
         print("Successfully created test accounts")
     except Exception as e:

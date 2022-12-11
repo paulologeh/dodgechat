@@ -147,6 +147,7 @@ class User(UserMixin, db.Model):
                 **json_user,
                 "memberSince": self.member_since,
                 "lastSeen": self.last_seen,
+                "id": self.id
             }
 
         return json_user
