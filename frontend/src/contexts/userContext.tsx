@@ -6,7 +6,7 @@ export type CurrentUser = {
   aboutMe?: string
   avatarHash?: string
   email?: string
-  id?: string
+  id?: number
   lastSeen?: Date
   location?: string
   memberSince?: Date

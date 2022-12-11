@@ -26,6 +26,7 @@ import { UserProfileModal } from 'components/common/UserProfile'
 import { Notifications } from './Notifications'
 import { UserSearch } from './Search'
 import { getGravatarUrl } from 'utils'
+import { Messages } from './Messages'
 
 export const Dashboard = () => {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -91,7 +92,7 @@ export const Dashboard = () => {
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <Box>dodgechat</Box>
 
-          <Flex alignItems={'center'}>
+          <Flex alignItems={'center'} justifyContent="center">
             <Stack direction={'row'} spacing={8}>
               <UserSearch
                 key="friends"
@@ -138,6 +139,9 @@ export const Dashboard = () => {
           </Flex>
         </Flex>
       </Box>
+      <Center>
+        <Messages />
+      </Center>
       <>
         <LoadingModal open={loading} message={loadingMessage} />
         <ErrorModal open={openErrorModal} message={modalError} />

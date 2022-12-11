@@ -102,7 +102,7 @@ export const UserSearch = ({
     if (isFriendSearch) {
       setQuery(e.target.value)
       if (isEmpty(e.target.value)) {
-        setResults(friends ?? [])
+        setResults(friends ?? null)
       } else {
         searchFriends(e.target.value)
       }
@@ -112,7 +112,7 @@ export const UserSearch = ({
     setError('')
     if (isEmpty(e.target.value)) {
       setLoading(false)
-      setResults([])
+      setResults(null)
       setQuery('')
       debouncedSearch.cancel()
     } else {

@@ -24,6 +24,7 @@ export type FriendMinimal = {
   gravatar: string
   memberSince?: Date
   lastSeen?: Date
+  id?: number
 }
 
 export type UserUpdate = {
@@ -32,4 +33,18 @@ export type UserUpdate = {
   avatarHash?: string
   location?: string
   aboutMe?: string
+}
+
+export type Message = {
+  id?: string
+  senderId: number
+  body: string
+  read: boolean
+  createdAt: Date
+}
+export type Conversation = {
+  id: string
+  senderId: number
+  recipientId: number
+  messages: Message[]
 }
