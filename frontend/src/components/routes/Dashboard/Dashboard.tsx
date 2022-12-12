@@ -4,6 +4,7 @@ import {
   Button,
   Center,
   Flex,
+  IconButton,
   Menu,
   MenuButton,
   MenuDivider,
@@ -14,7 +15,6 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { useAuth } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
 import { Settings } from './Settings'
@@ -23,10 +23,11 @@ import { useDashboardStore } from 'contexts/dashboardContext'
 import { LoadingModal } from './LoadingModal'
 import { ErrorModal } from './ErrorModal'
 import { UserProfileModal } from 'components/common/UserProfile'
-import { Notifications } from './Notifications'
-import { UserSearch } from './Search'
 import { getGravatarUrl } from 'utils'
 import { Messages } from './Messages'
+import { FiMoon, FiSmile, FiSun } from 'react-icons/fi'
+import { UserSearch } from './Search'
+import { Notifications } from './Notifications'
 
 export const Dashboard = () => {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -89,21 +90,23 @@ export const Dashboard = () => {
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
-        <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box>dodgechat</Box>
-
+        <Flex h={16} alignItems={'center'} justifyContent={'end'}>
           <Flex alignItems={'center'} justifyContent="center">
-            <Stack direction={'row'} spacing={8}>
+            <Stack direction={'row'} spacing={7}>
+              <UserSearch key="search" />
               <UserSearch
                 key="friends"
                 friends={friends}
                 isFriendSearch={true}
               />
-              <UserSearch key="search" />
               <Notifications friendRequests={friendRequests} />
-              <Button onClick={toggleColorMode}>
-                {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-              </Button>
+              <IconButton
+                size="lg"
+                variant="ghost"
+                aria-label="toggle-dark-mode"
+                icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
+                onClick={toggleColorMode}
+              />
 
               <Menu>
                 <MenuButton
@@ -111,9 +114,8 @@ export const Dashboard = () => {
                   rounded={'full'}
                   variant={'link'}
                   cursor={'pointer'}
-                  minW={0}
                 >
-                  <Avatar size={'sm'} src={displayGravatar} />
+                  <Avatar size="sm" src={displayGravatar} icon={<FiSmile />} />
                 </MenuButton>
                 <MenuList
                   alignItems={'center'}

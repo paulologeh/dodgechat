@@ -24,7 +24,7 @@ import { Search as SearchService } from 'api/search'
 import { debounce, isEmpty } from 'lodash'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import './SearchModal.css'
-import { FaUserFriends } from 'react-icons/fa'
+import { FiSearch, FiUsers } from 'react-icons/fi'
 
 const SearchNoResults = () => <Alert status="warning">No results found</Alert>
 
@@ -266,9 +266,10 @@ export const UserSearch = ({
   return (
     <>
       <IconButton
+        size="lg"
         variant="ghost"
         aria-label={isFriendSearch ? 'Search friends' : 'Search users'}
-        icon={isFriendSearch ? <FaUserFriends /> : <SearchIcon />}
+        icon={isFriendSearch ? <FiUsers /> : <FiSearch />}
         onClick={modal.onOpen}
       />
       <Modal

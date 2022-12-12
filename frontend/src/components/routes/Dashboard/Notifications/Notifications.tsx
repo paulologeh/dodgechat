@@ -22,7 +22,7 @@ export const Notifications = ({
       <IconButton
         size="lg"
         variant="ghost"
-        aria-label="open menu"
+        aria-label="notifications"
         icon={<FiBell />}
       />
     </PopoverTrigger>

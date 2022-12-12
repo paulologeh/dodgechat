@@ -19,11 +19,9 @@ export const Messages = () => {
     <Box
       sx={{
         px: 4,
-        bg: 'white',
-        '.chakra-ui-dark &': { bg: 'gray.700' },
       }}
     >
-      <Box as="ul" role="listbox" borderTopWidth="1px" pt={2} pb={4}>
+      <Box as="ul" role="listbox" pt={2} pb={4}>
         {(allConversations ?? []).map((conv, index) => {
           const lastMessage = conv.messages[0]
           const friend = friends.filter(
