@@ -25,7 +25,7 @@ import { ErrorModal } from './ErrorModal'
 import { UserProfileModal } from 'components/common/UserProfile'
 import { getGravatarUrl } from 'utils'
 import { Messages } from './Messages'
-import { FiMoon, FiSmile, FiSun } from 'react-icons/fi'
+import { FiMoon, FiSun } from 'react-icons/fi'
 import { UserSearch } from './Search'
 import { Notifications } from './Notifications'
 
@@ -115,7 +115,7 @@ export const Dashboard = () => {
                   variant={'link'}
                   cursor={'pointer'}
                 >
-                  <Avatar size="sm" src={displayGravatar} icon={<FiSmile />} />
+                  <Avatar size="sm" src={displayGravatar} />
                 </MenuButton>
                 <MenuList
                   alignItems={'center'}
