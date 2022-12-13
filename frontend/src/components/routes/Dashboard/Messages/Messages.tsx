@@ -9,26 +9,65 @@ import {
   Divider,
   Flex,
   Text,
+  useUpdateEffect,
 } from '@chakra-ui/react'
 import './Messages.css'
 import { EnterIcon } from './EnterIcon'
 import { SearchIcon } from '@chakra-ui/icons'
+import { SearchNoResults } from '../Search/SearchModal'
+import { isEmpty } from 'lodash'
 
 export const Messages = () => {
   const { dashboardStore } = useDashboardStore()
   const { conversations, friends } = dashboardStore
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
   const [active, setActive] = useState(-1)
-  const eventRef = useRef<'mouse' | null>(null)
-  const [query] = useState('')
+  const [query, setQuery] = useState('')
+  const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
+
+  const searchConversations = (term: string) => {
+    if (term === '') {
+      setAllConversations(conversations)
+      return
+    }
+    const results = []
+
+    const searchTerm = term.toLowerCase()
+    for (let i = 0; i < conversations.length; i++) {
+      const messages = conversations[i].messages
+      const filteredMessages = messages.filter((message) =>
+        message.body.toLowerCase().includes(searchTerm)
+      )
+      const { senderId, recipientId } = conversations[i]
+      const friend = friends.filter(
+        (friend) => friend.id === senderId || friend.id == recipientId
+      )[0]
+      if (filteredMessages.length > 0) {
+        results.push({ ...conversations[i] })
+      } else if (
+        friend.name.toLowerCase().includes(searchTerm) ||
+        friend.username.toLowerCase().includes(searchTerm)
+      ) {
+        results.push({ ...conversations[i] })
+      }
+    }
+
+    setAllConversations(results)
+  }
 
   useEffect(() => {
     setAllConversations(conversations)
   }, [conversations])
 
+  useUpdateEffect(() => {
+    setActive(0)
+    searchConversations(query)
+  }, [query])
+
   return (
     <>
       <Box
+        width="100vh"
         sx={{
           px: 4,
           mt: 2,
@@ -54,7 +93,7 @@ export const Messages = () => {
               }}
               placeholder="Search messages"
               value={query}
-              onChange={() => null}
+              onChange={(e) => setQuery(e.target.value)}
             />
             <Center pos="absolute" left={7} h="68px">
               <SearchIcon color="teal.500" boxSize="20px" />
@@ -66,58 +105,61 @@ export const Messages = () => {
               mt: 4,
             }}
           />
-          {(allConversations ?? []).map((conv, index) => {
-            const lastMessage = conv.messages[0]
-            const friend = friends.filter(
-              (val) => val.id === conv.senderId || val.id === conv.recipientId
-            )[0]
-            const selected = index === active
-            const isFriendLastMessage = lastMessage.senderId === friend.id
+          <div>
+            {isEmpty(allConversations) && <SearchNoResults />}
+            {(allConversations ?? []).map((conv, index) => {
+              const lastMessage = conv.messages[0]
+              const friend = friends.filter(
+                (val) => val.id === conv.senderId || val.id === conv.recipientId
+              )[0]
+              const selected = index === active
+              const isFriendLastMessage = lastMessage.senderId === friend.id
 
-            return (
-              <span key={conv.id} className="fake-link">
-                <Box
-                  as="li"
-                  role="option"
-                  key={conv.id}
-                  aria-selected={selected ? true : undefined}
-                  onMouseEnter={() => {
-                    setActive(index)
-                    eventRef.current = 'mouse'
-                  }}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    minH: 16,
-                    mt: 2,
-                    px: 4,
-                    py: 2,
-                    rounded: 'lg',
-                    bg: 'gray.100',
-                    '.chakra-ui-dark &': { bg: 'gray.600' },
-                    _selected: {
-                      bg: 'teal.500',
-                      color: 'white',
-                      mark: {
+              return (
+                <span key={conv.id} className="fake-link">
+                  <Box
+                    as="li"
+                    role="option"
+                    key={conv.id}
+                    aria-selected={selected ? true : undefined}
+                    onMouseEnter={() => {
+                      setActive(index)
+                      eventRef.current = 'mouse'
+                    }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      minH: 16,
+                      mt: 2,
+                      px: 4,
+                      py: 2,
+                      rounded: 'lg',
+                      bg: 'gray.100',
+                      '.chakra-ui-dark &': { bg: 'gray.600' },
+                      _selected: {
+                        bg: 'teal.500',
                         color: 'white',
-                        textDecoration: 'underline',
+                        mark: {
+                          color: 'white',
+                          textDecoration: 'underline',
+                        },
                       },
-                    },
-                  }}
-                >
-                  <Avatar size="sm" src={friend.gravatar} />
-                  <Box flex="1" ml="4">
-                    <Box fontWeight="semibold">{friend.name}</Box>
-                    <Text noOfLines={1}>
-                      {isFriendLastMessage ? null : 'You: '}
-                      {lastMessage.body}
-                    </Text>
+                    }}
+                  >
+                    <Avatar size="sm" src={friend.gravatar} />
+                    <Box flex="1" ml="4">
+                      <Box fontWeight="semibold">{friend.name}</Box>
+                      <Text noOfLines={1}>
+                        {isFriendLastMessage ? null : 'You: '}
+                        {lastMessage.body}
+                      </Text>
+                    </Box>
+                    <EnterIcon opacity={0.5} />
                   </Box>
-                  <EnterIcon opacity={0.5} />
-                </Box>
-              </span>
-            )
-          })}
+                </span>
+              )
+            })}
+          </div>
         </Box>
       </Box>
     </>

@@ -26,7 +26,9 @@ import { useDashboardStore } from 'contexts/dashboardContext'
 import './SearchModal.css'
 import { FiSearch, FiUsers } from 'react-icons/fi'
 
-const SearchNoResults = () => <Alert status="warning">No results found</Alert>
+export const SearchNoResults = () => (
+  <Alert status="warning">No results found</Alert>
+)
 
 const SearchError = ({ message }: { message: string }) => (
   <Alert status="error">{message}</Alert>
