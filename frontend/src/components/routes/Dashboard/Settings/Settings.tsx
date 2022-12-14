@@ -20,10 +20,12 @@ import { SetStateAction, useState } from 'react'
 import { useAuth } from 'contexts/userContext'
 import { Users } from 'api'
 import { isEmpty } from 'lodash'
-import { delay } from '../../../../utils'
+import { delay } from 'utils'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 export const Settings = () => {
   const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
+  const { setDashboardStore } = useDashboardStore()
   const [isSubmitting, setSubmitting] = useState(false)
   const [selected, setSelected] = useState('change-email')
   const [email, setEmail] = useState(currentUser.email ?? '')
@@ -93,11 +95,24 @@ export const Settings = () => {
         }
       }
 
+      setSubmitting(false)
+
       if (response?.status === 200) {
         switch (selected) {
           case 'delete-account':
-            setSucess('Account deleted. You will be rerouted in a moment')
+            setSucess('Account deleted. You will be redirected in a moment')
             await delay(5000)
+            setDashboardStore((prevState) => ({
+              ...prevState,
+              loading: true,
+              loadingMessage: 'Redirecting',
+            }))
+            await delay(5000)
+            setDashboardStore((prevState) => ({
+              ...prevState,
+              loading: false,
+              loadingMessage: '',
+            }))
             setLoggedIn(false)
             setCurrentUser({})
             break
@@ -121,7 +136,6 @@ export const Settings = () => {
       console.error(e)
       setError('Something went wrong')
     }
-    setSubmitting(false)
   }
 
   const handleSelectChange = (e: {
