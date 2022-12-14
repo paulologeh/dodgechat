@@ -27,10 +27,6 @@ def handle_before_request():
         current_user.ping()
         db.session.commit()
 
-    app = current_app._get_current_object()
-    if app.config.get("DEVELOPMENT") is not None:
-        time.sleep(1)  # delay all requests by 1 second
-
 
 @api.after_request
 def handle_after_request(response):
