@@ -1,6 +1,7 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Conversation, FriendMinimal, UserProfile } from 'types/api'
 import { Conversations, Relationships } from 'api'
+import { PageLoading } from 'components/common'
 
 type DashboardStore = {
   activeItem: string
@@ -46,9 +47,9 @@ export function useDashboardStore() {
 export const DashboardStoreProvider: FC = ({ children }) => {
   const [dashboardStore, setDashboardStore] =
     useState<DashboardStore>(initialStore)
+  const [loading, setLoading] = useState(true)
 
   const fetchAllData = async () => {
-    setDashboardStore((prevState) => ({ ...prevState, loading: true }))
     try {
       const response = await Relationships.getFriends()
       const data = await response.json()
@@ -67,14 +68,14 @@ export const DashboardStoreProvider: FC = ({ children }) => {
           friendRequests: friendRequests,
           friends: friends,
           conversations: conversationsData,
-          loading: false,
+          // loading: false,
         }))
       } else {
         setDashboardStore((prevState) => ({
           ...prevState,
           openErrorModal: true,
           modalError: data.message,
-          loading: false,
+          // loading: false,
         }))
       }
     } catch (error) {
@@ -83,13 +84,13 @@ export const DashboardStoreProvider: FC = ({ children }) => {
         ...prevState,
         openErrorModal: true,
         modalError: 'Something went wrong. Please try again',
-        loading: false,
       }))
     }
+    setLoading(false)
   }
 
   useEffect(() => {
-    fetchAllData()
+    fetchAllData().catch(console.error)
   }, [])
 
   const value = {
@@ -99,7 +100,8 @@ export const DashboardStoreProvider: FC = ({ children }) => {
 
   return (
     <DashboardContext.Provider value={value}>
-      {children}
+      {!loading && children}
+      {loading && <PageLoading />}
     </DashboardContext.Provider>
   )
 }
