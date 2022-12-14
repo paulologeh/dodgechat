@@ -12,6 +12,7 @@ import {
   MenuList,
   Stack,
   Text,
+  Tooltip,
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -100,13 +101,17 @@ export const Dashboard = () => {
                 isFriendSearch={true}
               />
               <Notifications friendRequests={friendRequests} />
-              <IconButton
-                size="lg"
-                variant="ghost"
-                aria-label="toggle-dark-mode"
-                icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
-                onClick={toggleColorMode}
-              />
+              <Tooltip
+                label={colorMode === 'light' ? 'dark mode' : 'light mode'}
+              >
+                <IconButton
+                  size="lg"
+                  variant="ghost"
+                  aria-label="toggle-dark-mode"
+                  icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
+                  onClick={toggleColorMode}
+                />
+              </Tooltip>
 
               <Menu>
                 <MenuButton

@@ -12,6 +12,7 @@ import {
   ModalContent,
   ModalOverlay,
   Spinner,
+  Tooltip,
   useDisclosure,
   useEventListener,
   useUpdateEffect,
@@ -267,13 +268,15 @@ export const UserSearch = ({
 
   return (
     <>
-      <IconButton
-        size="lg"
-        variant="ghost"
-        aria-label={isFriendSearch ? 'Search friends' : 'Search users'}
-        icon={isFriendSearch ? <FiUsers /> : <FiSearch />}
-        onClick={modal.onOpen}
-      />
+      <Tooltip label={isFriendSearch ? 'friends' : 'search'}>
+        <IconButton
+          size="lg"
+          variant="ghost"
+          aria-label={isFriendSearch ? 'Search friends' : 'Search users'}
+          icon={isFriendSearch ? <FiUsers /> : <FiSearch />}
+          onClick={modal.onOpen}
+        />
+      </Tooltip>
       <Modal
         scrollBehavior="inside"
         isOpen={modal.isOpen}

@@ -7,6 +7,7 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import { FiBell } from 'react-icons/fi'
 import { FriendRequest } from './FriendRequest'
@@ -19,12 +20,14 @@ export const Notifications = ({
 }) => (
   <Popover>
     <PopoverTrigger>
-      <IconButton
-        size="lg"
-        variant="ghost"
-        aria-label="notifications"
-        icon={<FiBell />}
-      />
+      <Tooltip label="notifications">
+        <IconButton
+          size="lg"
+          variant="ghost"
+          aria-label="notifications"
+          icon={<FiBell />}
+        />
+      </Tooltip>
     </PopoverTrigger>
     <PopoverContent>
       <PopoverHeader pt={4} fontWeight="bold">
