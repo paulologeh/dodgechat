@@ -47,4 +47,5 @@ export type Conversation = {
   senderId: number
   recipientId: number
   messages: Message[]
+  bottomMessage?: Message
 }

@@ -16,6 +16,7 @@ import { EnterIcon } from './EnterIcon'
 import { SearchIcon } from '@chakra-ui/icons'
 import { SearchNoResults } from '../Search/SearchModal'
 import { isEmpty } from 'lodash'
+import { OptionText } from './OptionText'
 
 export const Messages = () => {
   const { dashboardStore } = useDashboardStore()
@@ -34,16 +35,18 @@ export const Messages = () => {
 
     const searchTerm = term.toLowerCase()
     for (let i = 0; i < conversations.length; i++) {
-      const messages = conversations[i].messages
-      const filteredMessages = messages.filter((message) =>
+      const messages = conversations[i].messages.filter((message) =>
         message.body.toLowerCase().includes(searchTerm)
       )
       const { senderId, recipientId } = conversations[i]
       const friend = friends.filter(
         (friend) => friend.id === senderId || friend.id == recipientId
       )[0]
-      if (filteredMessages.length > 0) {
-        results.push({ ...conversations[i] })
+      if (messages.length > 0) {
+        results.push({
+          ...conversations[i],
+          bottomMessage: messages[messages.length - 1],
+        })
       } else if (
         friend.name.toLowerCase().includes(searchTerm) ||
         friend.username.toLowerCase().includes(searchTerm)
@@ -108,12 +111,15 @@ export const Messages = () => {
           <div>
             {isEmpty(allConversations) && <SearchNoResults />}
             {(allConversations ?? []).map((conv, index) => {
-              const lastMessage = conv.messages[0]
+              const { bottomMessage, messages } = conv
+              const lastMessage = bottomMessage ?? messages[0]
               const friend = friends.filter(
                 (val) => val.id === conv.senderId || val.id === conv.recipientId
               )[0]
               const selected = index === active
-              const isFriendLastMessage = lastMessage.senderId === friend.id
+              const content = `${
+                lastMessage.senderId === friend.id ? '' : 'You: '
+              }${lastMessage.body}`
 
               return (
                 <span key={conv.id} className="fake-link">
@@ -150,8 +156,10 @@ export const Messages = () => {
                     <Box flex="1" ml="4">
                       <Box fontWeight="semibold">{friend.name}</Box>
                       <Text noOfLines={1}>
-                        {isFriendLastMessage ? null : 'You: '}
-                        {lastMessage.body}
+                        <OptionText
+                          searchWords={[query]}
+                          textToHighlight={content}
+                        />
                       </Text>
                     </Box>
                     <EnterIcon opacity={0.5} />
