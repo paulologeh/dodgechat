@@ -23,7 +23,7 @@ import { isEmpty } from 'lodash'
 import { delay } from 'utils'
 import { useDashboardStore } from 'contexts/dashboardContext'
 
-export const Settings = () => {
+export const Account = () => {
   const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
   const { setDashboardStore } = useDashboardStore()
   const [isSubmitting, setSubmitting] = useState(false)
@@ -158,7 +158,7 @@ export const Settings = () => {
 
   return (
     <>
-      <MenuItem onClick={modal.onOpen}>Settings</MenuItem>
+      <MenuItem onClick={modal.onOpen}>Account</MenuItem>
       <Modal
         scrollBehavior="inside"
         isOpen={modal.isOpen}
@@ -181,7 +181,7 @@ export const Settings = () => {
               p={6}
             >
               <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-                Settings
+                Account Management
               </Heading>
               <Select
                 value={selected}

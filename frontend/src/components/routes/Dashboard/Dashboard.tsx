@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { useAuth } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
-import { Settings } from './Settings'
+import { Account } from './Account'
 import { Users } from 'api'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { LoadingModal } from './LoadingModal'
@@ -138,7 +138,7 @@ export const Dashboard = () => {
                   <br />
                   <MenuDivider />
                   <ProfileEdit currentUser={currentUser} />
-                  <Settings />
+                  <Account />
                   <MenuItem onClick={logout}>Sign out</MenuItem>
                 </MenuList>
               </Menu>
