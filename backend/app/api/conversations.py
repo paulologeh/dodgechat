@@ -21,14 +21,14 @@ def get_or_create_conversations():
     if request.method == "GET":
         data = [
             {
-                "messages": [
+                "messages": sorted([
                     MessageSchema().dump(message)
                     for message in db.session.query(Message)
                     .filter(Message.conversation_id == conversation.id)
                     .order_by(Message.created_at.desc())
                     .limit(10)
                     .all()
-                ],
+                ], key=lambda x:x["createdAt"]),
                 **ConversationSchema().dump(conversation),
             }
             for conversation in db.session.query(Conversation)
