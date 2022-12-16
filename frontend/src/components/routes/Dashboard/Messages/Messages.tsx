@@ -12,12 +12,13 @@ import {
   useUpdateEffect,
 } from '@chakra-ui/react'
 import './Messages.css'
-import { EnterIcon } from './EnterIcon'
 import { SearchIcon } from '@chakra-ui/icons'
 import { SearchNoResults } from '../Search/SearchModal'
 import { isEmpty } from 'lodash'
 import { OptionText } from './OptionText'
+import { UnreadIcon } from './UnreadIcon'
 import { UserConversations } from './UserConversations'
+import { useAuth } from 'contexts/userContext'
 
 export const Messages = () => {
   const { dashboardStore } = useDashboardStore()
@@ -28,6 +29,7 @@ export const Messages = () => {
   >(undefined)
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
+  const { currentUser } = useAuth()
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
 
   const searchConversations = (term: string) => {
@@ -75,6 +77,28 @@ export const Messages = () => {
     setSelectedConversation(undefined)
   }
 
+  const handleReadMessages = (messageIds: string[]) => {
+    const { messages } = selectedConversation ?? {}
+
+    const msgs = [...(messages ?? [])] ?? []
+    let count = 0
+    for (let i = 0; i < msgs.length; i++) {
+      if (msgs[i].id && messageIds.includes(msgs[i].id)) {
+        msgs[i].read = true
+        count++
+      }
+    }
+
+    if (count > 0 && msgs && !isEmpty(selectedConversation)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      setSelectedConversation((prevState) => ({
+        ...prevState,
+        messages: msgs,
+      }))
+    }
+  }
+
   const renderConversations = () => {
     return (
       <Box as="ul" role="listbox" pt={2} pb={4}>
@@ -117,6 +141,10 @@ export const Messages = () => {
             const friend = friends.filter(
               (val) => val.id === conv.senderId || val.id === conv.recipientId
             )[0]
+            const unreadCount =
+              messages.filter(
+                (msg) => msg.senderId !== currentUser.id && !msg.read
+              ).length ?? 0
             const selected = index === active
             const content = `${
               lastMessage.senderId === friend.id ? '' : 'You: '
@@ -164,7 +192,7 @@ export const Messages = () => {
                       />
                     </Text>
                   </Box>
-                  <EnterIcon opacity={0.5} />
+                  <UnreadIcon count={unreadCount} />
                 </Box>
               </span>
             )
@@ -178,15 +206,18 @@ export const Messages = () => {
     if (isEmpty(selectedConversation)) {
       return renderConversations()
     } else {
-      const { senderId, recipientId, messages } = selectedConversation
+      const { senderId, recipientId, messages, id } = selectedConversation
       const friend = friends.filter(
         (friend) => friend.id === senderId || friend.id == recipientId
       )[0]
+
       return (
         <UserConversations
           friend={friend}
           messages={messages}
           handleBackwardsClick={clearSelectedConversation}
+          handleReadMessages={handleReadMessages}
+          conversationId={id}
         />
       )
     }

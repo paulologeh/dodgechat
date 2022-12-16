@@ -36,7 +36,7 @@ export type UserUpdate = {
 }
 
 export type Message = {
-  id?: string
+  id: string
   senderId: number
   body: string
   read: boolean

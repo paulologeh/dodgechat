@@ -20,9 +20,15 @@ export class Conversations {
     return fetcher(`${ROOT}/${conversationId}`, 'GET')
   }
 
-  static addMessageToConversation(conversationId: string, message: string) {
+  static sendMessage(conversationId: string, text: string) {
     return fetcher(`${ROOT}/${conversationId}`, 'POST', {
-      messageBody: message,
+      body: text,
+    })
+  }
+
+  static readMessages(ids: string[]) {
+    return fetcher(`${ROOT}/messages/read`, 'POST', {
+      ids: ids,
     })
   }
 }
