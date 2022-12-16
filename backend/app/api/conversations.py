@@ -7,7 +7,12 @@ from app import db
 from app.exceptions import ValidationError
 from app.models.conversation import Conversation
 from app.models.message import Message
-from app.serde import ConversationSchema, MessageSchema, NewConversationSchema
+from app.serde import (
+    ConversationSchema,
+    MessageSchema,
+    NewConversationSchema,
+    MessagesToRead,
+)
 from app.utils import extract_all_errors
 
 logger = logging.getLogger(__name__)
@@ -100,20 +105,38 @@ def get_or_update_conversation(conversation_id):
         return jsonify(MessageSchema().dump(message))
 
 
-@conversations.route("/messages/<message_id>/read", methods=["POST"])
+@conversations.route("/messages/read", methods=["POST"])
 @login_required
-def read_message(message_id):
-    message = Message.query.get(message_id)
+def read_messages():
+    payload = request.get_json()
+    try:
+        data = MessagesToRead().load(payload)
+    except ValidationError as err:
+        abort(422, extract_all_errors(err))
 
-    if not message:
-        abort(400, "Message does not exist")
+    messages = []
+    msgs_non_existent = []
+    msgs_read = []
 
-    if message.read:
-        abort(400, "Messge already read")
+    for msg_id in data["ids"]:
+        msg = Message.query.get(msg_id)
+        if msg is None:
+            msgs_non_existent.append(str(msg_id))
+        elif msg.read:
+            msgs_read.append(str(msg_id))
+        else:
+            messages.append(msg)
 
-    message.read = True
+    if msgs_non_existent:
+        abort(400, f"Messages {','.join(msgs_non_existent)} are not exist")
 
-    db.session.add(message)
+    if msgs_read:
+        abort(400, f"Messages {','.join(msgs_read)} are already read")
+
+    for msg in messages:
+        msg.read = True
+
+    db.session.add_all(messages)
     db.session.commit()
 
-    return jsonify({"message": "Message has been read"})
+    return jsonify({"message": "Messages has been read"})

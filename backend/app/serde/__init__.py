@@ -10,6 +10,10 @@ from app.serde.utils import (
 )
 
 
+class MessagesToRead(BasicSchema):
+    ids = fields.List(fields.UUID)
+
+
 class MessageSchema(BasicSchema):
     id = fields.UUID(dump_only=True)
     sender_id = fields.Integer()
