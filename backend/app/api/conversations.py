@@ -21,14 +21,10 @@ def get_or_create_conversations():
     if request.method == "GET":
         data = [
             {
-                "messages": sorted([
+                "messages": [
                     MessageSchema().dump(message)
-                    for message in db.session.query(Message)
-                    .filter(Message.conversation_id == conversation.id)
-                    .order_by(Message.created_at.desc())
-                    .limit(10)
-                    .all()
-                ], key=lambda x:x["createdAt"]),
+                    for message in conversation.get_messages(10, current_user.id)
+                ],
                 **ConversationSchema().dump(conversation),
             }
             for conversation in db.session.query(Conversation)
@@ -84,11 +80,7 @@ def get_or_update_conversation(conversation_id):
         messages_limt = request.args.get("limit", 10)
         messages = [
             MessageSchema().dump(message)
-            for message in db.session.query(Message)
-            .filter(Message.conversation_id == conversation.id)
-            .order_by(Message.created_at.desc())
-            .limit(messages_limt)
-            .all()
+            for message in conversation.get_messages(messages_limt, current_user.id)
         ]
 
         return jsonify(messages)
@@ -99,7 +91,9 @@ def get_or_update_conversation(conversation_id):
         except ValidationError as err:
             abort(422, extract_all_errors(err))
 
-        message = Message(**data, conversation_id=conversation_id)
+        message = Message(
+            **data, sender_id=current_user.id, conversation_id=conversation_id
+        )
         db.session.add(message)
         db.session.commit()
 

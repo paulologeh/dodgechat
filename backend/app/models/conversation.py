@@ -5,6 +5,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import UUID
 
 from app import db
+from app.models.message import Message
 
 
 class UniqueConstraint(Exception):
@@ -20,6 +21,39 @@ class Conversation(db.Model):
     message = db.relationship("Message")
     sender = db.relationship("User", foreign_keys=[_sender_id])
     recipient = db.relationship("User", foreign_keys=[recipient_id])
+
+    def get_messages(self, limit: int, requester_id: int):
+        maximum_limit = (
+            db.session.query(Message)
+            .filter(
+                Message.conversation_id == self.id,
+            )
+            .count()
+        )
+        msgs = [
+            message
+            for message in db.session.query(Message)
+            .filter(Message.conversation_id == self.id)
+            .order_by(Message.created_at.desc())
+            .limit(limit)
+            .all()
+        ]
+
+        while limit <= maximum_limit and all(
+            [not msg.read for msg in msgs if msg.sender_id != requester_id]
+        ):
+            limit *= limit
+
+            msgs = [
+                message
+                for message in db.session.query(Message)
+                .filter(Message.conversation_id == self.id)
+                .order_by(Message.created_at.desc())
+                .limit(limit)
+                .all()
+            ]
+
+        return sorted(msgs, key=lambda x: x.created_at)
 
     @classmethod
     def conversation_exists(cls, sender_id: int, recipient_id: int) -> bool:
