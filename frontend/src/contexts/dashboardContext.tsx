@@ -34,6 +34,7 @@ const initialStore: DashboardStore = {
 }
 
 const DashboardContext = createContext({
+  refreshStore: () => Promise.resolve(),
   dashboardStore: initialStore,
   setDashboardStore: (data: (prevState: DashboardStore) => DashboardStore) => {
     data
@@ -49,7 +50,7 @@ export const DashboardStoreProvider: FC = ({ children }) => {
     useState<DashboardStore>(initialStore)
   const [loading, setLoading] = useState(true)
 
-  const fetchAllData = async () => {
+  const refreshStore = async () => {
     try {
       const response = await Relationships.getFriends()
       const data = await response.json()
@@ -68,14 +69,12 @@ export const DashboardStoreProvider: FC = ({ children }) => {
           friendRequests: friendRequests,
           friends: friends,
           conversations: conversationsData,
-          // loading: false,
         }))
       } else {
         setDashboardStore((prevState) => ({
           ...prevState,
           openErrorModal: true,
           modalError: data.message,
-          // loading: false,
         }))
       }
     } catch (error) {
@@ -90,10 +89,11 @@ export const DashboardStoreProvider: FC = ({ children }) => {
   }
 
   useEffect(() => {
-    fetchAllData().catch(console.error)
+    refreshStore().catch(console.error)
   }, [])
 
   const value = {
+    refreshStore,
     dashboardStore,
     setDashboardStore,
   }

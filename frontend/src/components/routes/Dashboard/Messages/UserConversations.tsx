@@ -3,6 +3,7 @@ import {
   Avatar,
   AvatarBadge,
   Box,
+  Button,
   Divider,
   IconButton,
   Input,
@@ -10,13 +11,14 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FiChevronLeft, FiSend } from 'react-icons/fi'
+import { FiArrowUp, FiChevronLeft, FiSend } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useAuth } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
-import { useEffect, useRef, useState } from 'react'
+import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { Conversations } from 'api'
 import { isEmpty } from 'lodash'
+import { useIsInViewport } from 'hooks'
 
 type UserConversationsProp = {
   friend: FriendMinimal
@@ -24,6 +26,7 @@ type UserConversationsProp = {
   handleBackwardsClick: () => void
   conversationId: string
   handleReadMessages: (ids: string[]) => void
+  handleMoreMessages: (msgs: Message[]) => void
 }
 
 export const UserConversations = ({
@@ -32,6 +35,7 @@ export const UserConversations = ({
   handleBackwardsClick,
   conversationId,
   handleReadMessages,
+  handleMoreMessages,
 }: UserConversationsProp) => {
   const { lastSeen } = friend
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
@@ -39,15 +43,37 @@ export const UserConversations = ({
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const isBottomRefInViewport = useIsInViewport(bottomRef)
   const [localMessages, setLocalMessages] = useState<Message[]>([])
   const [isFailed, setIsFailed] = useState(false)
 
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isBottomRefInViewport) {
       handleMessagesRead().catch(console.error)
     }
-  })
+  }, [isBottomRefInViewport])
+
+  const fetchMoreMessages = async () => {
+    const limit = messages.length * 2
+    try {
+      const response = await Conversations.getConversation(
+        conversationId,
+        limit
+      )
+      if (response.status === 200) {
+        const data: Message[] = await response.json()
+        handleMoreMessages(data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const handleFailedMessage = async () => {
     setIsSending(false)
@@ -129,6 +155,15 @@ export const UserConversations = ({
           <Box flex="1" ml="4">
             <Box fontWeight="extrabold">{friend.name}</Box>
           </Box>
+          <Button
+            rightIcon={<FiArrowUp />}
+            onClick={() => {
+              fetchMoreMessages().catch(console.error)
+              setLocalMessages([])
+            }}
+          >
+            Older chat
+          </Button>
         </Box>
         <Divider
           sx={{
@@ -169,6 +204,11 @@ export const UserConversations = ({
             size="lg"
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={async (e: KeyboardEvent) => {
+              if (e.key === 'Enter') {
+                await handleMessageSend()
+              }
+            }}
             isInvalid={isFailed}
           />
           <IconButton

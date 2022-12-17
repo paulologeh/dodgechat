@@ -1,6 +1,6 @@
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useEffect, useRef, useState } from 'react'
-import { Conversation } from 'types/api'
+import { Conversation, Message } from 'types/api'
 import {
   Avatar,
   Box,
@@ -21,7 +21,7 @@ import { UserConversations } from './UserConversations'
 import { useAuth } from 'contexts/userContext'
 
 export const Messages = () => {
-  const { dashboardStore } = useDashboardStore()
+  const { dashboardStore, refreshStore } = useDashboardStore()
   const { conversations, friends } = dashboardStore
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<
@@ -77,6 +77,14 @@ export const Messages = () => {
     setSelectedConversation(undefined)
   }
 
+  const handleMoreMessages = (msgs: Message[]) => {
+    if (!isEmpty(selectedConversation) && !isEmpty(msgs)) {
+      const conversationUpdate = { ...selectedConversation }
+      conversationUpdate.messages = msgs
+      setSelectedConversation(conversationUpdate)
+    }
+  }
+
   const handleReadMessages = (messageIds: string[]) => {
     const { messages } = selectedConversation ?? {}
 
@@ -90,12 +98,10 @@ export const Messages = () => {
     }
 
     if (count > 0 && msgs && !isEmpty(selectedConversation)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setSelectedConversation((prevState) => ({
-        ...prevState,
-        messages: msgs,
-      }))
+      const conversationUpdate = { ...selectedConversation }
+      conversationUpdate.messages = msgs
+      setSelectedConversation(conversationUpdate)
+      refreshStore().catch(console.error)
     }
   }
 
@@ -217,6 +223,7 @@ export const Messages = () => {
           messages={messages}
           handleBackwardsClick={clearSelectedConversation}
           handleReadMessages={handleReadMessages}
+          handleMoreMessages={handleMoreMessages}
           conversationId={id}
         />
       )
