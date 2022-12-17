@@ -16,12 +16,16 @@ export class Conversations {
     return fetcher(`${ROOT}`, 'POST', conversation)
   }
 
-  static getConversation(conversationId: string) {
-    return fetcher(`${ROOT}/${conversationId}`, 'GET')
+  static getConversation(conversationId: string, limit: number | null) {
+    if (limit) {
+      return fetcher(`${ROOT}/${conversationId}/messages?limit=${limit}`, 'GET')
+    } else {
+      return fetcher(`${ROOT}/${conversationId}/messages`, 'GET')
+    }
   }
 
   static sendMessage(conversationId: string, text: string) {
-    return fetcher(`${ROOT}/${conversationId}`, 'POST', {
+    return fetcher(`${ROOT}/${conversationId}/messages`, 'POST', {
       body: text,
     })
   }
