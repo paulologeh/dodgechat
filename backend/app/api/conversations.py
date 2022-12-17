@@ -74,7 +74,7 @@ def get_or_create_conversations():
         )
 
 
-@conversations.route("/<conversation_id>", methods=["GET", "POST"])
+@conversations.route("/<conversation_id>/messages", methods=["GET", "POST"])
 @login_required
 def get_or_update_conversation(conversation_id):
     conversation = Conversation.query.get(conversation_id)
@@ -82,7 +82,7 @@ def get_or_update_conversation(conversation_id):
         abort(400, "Conversation does not exist")
 
     if request.method == "GET":
-        messages_limt = request.args.get("limit", 10)
+        messages_limt = int(request.args.get("limit", 10))
         messages = [
             MessageSchema().dump(message)
             for message in conversation.get_messages(messages_limt, current_user.id)
