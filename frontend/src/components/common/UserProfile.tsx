@@ -1,10 +1,12 @@
 import {
-  Badge,
-  Button,
+  Avatar,
+  Box,
   Center,
-  Flex,
   Heading,
-  Image,
+  IconButton,
+  List,
+  ListIcon,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,11 +14,23 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { getLastSeen, months } from 'utils/index'
 import { useState } from 'react'
 import { Relationships, Search as SearchService } from 'api'
+import {
+  FiCalendar,
+  FiClock,
+  FiMessageSquare,
+  FiNavigation2,
+  FiSlash,
+  FiUserMinus,
+  FiUserPlus,
+  FiUsers,
+  FiUserX,
+} from 'react-icons/fi'
 
 type UserProfileModalProps = {
   open: boolean
@@ -46,6 +60,17 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
   })
   const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { selectedUser } = dashboardStore
+  const {
+    name,
+    username,
+    aboutMe,
+    gravatar,
+    lastSeen,
+    location,
+    relationshipState,
+    memberSince,
+    numberOfFriends,
+  } = selectedUser ?? {}
 
   const refetch = async (username: string) => {
     setDashboardStore((prevState) => ({
@@ -79,21 +104,20 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
   }
 
   const handleClick = async (button: string) => {
-    if (!selectedUser?.username) return
+    if (!username) return
 
     setLoading({ ...loading, [button]: true })
 
     try {
       let response
 
-      if (button === 'add')
-        response = await Relationships.addUser(selectedUser.username)
+      if (button === 'add') response = await Relationships.addUser(username)
       else if (button === 'delete')
-        response = await Relationships.deleteUser(selectedUser.username)
+        response = await Relationships.deleteUser(username)
       else if (button === 'block')
-        response = await Relationships.blockUser(selectedUser.username)
+        response = await Relationships.blockUser(username)
       else if (button === 'unblock')
-        response = await Relationships.unBlockUser(selectedUser.username)
+        response = await Relationships.unBlockUser(username)
 
       if (!response) {
         console.error('undefined response')
@@ -120,11 +144,10 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
       }))
     } finally {
       setLoading({ ...loading, [button]: false })
-      await refetch(selectedUser.username)
+      await refetch(username)
     }
   }
 
-  const isBlocked = selectedUser?.relationshipState === 'BLOCKED'
   return (
     <Modal
       isOpen={open}
@@ -134,123 +157,132 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
           openUserProfileModal: false,
         }))
       }}
-      size={'3xl'}
+      size="sm"
     >
       <ModalOverlay />
       <ModalContent>
         <ModalCloseButton />
         <ModalBody>
-          <Center py={6}>
-            <Stack
-              w={{ sm: '100%', md: '540px' }}
-              height={{ sm: '476px', md: '20rem' }}
-              direction={{ base: 'column', md: 'row' }}
-              padding={4}
-            >
-              <Flex flex={1} bg="blue.200">
-                <Image
-                  objectFit="cover"
-                  boxSize="100%"
-                  src={selectedUser?.gravatar}
-                />
-              </Flex>
-              <Stack
-                flex={1}
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                p={1}
-                pt={2}
-              >
-                <Heading fontSize={'2xl'} fontFamily={'body'}>
-                  {selectedUser?.name}
-                </Heading>
-                <Text fontWeight={600} color={'gray.500'} size="sm" mb={4}>
-                  {'@'}
-                  {selectedUser?.username}
-                </Text>
-                {selectedUser?.aboutMe && (
-                  <Text textAlign={'center'} px={3}>
-                    <i>{selectedUser.aboutMe}</i>
-                  </Text>
+          <Center>
+            <Box p={6} textAlign={'center'}>
+              <Avatar size={'xl'} src={gravatar} mb={4} pos={'relative'} />
+              <Heading fontSize={'2xl'} fontFamily={'body'}>
+                {name}
+              </Heading>
+              <Text fontWeight={600} color={'gray.500'} mb={4}>
+                @{username}
+              </Text>
+              <Stack flex={1} flexDirection="column" mt={6}>
+                {aboutMe && <Text textAlign={'center'}>{aboutMe}</Text>}
+                <List spacing={3}>
+                  {numberOfFriends && (
+                    <ListItem>
+                      <ListIcon as={FiUsers} color="green.500" />
+                      {`${numberOfFriends} friend${
+                        numberOfFriends > 1 ? 's' : ''
+                      }`}
+                    </ListItem>
+                  )}
+                  {lastSeen && (
+                    <ListItem>
+                      <ListIcon as={FiClock} color="green.500" />
+                      Last seen {getLastSeen(lastSeen)}
+                    </ListItem>
+                  )}
+                  {memberSince && (
+                    <ListItem>
+                      <ListIcon as={FiCalendar} color="green.500" />
+                      {getJoined(memberSince)}
+                    </ListItem>
+                  )}
+                  {location && (
+                    <ListItem>
+                      <ListIcon as={FiNavigation2} color="green.500" />
+                      {location}
+                    </ListItem>
+                  )}
+                </List>
+              </Stack>
+
+              <Stack mt={8} direction={'row'} spacing={4}>
+                {relationshipState === 'ACCEPTED' && (
+                  <Tooltip label="Send message">
+                    <IconButton
+                      aria-label="message user"
+                      variant="outline"
+                      colorScheme="teal"
+                      size="lg"
+                      icon={<FiMessageSquare />}
+                    />
+                  </Tooltip>
                 )}
-                <Stack
-                  align={'center'}
-                  justify={'center'}
-                  direction={'column'}
-                  mt={6}
-                >
-                  {selectedUser?.numberOfFriends && (
-                    <Badge px={2} py={1} fontWeight={'400'}>
-                      {selectedUser.numberOfFriends}
-                      {selectedUser.numberOfFriends === 1
-                        ? ' friend'
-                        : ' friends'}
-                    </Badge>
-                  )}
-                  {selectedUser?.lastSeen && (
-                    <Badge px={2} py={1} fontWeight={'400'}>
-                      {'Last seen: '}
-                      {getLastSeen(selectedUser.lastSeen)}
-                    </Badge>
-                  )}
-                  {selectedUser?.memberSince && (
-                    <Badge px={2} py={1} fontWeight={'400'}>
-                      {getJoined(selectedUser.memberSince)}
-                    </Badge>
-                  )}
-                  {selectedUser?.location && (
-                    <Badge px={2} py={1} fontWeight={'400'}>
-                      {'Location: '}
-                      {selectedUser.location}
-                    </Badge>
-                  )}
-                </Stack>
-                <Stack
-                  width={'100%'}
-                  mt={'2rem'}
-                  direction={'row'}
-                  padding={2}
-                  justifyContent={'space-between'}
-                  alignItems={'center'}
-                >
-                  {selectedUser?.relationshipState === null && (
-                    <Button
-                      flex={1}
-                      fontSize={'sm'}
-                      rounded={'full'}
-                      colorScheme={'blue'}
+                {(relationshipState === null ||
+                  relationshipState === 'REQUESTED') && (
+                  <Tooltip
+                    label={
+                      relationshipState === null ? 'Add user' : 'Accept user'
+                    }
+                  >
+                    <IconButton
+                      aria-label="add or accept user"
+                      variant="outline"
+                      colorScheme="green"
+                      size="lg"
+                      icon={<FiUserPlus />}
                       isLoading={loading.add}
                       onClick={() => handleClick('add')}
-                    >
-                      Add
-                    </Button>
-                  )}
-                  {selectedUser?.relationshipState === 'ACCEPTED' && (
-                    <Button
-                      flex={1}
-                      fontSize={'sm'}
-                      rounded={'full'}
-                      colorScheme={'red'}
+                    />
+                  </Tooltip>
+                )}
+                {relationshipState !== null && relationshipState !== 'BLOCKED' && (
+                  <Tooltip
+                    label={
+                      relationshipState === 'ACCEPTED'
+                        ? 'Remove user'
+                        : relationshipState === 'REQUESTED'
+                        ? 'Reject user'
+                        : 'Cancel request'
+                    }
+                  >
+                    <IconButton
+                      aria-label="reject or remove user or cancel request"
+                      variant="outline"
+                      colorScheme="red"
+                      size="lg"
+                      icon={
+                        relationshipState === 'ACCEPTED' ? (
+                          <FiUserMinus />
+                        ) : (
+                          <FiUserX />
+                        )
+                      }
                       isLoading={loading.delete}
                       onClick={() => handleClick('delete')}
-                    >
-                      Delete
-                    </Button>
-                  )}
-                  <Button
-                    flex={1}
-                    fontSize={'sm'}
-                    rounded={'full'}
-                    colorScheme={'gray'}
+                    />
+                  </Tooltip>
+                )}
+                <Tooltip
+                  label={
+                    relationshipState === 'BLOCKED'
+                      ? 'Unblock user'
+                      : 'Block user'
+                  }
+                >
+                  <IconButton
+                    aria-label="block or unblock user"
+                    colorScheme="red"
+                    size="lg"
+                    icon={<FiSlash />}
                     isLoading={loading.block || loading.unblock}
-                    onClick={() => handleClick(isBlocked ? 'unblock' : 'block')}
-                  >
-                    {isBlocked ? 'Unblock' : 'Block'}
-                  </Button>
-                </Stack>
+                    onClick={() =>
+                      handleClick(
+                        relationshipState === 'BLOCKED' ? 'unblock' : 'block'
+                      )
+                    }
+                  />
+                </Tooltip>
               </Stack>
-            </Stack>
+            </Box>
           </Center>
         </ModalBody>
       </ModalContent>
