@@ -170,6 +170,19 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     }
   }
 
+  const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
+  const onlineStyle = {
+    content: '""',
+    w: 4,
+    h: 4,
+    bg: 'green.300',
+    border: '2px solid white',
+    rounded: 'full',
+    pos: 'absolute',
+    bottom: 0,
+    right: 3,
+  }
+
   return (
     <Modal
       isOpen={open}
@@ -187,16 +200,34 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
         <ModalBody>
           <Center>
             <Box p={6} textAlign={'center'}>
-              <Avatar size={'xl'} src={gravatar} mb={4} pos={'relative'} />
+              <Avatar
+                size={'xl'}
+                src={gravatar}
+                mb={4}
+                pos={'relative'}
+                _after={isOnline ? onlineStyle : undefined}
+              />
               <Heading fontSize={'2xl'} fontFamily={'body'}>
                 {name}
               </Heading>
               <Text fontWeight={600} color={'gray.500'} mb={4}>
                 @{username}
               </Text>
-              <Stack flex={1} flexDirection="column" mt={6}>
-                {aboutMe && <Text textAlign={'center'}>{aboutMe}</Text>}
+              <Stack
+                flex={1}
+                flexDirection="column"
+                textAlign="center"
+                align="center"
+                mt={2}
+              >
                 <List spacing={3}>
+                  {aboutMe && (
+                    <ListItem>
+                      <Text mb={2} fontWeight="light">
+                        {aboutMe}
+                      </Text>
+                    </ListItem>
+                  )}
                   {numberOfFriends && (
                     <ListItem>
                       <ListIcon as={FiUsers} color="green.500" />
@@ -225,7 +256,13 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                   )}
                 </List>
               </Stack>
-              <Stack mt={8} direction={'row'} spacing={4}>
+              <Stack
+                mt={8}
+                direction="row"
+                align="start"
+                justify="center"
+                spacing={6}
+              >
                 {relationshipState === 'ACCEPTED' && (
                   <Tooltip label="Send message">
                     <IconButton
