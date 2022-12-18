@@ -89,3 +89,10 @@ export const getLastSeen = (date: Date) => {
     return 'Over a day ago'
   }
 }
+
+export const removedFriend = {
+  id: 0,
+  lastSeen: '1970-01-01',
+  name: 'Unknown',
+  username: 'unknow',
+}

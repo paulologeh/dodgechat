@@ -51,7 +51,7 @@ export const UserConversations = ({
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [])
+  })
 
   useEffect(() => {
     if (isBottomRefInViewport) {
@@ -203,6 +203,7 @@ export const UserConversations = ({
             flex={1}
             size="lg"
             value={text}
+            isDisabled={friend.id === 0}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={async (e: KeyboardEvent) => {
               if (e.key === 'Enter') {
@@ -216,6 +217,7 @@ export const UserConversations = ({
             aria-label="send message"
             icon={isSending ? <Spinner color="teal.500" /> : <FiSend />}
             size="lg"
+            isDisabled={friend.id === 0}
             onClick={handleMessageSend}
           />
         </Stack>

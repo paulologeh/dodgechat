@@ -2,6 +2,7 @@ import { useDashboardStore } from 'contexts/dashboardContext'
 import { useEffect, useRef, useState } from 'react'
 import { Conversation, Message } from 'types/api'
 import {
+  Alert,
   Avatar,
   Box,
   Center,
@@ -13,12 +14,12 @@ import {
 } from '@chakra-ui/react'
 import './Messages.css'
 import { SearchIcon } from '@chakra-ui/icons'
-import { SearchNoResults } from '../Search/SearchModal'
 import { isEmpty } from 'lodash'
 import { OptionText } from './OptionText'
 import { UnreadIcon } from './UnreadIcon'
 import { UserConversations } from './UserConversations'
 import { useAuth } from 'contexts/userContext'
+import { removedFriend } from 'utils'
 
 export const Messages = () => {
   const { dashboardStore, refreshStore } = useDashboardStore()
@@ -140,13 +141,16 @@ export const Messages = () => {
           }}
         />
         <div>
-          {isEmpty(allConversations) && <SearchNoResults />}
+          {isEmpty(allConversations) && (
+            <Alert status="warning">No messages</Alert>
+          )}
           {(allConversations ?? []).map((conv, index) => {
             const { bottomMessage, messages } = conv
             const lastMessage = bottomMessage ?? messages[messages.length - 1]
-            const friend = friends.filter(
-              (val) => val.id === conv.senderId || val.id === conv.recipientId
-            )[0]
+            const friend =
+              friends.filter(
+                (val) => val.id === conv.senderId || val.id === conv.recipientId
+              )[0] ?? removedFriend
             const unreadCount =
               messages.filter(
                 (msg) => msg.senderId !== currentUser.id && !msg.read
@@ -213,9 +217,10 @@ export const Messages = () => {
       return renderConversations()
     } else {
       const { senderId, recipientId, messages, id } = selectedConversation
-      const friend = friends.filter(
-        (friend) => friend.id === senderId || friend.id == recipientId
-      )[0]
+      const friend =
+        friends.filter(
+          (friend) => friend.id === senderId || friend.id == recipientId
+        )[0] ?? removedFriend
 
       return (
         <UserConversations
