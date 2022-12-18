@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import './Messages.css'
 import { SearchIcon } from '@chakra-ui/icons'
-import { isEmpty } from 'lodash'
+import { isEmpty, orderBy } from 'lodash'
 import { OptionText } from './OptionText'
 import { UnreadIcon } from './UnreadIcon'
 import { UserConversations } from './UserConversations'
@@ -22,12 +22,10 @@ import { useAuth } from 'contexts/userContext'
 import { removedFriend } from 'utils'
 
 export const Messages = () => {
-  const { dashboardStore, refreshStore } = useDashboardStore()
-  const { conversations, friends } = dashboardStore
+  const { dashboardStore, setDashboardStore, refreshStore } =
+    useDashboardStore()
+  const { conversations, friends, currentConversation } = dashboardStore
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
-  const [selectedConversation, setSelectedConversation] = useState<
-    Conversation | undefined
-  >(undefined)
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
   const { currentUser } = useAuth()
@@ -66,7 +64,12 @@ export const Messages = () => {
   }
 
   useEffect(() => {
-    setAllConversations(conversations)
+    const sortedConversations = orderBy(
+      conversations,
+      (conv) => new Date(conv.messages[conv.messages.length - 1].createdAt),
+      ['desc']
+    )
+    setAllConversations(sortedConversations)
   }, [conversations])
 
   useUpdateEffect(() => {
@@ -75,19 +78,25 @@ export const Messages = () => {
   }, [query])
 
   const clearSelectedConversation = () => {
-    setSelectedConversation(undefined)
+    setDashboardStore((prevState) => ({
+      ...prevState,
+      currentConversation: null,
+    }))
   }
 
   const handleMoreMessages = (msgs: Message[]) => {
-    if (!isEmpty(selectedConversation) && !isEmpty(msgs)) {
-      const conversationUpdate = { ...selectedConversation }
+    if (!isEmpty(currentConversation) && !isEmpty(msgs)) {
+      const conversationUpdate = { ...currentConversation }
       conversationUpdate.messages = msgs
-      setSelectedConversation(conversationUpdate)
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        currentConversation: conversationUpdate,
+      }))
     }
   }
 
   const handleReadMessages = (messageIds: string[]) => {
-    const { messages } = selectedConversation ?? {}
+    const { messages } = currentConversation ?? {}
 
     const msgs = [...(messages ?? [])] ?? []
     let count = 0
@@ -98,10 +107,13 @@ export const Messages = () => {
       }
     }
 
-    if (count > 0 && msgs && !isEmpty(selectedConversation)) {
-      const conversationUpdate = { ...selectedConversation }
+    if (count > 0 && msgs && !isEmpty(currentConversation)) {
+      const conversationUpdate = { ...currentConversation }
       conversationUpdate.messages = msgs
-      setSelectedConversation(conversationUpdate)
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        currentConversation: conversationUpdate,
+      }))
       refreshStore().catch(console.error)
     }
   }
@@ -171,7 +183,12 @@ export const Messages = () => {
                     setActive(index)
                     eventRef.current = 'mouse'
                   }}
-                  onClick={() => setSelectedConversation(conv)}
+                  onClick={() =>
+                    setDashboardStore((prevState) => ({
+                      ...prevState,
+                      currentConversation: conv,
+                    }))
+                  }
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -213,10 +230,10 @@ export const Messages = () => {
   }
 
   const renderMessages = () => {
-    if (isEmpty(selectedConversation)) {
+    if (isEmpty(currentConversation)) {
       return renderConversations()
     } else {
-      const { senderId, recipientId, messages, id } = selectedConversation
+      const { senderId, recipientId, messages, id } = currentConversation
       const friend =
         friends.filter(
           (friend) => friend.id === senderId || friend.id == recipientId

@@ -19,12 +19,13 @@ import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { Conversations } from 'api'
 import { isEmpty } from 'lodash'
 import { useIsInViewport } from 'hooks'
+import { useDashboardStore } from 'contexts/dashboardContext'
 
 type UserConversationsProp = {
   friend: FriendMinimal
   messages: Message[]
   handleBackwardsClick: () => void
-  conversationId: string
+  conversationId: string | null
   handleReadMessages: (ids: string[]) => void
   handleMoreMessages: (msgs: Message[]) => void
 }
@@ -37,9 +38,10 @@ export const UserConversations = ({
   handleReadMessages,
   handleMoreMessages,
 }: UserConversationsProp) => {
-  const { lastSeen } = friend
+  const { lastSeen, name, gravatar } = friend
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
   const { currentUser } = useAuth()
+  const { setDashboardStore } = useDashboardStore()
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -60,6 +62,8 @@ export const UserConversations = ({
   }, [isBottomRefInViewport])
 
   const fetchMoreMessages = async () => {
+    if (!conversationId) return
+
     const limit = messages.length * 2
     try {
       const response = await Conversations.getConversation(
@@ -106,10 +110,26 @@ export const UserConversations = ({
     setIsSending(true)
 
     try {
-      const response = await Conversations.sendMessage(conversationId, text)
-      if (response.status === 200) {
+      let response
+      if (conversationId) {
+        response = await Conversations.sendMessage(conversationId, text)
+      } else if (friend.id) {
+        response = await Conversations.createConversation({
+          recipientId: friend.id,
+          messageBody: text,
+        })
+      }
+      if (response?.status === 200) {
         const data = await response.json()
-        setLocalMessages([...localMessages, data])
+        if (conversationId) {
+          setLocalMessages([...localMessages, data])
+        } else {
+          setDashboardStore((prevState) => ({
+            ...prevState,
+            currentConversation: data,
+          }))
+        }
+
         setText('')
       } else {
         await handleFailedMessage()
@@ -146,14 +166,14 @@ export const UserConversations = ({
             icon={<FiChevronLeft />}
             onClick={handleBackwardsClick}
           />
-          <Avatar size="lg" src={friend.gravatar}>
+          <Avatar size="lg" src={gravatar}>
             <AvatarBadge
               boxSize={isOnline ? '0.9em' : undefined}
               bg="green.500"
             />
           </Avatar>
           <Box flex="1" ml="4">
-            <Box fontWeight="extrabold">{friend.name}</Box>
+            <Box fontWeight="extrabold">{name}</Box>
           </Box>
           <Button
             rightIcon={<FiArrowUp />}
@@ -172,7 +192,7 @@ export const UserConversations = ({
           }}
         />
       </Box>
-      <Box>
+      <Box minHeight={'80vh'}>
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}

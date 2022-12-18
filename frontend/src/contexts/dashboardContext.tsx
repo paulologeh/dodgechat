@@ -4,9 +4,6 @@ import { Conversations, Relationships } from 'api'
 import { PageLoading } from 'components/common'
 
 type DashboardStore = {
-  activeItem: string
-  unreadCount: number
-  friendRequestsCount: number
   loading: boolean
   loadingMessage: string
   friendRequests: FriendMinimal[]
@@ -16,12 +13,10 @@ type DashboardStore = {
   openUserProfileModal: boolean
   selectedUser: UserProfile | null
   conversations: Conversation[]
+  currentConversation: Conversation | null
 }
 
 const initialStore: DashboardStore = {
-  activeItem: 'friends',
-  unreadCount: 0,
-  friendRequestsCount: 0,
   loading: false,
   loadingMessage: '',
   friendRequests: [],
@@ -31,6 +26,7 @@ const initialStore: DashboardStore = {
   openUserProfileModal: false,
   selectedUser: null,
   conversations: [],
+  currentConversation: null,
 }
 
 const DashboardContext = createContext({

@@ -31,6 +31,7 @@ import {
   FiUsers,
   FiUserX,
 } from 'react-icons/fi'
+import { useAuth } from 'contexts/userContext'
 
 type UserProfileModalProps = {
   open: boolean
@@ -59,7 +60,8 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     unblock: false,
   })
   const { dashboardStore, setDashboardStore } = useDashboardStore()
-  const { selectedUser } = dashboardStore
+  const { currentUser } = useAuth()
+  const { selectedUser, conversations, friends } = dashboardStore
   const {
     name,
     username,
@@ -105,6 +107,26 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
 
   const handleClick = async (button: string) => {
     if (!username) return
+
+    if (button === 'message') {
+      const friend = friends.filter((friend) => friend.username === username)[0]
+      const conversation = conversations.filter(
+        (conv) => conv.senderId === friend.id || conv.recipientId === friend.id
+      )[0] ?? {
+        id: null,
+        senderId: currentUser.id,
+        recipientId: friend.id,
+        messages: [],
+      }
+
+      setDashboardStore((prevState) => ({
+        ...prevState,
+        currentConversation: conversation,
+        selectedUser: null,
+        openUserProfileModal: false,
+      }))
+      return
+    }
 
     setLoading({ ...loading, [button]: true })
 
@@ -203,7 +225,6 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                   )}
                 </List>
               </Stack>
-
               <Stack mt={8} direction={'row'} spacing={4}>
                 {relationshipState === 'ACCEPTED' && (
                   <Tooltip label="Send message">
@@ -213,11 +234,12 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                       colorScheme="teal"
                       size="lg"
                       icon={<FiMessageSquare />}
+                      onClick={() => handleClick('message')}
                     />
                   </Tooltip>
                 )}
                 {(relationshipState === null ||
-                  relationshipState === 'REQUESTED') && (
+                  relationshipState === 'REQUESTEE') && (
                   <Tooltip
                     label={
                       relationshipState === null ? 'Add user' : 'Accept user'
@@ -239,7 +261,7 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                     label={
                       relationshipState === 'ACCEPTED'
                         ? 'Remove user'
-                        : relationshipState === 'REQUESTED'
+                        : relationshipState === 'REQUESTEE'
                         ? 'Reject user'
                         : 'Cancel request'
                     }

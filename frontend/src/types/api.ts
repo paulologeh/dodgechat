@@ -43,7 +43,7 @@ export type Message = {
   createdAt: Date
 }
 export type Conversation = {
-  id: string
+  id: string | null
   senderId: number
   recipientId: number
   messages: Message[]

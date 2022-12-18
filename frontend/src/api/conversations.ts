@@ -3,7 +3,7 @@ import { fetcher } from 'utils'
 const ROOT = `${process.env.API_URI}/api/conversations`
 
 type NewConversation = {
-  recipientId: string
+  recipientId: number
   messageBody: string
 }
 
