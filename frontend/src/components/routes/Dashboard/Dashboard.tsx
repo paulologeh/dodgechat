@@ -124,8 +124,8 @@ export const Dashboard = () => {
                 </MenuButton>
                 <MenuList
                   alignItems={'center'}
-                  bg={useColorModeValue('white', 'gray.900')}
-                  borderColor={useColorModeValue('gray.200', 'gray.700')}
+                  bg={useColorModeValue('white', 'gray.700')}
+                  borderColor={useColorModeValue('gray.200', 'gray.900')}
                 >
                   <br />
                   <Center>
