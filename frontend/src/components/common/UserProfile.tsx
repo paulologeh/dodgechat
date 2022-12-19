@@ -216,11 +216,11 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
               <Stack
                 flex={1}
                 flexDirection="column"
-                textAlign="center"
-                align="center"
+                textAlign="left"
+                justify="center"
                 mt={2}
               >
-                <List spacing={3}>
+                <List spacing={3} mb={4}>
                   {aboutMe && (
                     <ListItem>
                       <Text mb={2} fontWeight="light">
@@ -255,91 +255,86 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
                     </ListItem>
                   )}
                 </List>
-              </Stack>
-              <Stack
-                mt={8}
-                direction="row"
-                align="start"
-                justify="center"
-                spacing={6}
-              >
-                {relationshipState === 'ACCEPTED' && (
-                  <Tooltip label="Send message">
-                    <IconButton
-                      aria-label="message user"
-                      variant="outline"
-                      colorScheme="teal"
-                      size="lg"
-                      icon={<FiMessageSquare />}
-                      onClick={() => handleClick('message')}
-                    />
-                  </Tooltip>
-                )}
-                {(relationshipState === null ||
-                  relationshipState === 'REQUESTEE') && (
+                <Stack direction="row" justify="center" spacing={6}>
+                  {relationshipState === 'ACCEPTED' && (
+                    <Tooltip label="Send message">
+                      <IconButton
+                        aria-label="message user"
+                        variant="outline"
+                        colorScheme="teal"
+                        size="lg"
+                        icon={<FiMessageSquare />}
+                        onClick={() => handleClick('message')}
+                      />
+                    </Tooltip>
+                  )}
+                  {(relationshipState === null ||
+                    relationshipState === 'REQUESTEE') && (
+                    <Tooltip
+                      label={
+                        relationshipState === null ? 'Add user' : 'Accept user'
+                      }
+                    >
+                      <IconButton
+                        aria-label="add or accept user"
+                        variant="outline"
+                        colorScheme="green"
+                        size="lg"
+                        icon={<FiUserPlus />}
+                        isLoading={loading.add}
+                        onClick={() => handleClick('add')}
+                      />
+                    </Tooltip>
+                  )}
+                  {relationshipState !== null &&
+                    relationshipState !== 'BLOCKED' && (
+                      <Tooltip
+                        label={
+                          relationshipState === 'ACCEPTED'
+                            ? 'Remove user'
+                            : relationshipState === 'REQUESTEE'
+                            ? 'Reject user'
+                            : 'Cancel request'
+                        }
+                      >
+                        <IconButton
+                          aria-label="reject or remove user or cancel request"
+                          variant="outline"
+                          colorScheme="red"
+                          size="lg"
+                          icon={
+                            relationshipState === 'ACCEPTED' ? (
+                              <FiUserMinus />
+                            ) : (
+                              <FiUserX />
+                            )
+                          }
+                          isLoading={loading.delete}
+                          onClick={() => handleClick('delete')}
+                        />
+                      </Tooltip>
+                    )}
                   <Tooltip
                     label={
-                      relationshipState === null ? 'Add user' : 'Accept user'
+                      relationshipState === 'BLOCKED'
+                        ? 'Unblock user'
+                        : 'Block user'
                     }
                   >
                     <IconButton
-                      aria-label="add or accept user"
-                      variant="outline"
-                      colorScheme="green"
-                      size="lg"
-                      icon={<FiUserPlus />}
-                      isLoading={loading.add}
-                      onClick={() => handleClick('add')}
-                    />
-                  </Tooltip>
-                )}
-                {relationshipState !== null && relationshipState !== 'BLOCKED' && (
-                  <Tooltip
-                    label={
-                      relationshipState === 'ACCEPTED'
-                        ? 'Remove user'
-                        : relationshipState === 'REQUESTEE'
-                        ? 'Reject user'
-                        : 'Cancel request'
-                    }
-                  >
-                    <IconButton
-                      aria-label="reject or remove user or cancel request"
-                      variant="outline"
+                      aria-label="block or unblock user"
                       colorScheme="red"
                       size="lg"
-                      icon={
-                        relationshipState === 'ACCEPTED' ? (
-                          <FiUserMinus />
-                        ) : (
-                          <FiUserX />
+                      icon={<FiSlash />}
+                      isLoading={loading.block || loading.unblock}
+                      onClick={() =>
+                        handleClick(
+                          relationshipState === 'BLOCKED' ? 'unblock' : 'block'
                         )
                       }
-                      isLoading={loading.delete}
-                      onClick={() => handleClick('delete')}
                     />
                   </Tooltip>
-                )}
-                <Tooltip
-                  label={
-                    relationshipState === 'BLOCKED'
-                      ? 'Unblock user'
-                      : 'Block user'
-                  }
-                >
-                  <IconButton
-                    aria-label="block or unblock user"
-                    colorScheme="red"
-                    size="lg"
-                    icon={<FiSlash />}
-                    isLoading={loading.block || loading.unblock}
-                    onClick={() =>
-                      handleClick(
-                        relationshipState === 'BLOCKED' ? 'unblock' : 'block'
-                      )
-                    }
-                  />
-                </Tooltip>
+                </Stack>
               </Stack>
             </Box>
           </Center>
