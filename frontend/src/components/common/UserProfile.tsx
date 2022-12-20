@@ -109,6 +109,7 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     if (!username) return
 
     if (button === 'message') {
+      const timeNow = new Date(Date.now())
       const friend = friends.filter((friend) => friend.username === username)[0]
       const conversation = conversations.filter(
         (conv) => conv.senderId === friend.id || conv.recipientId === friend.id
@@ -117,13 +118,15 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
         senderId: currentUser.id,
         recipientId: friend.id,
         messages: [],
+        createdAt: timeNow.toISOString(),
       }
 
       setDashboardStore((prevState) => ({
         ...prevState,
-        currentConversation: conversation,
+        activeConversationId: conversation.id,
         selectedUser: null,
         openUserProfileModal: false,
+        conversations: [...prevState.conversations, conversation],
       }))
       return
     }

@@ -27,7 +27,6 @@ type UserConversationsProp = {
   handleBackwardsClick: () => void
   conversationId: string | null
   handleReadMessages: (ids: string[]) => void
-  handleMoreMessages: (msgs: Message[]) => void
 }
 
 export const UserConversations = ({
@@ -36,12 +35,12 @@ export const UserConversations = ({
   handleBackwardsClick,
   conversationId,
   handleReadMessages,
-  handleMoreMessages,
 }: UserConversationsProp) => {
   const { lastSeen, name, gravatar } = friend
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
   const { currentUser } = useAuth()
-  const { setDashboardStore } = useDashboardStore()
+  const { dashboardStore, setDashboardStore } = useDashboardStore()
+  const { olderMessages } = dashboardStore
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -50,7 +49,7 @@ export const UserConversations = ({
   const [isFailed, setIsFailed] = useState(false)
 
   useEffect(() => {
-    if (bottomRef.current) {
+    if (isEmpty(olderMessages) && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   })
@@ -64,15 +63,19 @@ export const UserConversations = ({
   const fetchMoreMessages = async () => {
     if (!conversationId) return
 
-    const limit = messages.length * 2
+    const timestamp = messages[0].createdAt
     try {
       const response = await Conversations.getConversation(
         conversationId,
-        limit
+        10,
+        timestamp
       )
       if (response.status === 200) {
-        const data: Message[] = await response.json()
-        handleMoreMessages(data)
+        const msgs: Message[] = await response.json()
+        setDashboardStore((prevState) => ({
+          ...prevState,
+          olderMessages: msgs.concat([...(olderMessages ?? [])]),
+        }))
       }
     } catch (error) {
       console.error(error)
@@ -123,10 +126,14 @@ export const UserConversations = ({
         const data = await response.json()
         if (conversationId) {
           setLocalMessages([...localMessages, data])
-        } else {
+        } else if (conversationId === null) {
+          const conversationsUpdate = [...dashboardStore.conversations].filter(
+            (conv) => conv.id !== null
+          )
           setDashboardStore((prevState) => ({
             ...prevState,
-            currentConversation: data,
+            conversations: [...conversationsUpdate, data],
+            activeConversationId: data.id,
           }))
         }
 
@@ -182,7 +189,7 @@ export const UserConversations = ({
               setLocalMessages([])
             }}
           >
-            Older chat
+            Older
           </Button>
         </Box>
         <Divider
@@ -193,6 +200,13 @@ export const UserConversations = ({
         />
       </Box>
       <Box minHeight={'80vh'}>
+        {(olderMessages ?? []).map((msg) => (
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            isSender={currentUser.id === msg.senderId}
+          />
+        ))}
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}

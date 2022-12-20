@@ -27,8 +27,8 @@ import { useDashboardStore } from 'contexts/dashboardContext'
 import './SearchModal.css'
 import { FiSearch, FiUsers } from 'react-icons/fi'
 
-export const SearchNoResults = () => (
-  <Alert status="warning">No results found</Alert>
+export const SearchNoResults = ({ message }: { message: string }) => (
+  <Alert status="warning">{message}</Alert>
 )
 
 const SearchError = ({ message }: { message: string }) => (
@@ -44,7 +44,9 @@ export const UserSearch = ({
   friends,
   isFriendSearch = false,
 }: UserSearchProps) => {
-  const [results, setResults] = useState<FriendMinimal[] | null>(null)
+  const [results, setResults] = useState<FriendMinimal[] | null>(
+    isFriendSearch ? [] : null
+  )
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [shouldCloseModal, setShouldCloseModal] = useState(true)
@@ -327,8 +329,10 @@ export const UserSearch = ({
             </Center>
           </Flex>
           <ModalBody maxH="66vh" p="0" ref={menuRef}>
-            {resultsLength === 0 && results !== null && !isFriendSearch && (
-              <SearchNoResults />
+            {resultsLength === 0 && results !== null && (
+              <SearchNoResults
+                message={isFriendSearch ? 'No friends found' : 'No users found'}
+              />
             )}
             {error && !isFriendSearch && <SearchError message={error} />}
             {open && (

@@ -1,6 +1,6 @@
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useEffect, useRef, useState } from 'react'
-import { Conversation, Message } from 'types/api'
+import { Conversation } from 'types/api'
 import {
   Alert,
   Avatar,
@@ -24,7 +24,7 @@ import { removedFriend } from 'utils'
 export const Messages = () => {
   const { dashboardStore, setDashboardStore, refreshStore } =
     useDashboardStore()
-  const { conversations, friends, currentConversation } = dashboardStore
+  const { conversations, friends, activeConversationId } = dashboardStore
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
@@ -66,7 +66,7 @@ export const Messages = () => {
   useEffect(() => {
     const sortedConversations = orderBy(
       conversations,
-      (conv) => new Date(conv.messages[conv.messages.length - 1].createdAt),
+      (conv) => new Date(conv.messages[conv.messages.length - 1]?.createdAt),
       ['desc']
     )
     setAllConversations(sortedConversations)
@@ -80,24 +80,13 @@ export const Messages = () => {
   const clearSelectedConversation = () => {
     setDashboardStore((prevState) => ({
       ...prevState,
-      currentConversation: null,
+      activeConversationId: undefined,
     }))
   }
-
-  const handleMoreMessages = (msgs: Message[]) => {
-    if (!isEmpty(currentConversation) && !isEmpty(msgs)) {
-      const conversationUpdate = { ...currentConversation }
-      conversationUpdate.messages = msgs
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        currentConversation: conversationUpdate,
-      }))
-    }
-  }
-
   const handleReadMessages = (messageIds: string[]) => {
-    const { messages } = currentConversation ?? {}
-
+    const messages = (
+      conversations.filter((conv) => conv.id === activeConversationId)[0] ?? {}
+    ).messages
     const msgs = [...(messages ?? [])] ?? []
     let count = 0
     for (let i = 0; i < msgs.length; i++) {
@@ -107,12 +96,16 @@ export const Messages = () => {
       }
     }
 
-    if (count > 0 && msgs && !isEmpty(currentConversation)) {
-      const conversationUpdate = { ...currentConversation }
-      conversationUpdate.messages = msgs
+    const activeConversation =
+      conversations.filter((conv) => conv.id === activeConversationId)[0] ?? {}
+    if (count > 0 && msgs && !isEmpty(activeConversation)) {
+      activeConversation.messages = msgs
+      const conversationUpdate = conversations.filter(
+        (conv) => conv.id !== activeConversationId
+      )
       setDashboardStore((prevState) => ({
         ...prevState,
-        currentConversation: conversationUpdate,
+        conversations: [...conversationUpdate, activeConversation],
       }))
       refreshStore().catch(console.error)
     }
@@ -186,7 +179,7 @@ export const Messages = () => {
                   onClick={() =>
                     setDashboardStore((prevState) => ({
                       ...prevState,
-                      currentConversation: conv,
+                      activeConversationId: conv.id,
                     }))
                   }
                   sx={{
@@ -230,10 +223,13 @@ export const Messages = () => {
   }
 
   const renderMessages = () => {
-    if (isEmpty(currentConversation)) {
+    if (activeConversationId === undefined) {
       return renderConversations()
     } else {
-      const { senderId, recipientId, messages, id } = currentConversation
+      const activeConversation = conversations.filter(
+        (conv) => conv.id === activeConversationId
+      )[0]
+      const { senderId, recipientId, messages, id } = activeConversation
       const friend =
         friends.filter(
           (friend) => friend.id === senderId || friend.id == recipientId
@@ -245,7 +241,6 @@ export const Messages = () => {
           messages={messages}
           handleBackwardsClick={clearSelectedConversation}
           handleReadMessages={handleReadMessages}
-          handleMoreMessages={handleMoreMessages}
           conversationId={id}
         />
       )

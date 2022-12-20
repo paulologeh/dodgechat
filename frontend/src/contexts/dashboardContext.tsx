@@ -1,5 +1,5 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
-import { Conversation, FriendMinimal, UserProfile } from 'types/api'
+import { Conversation, FriendMinimal, Message, UserProfile } from 'types/api'
 import { Conversations, Relationships } from 'api'
 import { PageLoading } from 'components/common'
 
@@ -13,7 +13,8 @@ type DashboardStore = {
   openUserProfileModal: boolean
   selectedUser: UserProfile | null
   conversations: Conversation[]
-  currentConversation: Conversation | null
+  activeConversationId: string | null | undefined
+  olderMessages: Message[] | null
 }
 
 const initialStore: DashboardStore = {
@@ -26,7 +27,8 @@ const initialStore: DashboardStore = {
   openUserProfileModal: false,
   selectedUser: null,
   conversations: [],
-  currentConversation: null,
+  activeConversationId: undefined,
+  olderMessages: null,
 }
 
 const DashboardContext = createContext({

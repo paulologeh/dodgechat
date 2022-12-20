@@ -16,12 +16,15 @@ export class Conversations {
     return fetcher(`${ROOT}`, 'POST', conversation)
   }
 
-  static getConversation(conversationId: string, limit: number | null) {
-    if (limit) {
-      return fetcher(`${ROOT}/${conversationId}?limit=${limit}`, 'GET')
-    } else {
-      return fetcher(`${ROOT}/${conversationId}`, 'GET')
-    }
+  static getConversation(
+    conversationId: string,
+    limit: number,
+    timestamp: Date
+  ) {
+    return fetcher(
+      `${ROOT}/${conversationId}?limit=${limit}&timestamp=${timestamp}`,
+      'GET'
+    )
   }
 
   static sendMessage(conversationId: string, text: string) {

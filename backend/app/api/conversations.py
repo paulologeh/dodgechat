@@ -2,6 +2,7 @@ import logging
 from sqlalchemy import or_
 from flask import Blueprint, abort, jsonify, request
 from flask_login import current_user, login_required
+from datetime import datetime
 
 from app import db
 from app.exceptions import ValidationError
@@ -28,7 +29,7 @@ def get_or_create_conversations():
             {
                 "messages": [
                     MessageSchema().dump(message)
-                    for message in conversation.get_messages(10, current_user.id)
+                    for message in conversation.get_messages(current_user.id)
                 ],
                 **ConversationSchema().dump(conversation),
             }
@@ -83,9 +84,15 @@ def get_or_update_or_remove_conversation(conversation_id):
 
     if request.method == "GET":
         messages_limt = int(request.args.get("limit", 10))
+        timestamp = request.args.get("timestamp")
+        if timestamp:
+            timestamp = datetime.fromisoformat(timestamp)
+
         messages = [
             MessageSchema().dump(message)
-            for message in conversation.get_messages(messages_limt, current_user.id)
+            for message in conversation.get_messages(
+                messages_limt, current_user.id, timestamp
+            )
         ]
 
         return jsonify(messages)
