@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import type { CurrentUser } from 'contexts/userContext'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { UserUpdate } from 'types/api'
 import { Users } from 'api'
 import { isEmpty } from 'lodash'
@@ -30,7 +30,7 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [isSubmitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const { setCurrentUser } = useAuth()
+  const { setCurrentUser } = useUser()
   const modal = useDisclosure()
   const handleSubmit = async () => {
     const userUpdate: UserUpdate = {

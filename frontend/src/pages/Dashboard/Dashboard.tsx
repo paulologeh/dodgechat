@@ -16,7 +16,7 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
 import { Account } from './Account'
 import { Users } from 'api'
@@ -32,7 +32,7 @@ import { Notifications } from './Notifications'
 
 export const Dashboard = () => {
   const { colorMode, toggleColorMode } = useColorMode()
-  const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
+  const { currentUser, setLoggedIn, setCurrentUser } = useUser()
   const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { avatarHash, name, username, email } = currentUser
   const displayName = name ?? username ?? 'Unknown user'

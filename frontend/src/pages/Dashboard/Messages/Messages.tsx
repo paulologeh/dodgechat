@@ -18,7 +18,7 @@ import { isEmpty, orderBy } from 'lodash'
 import { OptionText } from './OptionText'
 import { UnreadIcon } from './UnreadIcon'
 import { UserConversations } from './UserConversations'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { removedFriend } from 'utils'
 
 export const Messages = () => {
@@ -28,7 +28,7 @@ export const Messages = () => {
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
-  const { currentUser } = useAuth()
+  const { currentUser } = useUser()
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
 
   const searchConversations = (term: string) => {

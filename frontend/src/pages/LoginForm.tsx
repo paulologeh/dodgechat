@@ -18,7 +18,7 @@ import {
 import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Users } from 'api'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { validateEmail } from 'utils'
 
 type LoginFormState = {
@@ -44,7 +44,7 @@ export const LoginForm = () => {
     password: '',
     request: '',
   })
-  const { setLoggedIn, setCurrentUser } = useAuth()
+  const { setLoggedIn, setCurrentUser } = useUser()
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()

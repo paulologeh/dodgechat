@@ -27,7 +27,7 @@ const UserContext = createContext({
   },
 })
 
-export function useAuth() {
+export function useUser() {
   return useContext(UserContext)
 }
 

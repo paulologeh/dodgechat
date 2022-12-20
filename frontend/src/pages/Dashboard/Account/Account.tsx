@@ -17,14 +17,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { SetStateAction, useState } from 'react'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { Users } from 'api'
 import { isEmpty } from 'lodash'
 import { delay } from 'utils'
 import { useDashboardStore } from 'contexts/dashboardContext'
 
 export const Account = () => {
-  const { currentUser, setLoggedIn, setCurrentUser } = useAuth()
+  const { currentUser, setLoggedIn, setCurrentUser } = useUser()
   const { setDashboardStore } = useDashboardStore()
   const [isSubmitting, setSubmitting] = useState(false)
   const [selected, setSelected] = useState('change-email')

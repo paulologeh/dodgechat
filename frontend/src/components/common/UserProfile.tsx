@@ -31,7 +31,7 @@ import {
   FiUsers,
   FiUserX,
 } from 'react-icons/fi'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 
 type UserProfileModalProps = {
   open: boolean
@@ -60,7 +60,7 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     unblock: false,
   })
   const { dashboardStore, setDashboardStore } = useDashboardStore()
-  const { currentUser } = useAuth()
+  const { currentUser } = useUser()
   const { selectedUser, conversations, friends } = dashboardStore
   const {
     name,

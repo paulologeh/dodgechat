@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { FiArrowUp, FiChevronLeft, FiSend } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
-import { useAuth } from 'contexts/userContext'
+import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
 import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { Conversations } from 'api'
@@ -38,7 +38,7 @@ export const UserConversations = ({
 }: UserConversationsProp) => {
   const { lastSeen, name, gravatar } = friend
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
-  const { currentUser } = useAuth()
+  const { currentUser } = useUser()
   const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { olderMessages } = dashboardStore
   const [isSending, setIsSending] = useState(false)
