@@ -18,7 +18,12 @@ class Conversation(db.Model):
     _sender_id = db.Column("sender_id", db.Integer, db.ForeignKey("users.id"))
     recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
-    message = db.relationship("Message")
+    message = db.relationship(
+        "Message",
+        back_populates="conversation",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
     sender = db.relationship("User", foreign_keys=[_sender_id])
     recipient = db.relationship("User", foreign_keys=[recipient_id])
 
