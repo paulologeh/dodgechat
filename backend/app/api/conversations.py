@@ -74,9 +74,9 @@ def get_or_create_conversations():
         )
 
 
-@conversations.route("/<conversation_id>/messages", methods=["GET", "POST"])
+@conversations.route("/<conversation_id>", methods=["GET", "POST", "DELETE"])
 @login_required
-def get_or_update_conversation(conversation_id):
+def get_or_update_or_remove_conversation(conversation_id):
     conversation = Conversation.query.get(conversation_id)
     if not conversation:
         abort(400, "Conversation does not exist")
@@ -103,6 +103,8 @@ def get_or_update_conversation(conversation_id):
         db.session.commit()
 
         return jsonify(MessageSchema().dump(message))
+    elif request.method == "DELETE":
+        return jsonify({"message": "Removed conversation", "id": conversation_id})
 
 
 @conversations.route("/messages/read", methods=["POST"])

@@ -18,14 +18,14 @@ export class Conversations {
 
   static getConversation(conversationId: string, limit: number | null) {
     if (limit) {
-      return fetcher(`${ROOT}/${conversationId}/messages?limit=${limit}`, 'GET')
+      return fetcher(`${ROOT}/${conversationId}?limit=${limit}`, 'GET')
     } else {
-      return fetcher(`${ROOT}/${conversationId}/messages`, 'GET')
+      return fetcher(`${ROOT}/${conversationId}`, 'GET')
     }
   }
 
   static sendMessage(conversationId: string, text: string) {
-    return fetcher(`${ROOT}/${conversationId}/messages`, 'POST', {
+    return fetcher(`${ROOT}/${conversationId}`, 'POST', {
       body: text,
     })
   }
