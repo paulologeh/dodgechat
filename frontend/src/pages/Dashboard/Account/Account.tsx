@@ -181,7 +181,7 @@ export const Account = () => {
               p={6}
             >
               <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-                Account Management
+                Account management
               </Heading>
               <Select
                 value={selected}

@@ -10,7 +10,7 @@ import {
   RegisterForm,
   ResetPasswordForm,
   VerifyEmailToken,
-} from 'components/routes'
+} from 'pages'
 
 const RouterConfig = () => {
   return (

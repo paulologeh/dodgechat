@@ -1,4 +1,5 @@
 import { Card, CardBody, Flex, Text } from '@chakra-ui/react'
+import { Message } from 'types/api'
 
 const senderStyle = {
   bg: 'teal.500',
@@ -14,16 +15,16 @@ const receiverStyle = {
   '.chakra-ui-dark &': { bg: 'gray.600' },
 }
 type MessageProps = {
-  body: string
+  message: Message
   isSender: boolean
 }
 
-export const MessageBubble = ({ body, isSender }: MessageProps) => {
+export const MessageBubble = ({ message, isSender }: MessageProps) => {
   return (
     <Flex justify={isSender ? 'end' : 'start'}>
       <Card mb={4} sx={isSender ? senderStyle : receiverStyle}>
         <CardBody>
-          <Text color={isSender ? 'white' : undefined}>{body}</Text>
+          <Text color={isSender ? 'white' : undefined}>{message.body}</Text>
         </CardBody>
       </Card>
     </Flex>

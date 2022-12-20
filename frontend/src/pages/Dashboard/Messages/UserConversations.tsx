@@ -196,14 +196,14 @@ export const UserConversations = ({
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}
-            body={msg.body}
+            message={msg}
             isSender={currentUser.id === msg.senderId}
           />
         ))}
         {localMessages.map((msg) => (
           <MessageBubble
             key={msg.id}
-            body={msg.body}
+            message={msg}
             isSender={currentUser.id === msg.senderId}
           />
         ))}
