@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import UUID
 
+from typing import Optional
 from app import db
 from app.models.message import Message
 
@@ -27,28 +28,28 @@ class Conversation(db.Model):
     sender = db.relationship("User", foreign_keys=[_sender_id])
     recipient = db.relationship("User", foreign_keys=[recipient_id])
 
-    def get_messages(self, limit: int, requester_id: int):
-        maximum_limit = (
-            db.session.query(Message)
-            .filter(
-                Message.conversation_id == self.id,
+    def get_messages(
+        self, requester_id: int, limit: int = 10, timestamp: Optional[datetime] = None
+    ):
+        if timestamp:
+            msgs = [
+                message
+                for message in db.session.query(Message)
+                .filter(Message.conversation_id == self.id)
+                .filter(Message.created_at < timestamp)
+                .order_by(Message.created_at.desc())
+                .limit(limit)
+                .all()
+            ]
+
+        else:
+            maximum_limit = (
+                db.session.query(Message)
+                .filter(
+                    Message.conversation_id == self.id,
+                )
+                .count()
             )
-            .count()
-        )
-        msgs = [
-            message
-            for message in db.session.query(Message)
-            .filter(Message.conversation_id == self.id)
-            .order_by(Message.created_at.desc())
-            .limit(limit)
-            .all()
-        ]
-
-        while limit <= maximum_limit and all(
-            [not msg.read for msg in msgs if msg.sender_id != requester_id]
-        ):
-            limit *= limit
-
             msgs = [
                 message
                 for message in db.session.query(Message)
@@ -57,6 +58,20 @@ class Conversation(db.Model):
                 .limit(limit)
                 .all()
             ]
+
+            while limit <= maximum_limit and all(
+                [not msg.read for msg in msgs if msg.sender_id != requester_id]
+            ):
+                limit += limit
+
+                msgs = [
+                    message
+                    for message in db.session.query(Message)
+                    .filter(Message.conversation_id == self.id)
+                    .order_by(Message.created_at.desc())
+                    .limit(limit)
+                    .all()
+                ]
 
         return sorted(msgs, key=lambda x: x.created_at)
 
