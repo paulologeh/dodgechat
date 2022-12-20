@@ -69,6 +69,9 @@ def setup_test_accounts():
             _user = user.User.query.filter_by(email=_email).first()
 
             if _user:
+                conversation.Conversation.query.filter_by(_sender_id=_user.id).delete()
+                conversation.Conversation.query.filter_by(recipient_id=_user.id).delete()
+
                 db.session.delete(_user)
 
             db.session.commit()
