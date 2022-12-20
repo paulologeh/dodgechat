@@ -15,7 +15,7 @@ class Message(db.Model):
     conversation_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("conversations.id", ondelete="CASCADE")
     )
-    conversation = db.relationship("Conversation", back_populates="conversations")
+    conversation = db.relationship("Conversation", back_populates="message")
     body = db.Column(db.Text(), nullable=False)
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
