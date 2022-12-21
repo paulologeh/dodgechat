@@ -118,7 +118,15 @@ def get_or_update_or_remove_conversation(conversation_id):
 
         return jsonify(MessageSchema().dump(message))
     elif request.method == "DELETE":
-        return jsonify({"message": "Removed conversation", "id": conversation_id})
+        if (
+            current_user.id == conversation.sender_id
+            or current_user.id == conversation.recipient_id
+        ):
+            db.session.delete(conversation)
+            db.session.commit()
+            return jsonify({"message": "Deleted conversation"})
+        else:
+            abort(400, "You do not have permission to delete this conversation")
 
 
 @conversations.route("/messages/read", methods=["POST"])
