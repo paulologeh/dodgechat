@@ -33,6 +33,10 @@ export class Conversations {
     })
   }
 
+  static deleteConversation(conversationId: string) {
+    return fetcher(`${ROOT}/${conversationId}`, 'DELETE')
+  }
+
   static readMessages(ids: string[]) {
     return fetcher(`${ROOT}/messages/read`, 'POST', {
       ids: ids,
