@@ -7,6 +7,7 @@ from sqlalchemy import and_, or_
 from app import db
 from app.models.relationship import FriendState, Relationship, RelationshipType
 from app.models.user import User
+from app.models.conversation import Conversation
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,28 @@ def _get_friends(user_id, include_requests=True):
     result["friendRequests"] = [
         friend_request.to_minimal() for friend_request in friend_requests
     ]
+
+    other_ids = [
+        conversation.recipient_id
+        if conversation.sender_id == user_id
+        else conversation.sender_id
+        for conversation in db.session.query(Conversation)
+        .filter(
+            or_(
+                Conversation.recipient_id == user_id, Conversation._sender_id == user_id
+            )
+        )
+        .all()
+    ]
+
+    others = []
+    for id in other_ids:
+        if id not in friend_ids:
+            other = User.query.get(id)
+            if other:
+                others.append(other.to_minimal())
+
+    result["others"] = others
 
     return result
 

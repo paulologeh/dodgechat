@@ -57,7 +57,11 @@ def get_or_create_conversations():
             _sender_id=current_user.id, recipient_id=data["recipient_id"]
         )
         db.session.add(conversation)
-        db.session.commit()
+        db.session.flush()
+
+        if not conversation.are_friends():
+            db.session.rollback()
+            abort(400, "You cannot message this user as you are not friends")
 
         message = Message(
             body=data["message_body"],
@@ -97,6 +101,9 @@ def get_or_update_or_remove_conversation(conversation_id):
 
         return jsonify(messages)
     elif request.method == "POST":
+        if not conversation.are_friends():
+            abort(400, "You cannot message this user as you are not friends")
+
         payload = request.get_json()
         try:
             data = MessageSchema().load(payload)

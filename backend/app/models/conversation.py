@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from typing import Optional
 from app import db
 from app.models.message import Message
+from app.models.relationship import Relationship
 
 
 class UniqueConstraint(Exception):
@@ -74,6 +75,19 @@ class Conversation(db.Model):
                 ]
 
         return sorted(msgs, key=lambda x: x.created_at)
+
+    def are_friends(self) -> bool:
+        relationship_1 = Relationship.query.filter_by(
+            requester_id=self.sender_id, addressee_id=self.recipient_id
+        ).first()
+        relationship_2 = Relationship.query.filter_by(
+            requester_id=self.recipient_id, addressee_id=self.sender_id
+        ).first()
+
+        if relationship_1 and relationship_2:
+            return True
+        else:
+            return False
 
     @classmethod
     def conversation_exists(cls, sender_id: int, recipient_id: int) -> bool:

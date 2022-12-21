@@ -133,6 +133,7 @@ class User(UserMixin, db.Model):
 
     def to_minimal(self, private=False):
         json_user = {
+            "id": self.id,
             "username": self.username,
             "name": self.name,
             "location": self.location,
@@ -147,7 +148,6 @@ class User(UserMixin, db.Model):
                 **json_user,
                 "memberSince": self.member_since,
                 "lastSeen": self.last_seen,
-                "id": self.id,
             }
 
         return json_user
