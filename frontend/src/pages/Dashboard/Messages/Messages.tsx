@@ -1,6 +1,6 @@
 import { useDashboardStore } from 'contexts/dashboardContext'
 import { useEffect, useRef, useState } from 'react'
-import { Conversation } from 'types/api'
+import { Conversation, FriendMinimal } from 'types/api'
 import {
   Alert,
   Avatar,
@@ -19,12 +19,30 @@ import { OptionText } from './OptionText'
 import { UnreadIcon } from './UnreadIcon'
 import { UserConversations } from './UserConversations'
 import { useUser } from 'contexts/userContext'
-import { removedFriend } from 'utils'
+import { unknownProfile } from 'utils'
+
+const getFriend = (
+  friends: FriendMinimal[],
+  others: FriendMinimal[],
+  senderId: number,
+  recipientId: number
+) => {
+  const maybeFriend = friends.find(
+    ({ id }) => id === senderId || id === recipientId
+  )
+
+  const maybeOther = others.find(
+    ({ id }) => id === senderId || id === recipientId
+  )
+
+  return maybeFriend ?? maybeOther ?? unknownProfile
+}
 
 export const Messages = () => {
   const { dashboardStore, setDashboardStore, refreshStore } =
     useDashboardStore()
-  const { conversations, friends, activeConversationId } = dashboardStore
+  const { conversations, friends, activeConversationId, others } =
+    dashboardStore
   const [allConversations, setAllConversations] = useState<Conversation[]>([])
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
@@ -44,9 +62,15 @@ export const Messages = () => {
         message.body.toLowerCase().includes(searchTerm)
       )
       const { senderId, recipientId } = conversations[i]
-      const friend = friends.filter(
-        (friend) => friend.id === senderId || friend.id == recipientId
-      )[0]
+      const maybeFriend = friends.find(
+        ({ id }) => id === senderId || id === recipientId
+      )
+      const maybeOther = others.find(
+        ({ id }) => id === senderId || id === recipientId
+      )
+
+      const friend = maybeFriend ?? maybeOther ?? unknownProfile
+
       if (messages.length > 0) {
         results.push({
           ...conversations[i],
@@ -150,12 +174,11 @@ export const Messages = () => {
             <Alert status="warning">No messages</Alert>
           )}
           {(allConversations ?? []).map((conv, index) => {
-            const { bottomMessage, messages } = conv
+            const { bottomMessage, messages, senderId, recipientId } = conv
             const lastMessage = bottomMessage ?? messages[messages.length - 1]
-            const friend =
-              friends.filter(
-                (val) => val.id === conv.senderId || val.id === conv.recipientId
-              )[0] ?? removedFriend
+
+            const friend = getFriend(friends, others, senderId, recipientId)
+
             const unreadCount =
               messages.filter(
                 (msg) => msg.senderId !== currentUser.id && !msg.read
@@ -230,10 +253,15 @@ export const Messages = () => {
         (conv) => conv.id === activeConversationId
       )[0]
       const { senderId, recipientId, messages, id } = activeConversation
-      const friend =
-        friends.filter(
-          (friend) => friend.id === senderId || friend.id == recipientId
-        )[0] ?? removedFriend
+
+      const maybeFriend = friends.find(
+        ({ id }) => id === senderId || id === recipientId
+      )
+      const maybeOther = others.find(
+        ({ id }) => id === senderId || id === recipientId
+      )
+
+      const friend = maybeFriend ?? maybeOther ?? unknownProfile
 
       return (
         <UserConversations

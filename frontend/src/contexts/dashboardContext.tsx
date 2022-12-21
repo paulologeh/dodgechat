@@ -8,6 +8,7 @@ type DashboardStore = {
   loadingMessage: string
   friendRequests: FriendMinimal[]
   friends: FriendMinimal[]
+  others: FriendMinimal[]
   openErrorModal: boolean
   modalError: string
   openUserProfileModal: boolean
@@ -22,6 +23,7 @@ const initialStore: DashboardStore = {
   loadingMessage: '',
   friendRequests: [],
   friends: [],
+  others: [],
   openErrorModal: false,
   modalError: '',
   openUserProfileModal: false,
@@ -58,14 +60,17 @@ export const DashboardStoreProvider: FC = ({ children }) => {
         const {
           friendRequests,
           friends,
+          others,
         }: {
           friendRequests: FriendMinimal[]
           friends: FriendMinimal[]
+          others: FriendMinimal[]
         } = data
         setDashboardStore((prevState) => ({
           ...prevState,
           friendRequests: friendRequests,
           friends: friends,
+          others: others,
           conversations: conversationsData,
         }))
       } else {

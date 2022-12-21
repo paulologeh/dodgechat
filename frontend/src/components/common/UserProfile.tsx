@@ -32,6 +32,7 @@ import {
   FiUserX,
 } from 'react-icons/fi'
 import { useUser } from 'contexts/userContext'
+import { Conversation } from 'types/api'
 
 type UserProfileModalProps = {
   open: boolean
@@ -91,6 +92,7 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
         selectedUser: user,
         friendRequests: friends.friendRequests,
         friends: friends.friends,
+        others: friends.others,
         loading: false,
         loadingMessage: '',
       }))
@@ -109,16 +111,16 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     if (!username) return
 
     if (button === 'message') {
-      const timeNow = new Date(Date.now())
-      const friend = friends.filter((friend) => friend.username === username)[0]
-      const conversation = conversations.filter(
-        (conv) => conv.senderId === friend.id || conv.recipientId === friend.id
-      )[0] ?? {
+      const friend = friends.find((friend) => friend.username === username)
+      if (!friend) return
+      const conversation = conversations.find(
+        (conv: Conversation) =>
+          conv.senderId === friend.id || conv.recipientId === friend.id
+      ) ?? {
         id: null,
         senderId: currentUser.id,
         recipientId: friend.id,
         messages: [],
-        createdAt: timeNow.toISOString(),
       }
 
       setDashboardStore((prevState) => ({
@@ -126,7 +128,12 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
         activeConversationId: conversation.id,
         selectedUser: null,
         openUserProfileModal: false,
-        conversations: [...prevState.conversations, conversation],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        conversations:
+          conversation.id === null
+            ? [...prevState.conversations, conversation]
+            : prevState.conversations,
       }))
       return
     }

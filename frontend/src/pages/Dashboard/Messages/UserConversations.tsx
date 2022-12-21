@@ -11,7 +11,7 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FiArrowUp, FiChevronLeft, FiSend } from 'react-icons/fi'
+import { FiChevronLeft, FiRefreshCcw, FiSend, FiTrash2 } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
@@ -47,6 +47,8 @@ export const UserConversations = ({
   const isBottomRefInViewport = useIsInViewport(bottomRef)
   const [localMessages, setLocalMessages] = useState<Message[]>([])
   const [isFailed, setIsFailed] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState(false)
 
   useEffect(() => {
     if (isEmpty(olderMessages) && bottomRef.current) {
@@ -63,7 +65,9 @@ export const UserConversations = ({
   const fetchMoreMessages = async () => {
     if (!conversationId) return
 
-    const timestamp = messages[0].createdAt
+    const timestamp =
+      ((olderMessages ?? [])[0] ?? {}).createdAt ?? messages[0].createdAt
+    setIsLoadingMore(true)
     try {
       const response = await Conversations.getConversation(
         conversationId,
@@ -72,14 +76,20 @@ export const UserConversations = ({
       )
       if (response.status === 200) {
         const msgs: Message[] = await response.json()
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          olderMessages: msgs.concat([...(olderMessages ?? [])]),
-        }))
+        if (isEmpty(msgs)) {
+          console.log('messages are empty')
+          setIsLoadMoreDisabled(true)
+        } else {
+          setDashboardStore((prevState) => ({
+            ...prevState,
+            olderMessages: msgs.concat([...(olderMessages ?? [])]),
+          }))
+        }
       }
     } catch (error) {
       console.error(error)
     }
+    setIsLoadingMore(false)
   }
 
   const handleFailedMessage = async () => {
@@ -182,15 +192,22 @@ export const UserConversations = ({
           <Box flex="1" ml="4">
             <Box fontWeight="extrabold">{name}</Box>
           </Box>
-          <Button
-            rightIcon={<FiArrowUp />}
-            onClick={() => {
-              fetchMoreMessages().catch(console.error)
-              setLocalMessages([])
-            }}
-          >
-            Older
-          </Button>
+          <Stack direction="row" spacing={3}>
+            <Button
+              rightIcon={<FiRefreshCcw />}
+              onClick={() => {
+                fetchMoreMessages().catch(console.error)
+                setLocalMessages([])
+              }}
+              isLoading={isLoadingMore}
+              isDisabled={isLoadMoreDisabled}
+            >
+              Load more
+            </Button>
+            <Button rightIcon={<FiTrash2 />} colorScheme="red">
+              Delete
+            </Button>
+          </Stack>
         </Box>
         <Divider
           sx={{

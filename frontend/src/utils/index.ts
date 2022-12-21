@@ -1,3 +1,5 @@
+import { FriendMinimal } from 'types/api'
+
 export const validateEmail = (email: string) => {
   return /^\w+(-?\w+)*@\w+(-?\w+)*(\.\w{2,3})+$/.test(email)
 }
@@ -89,9 +91,12 @@ export const getLastSeen = (date: Date) => {
   }
 }
 
-export const removedFriend = {
+export const unknownProfile: FriendMinimal = {
   id: 0,
-  lastSeen: '1970-01-01',
+  lastSeen: new Date('1970-01-01'),
   name: 'Unknown',
-  username: 'unknow',
+  username: 'unknown',
+  gravatar: '',
+  location: '',
+  aboutMe: '',
 }
