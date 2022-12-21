@@ -20,8 +20,6 @@ class Conversation(db.Model):
     _sender_id = db.Column("sender_id", db.Integer, db.ForeignKey("users.id"))
     recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
-    sender_cleared_at = db.Column(db.DateTime(), default=None)
-    recipient_cleared_at = db.Column(db.DateTime(), default=None)
     message = db.relationship(
         "Message",
         back_populates="conversation",
