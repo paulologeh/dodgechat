@@ -30,7 +30,7 @@ import { FiMoon, FiSun } from 'react-icons/fi'
 import { UserSearch } from './Search'
 import { Notifications } from './Notifications'
 
-export const Dashboard = () => {
+export const Application = () => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { currentUser, setLoggedIn, setCurrentUser } = useUser()
   const { dashboardStore, setDashboardStore } = useDashboardStore()
