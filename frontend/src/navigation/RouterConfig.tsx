@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { RequireAuth, RequireNoAuth } from 'navigation/RequireAuth'
 import { DashboardStoreProvider } from 'contexts/dashboardContext'
+import { ApplicationProvider } from 'contexts/applictionContext'
 import {
   Application,
   ConfirmAccountToken,
@@ -22,7 +23,9 @@ const RouterConfig = () => {
           element={
             <RequireAuth redirectTo="/login">
               <DashboardStoreProvider>
-                <Application />
+                <ApplicationProvider>
+                  <Application />
+                </ApplicationProvider>
               </DashboardStoreProvider>
             </RequireAuth>
           }
