@@ -47,7 +47,56 @@ const initialUserRelationshipState: UserRelationshipsState = {
   otherUsers: [],
 }
 
-const ApplicationContext = createContext({})
+type ContextType = LoadingState &
+  ErrorsState &
+  UserRelationshipsState & {
+    showAppLoading: () => void
+    showAppLoadingWithMessage: (message: string) => void
+    clearAppLoading: () => void
+    setAppModalError: (error: string) => void
+    setAppToastError: (error: string) => void
+    clearAppError: () => void
+    requestOrAppError: (
+      errorKind: ErrorKind,
+      appLoadingMessage: string | null,
+      request: () => Promise<Response>
+    ) => Promise<never | null>
+    requestSilent: (request: () => Promise<Response>) => Promise<never | null>
+    displayedProfile: UserProfile | null
+    setDisplayedProfile: (profile: UserProfile | null) => void
+    activeConversation: Conversation | undefined
+    userConversations: Conversation[]
+  }
+
+const ApplicationContext = createContext<ContextType>({
+  ...initialAppLoading,
+  showAppLoading: () => void undefined,
+  showAppLoadingWithMessage: (message: string) => void message,
+  clearAppLoading: () => void undefined,
+  ...initialAppError,
+  setAppModalError: (err: string) => void err,
+  setAppToastError: (err: string) => void err,
+  clearAppError: () => void undefined,
+  requestOrAppError: (
+    errorKind: ErrorKind,
+    appLoadingMessage: string | null,
+    request: () => Promise<Response>
+  ) => {
+    void errorKind
+    void appLoadingMessage
+    void request()
+    return Promise.resolve(null)
+  },
+  requestSilent: (request: () => Promise<Response>) => {
+    void request()
+    return Promise.resolve(null)
+  },
+  ...initialUserRelationshipState,
+  displayedProfile: null,
+  setDisplayedProfile: (profile: UserProfile | null) => void profile,
+  activeConversation: undefined,
+  userConversations: [],
+})
 
 export function useApplication() {
   return useContext(ApplicationContext)
@@ -102,7 +151,7 @@ export const ApplicationProvider: FC = ({ children }) => {
     setAppError(initialAppError)
   }
 
-  const requestOrError = async (
+  const requestOrAppError = async (
     errorKind: ErrorKind,
     appLoadingMessage: string | null,
     request: () => Promise<Response>
@@ -186,7 +235,7 @@ export const ApplicationProvider: FC = ({ children }) => {
     setAppModalError,
     setAppToastError,
     clearAppError,
-    requestOrError,
+    requestOrAppError,
     activeConversation,
     userConversations,
     requestSilent,
