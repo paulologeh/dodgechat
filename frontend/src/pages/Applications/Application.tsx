@@ -81,8 +81,6 @@ export const Application = () => {
   const {
     openErrorModal,
     modalError,
-    loading,
-    loadingMessage,
     openUserProfileModal,
     friendRequests = [],
     friends = [],
@@ -150,7 +148,7 @@ export const Application = () => {
         <Messages />
       </Center>
       <>
-        <LoadingModal open={loading} message={loadingMessage} />
+        <LoadingModal />
         <ErrorModal open={openErrorModal} message={modalError} />
         <UserProfileModal open={openUserProfileModal} />
       </>

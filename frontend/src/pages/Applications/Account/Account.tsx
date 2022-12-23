@@ -21,11 +21,11 @@ import { useUser } from 'contexts/userContext'
 import { Users } from 'api'
 import { isEmpty } from 'lodash'
 import { delay } from 'utils'
-import { useDashboardStore } from 'contexts/dashboardContext'
+import { useApplication } from 'contexts/applictionContext'
 
 export const Account = () => {
   const { currentUser, setLoggedIn, setCurrentUser } = useUser()
-  const { setDashboardStore } = useDashboardStore()
+  const { showAppLoadingWithMessage, clearAppLoading } = useApplication()
   const [isSubmitting, setSubmitting] = useState(false)
   const [selected, setSelected] = useState('change-email')
   const [email, setEmail] = useState(currentUser.email ?? '')
@@ -102,17 +102,9 @@ export const Account = () => {
           case 'delete-account':
             setSucess('Account deleted. You will be redirected in a moment')
             await delay(5000)
-            setDashboardStore((prevState) => ({
-              ...prevState,
-              loading: true,
-              loadingMessage: 'Redirecting',
-            }))
+            showAppLoadingWithMessage('Redirecting')
             await delay(5000)
-            setDashboardStore((prevState) => ({
-              ...prevState,
-              loading: false,
-              loadingMessage: '',
-            }))
+            clearAppLoading()
             setLoggedIn(false)
             setCurrentUser({})
             break

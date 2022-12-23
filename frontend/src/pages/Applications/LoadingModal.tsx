@@ -1,28 +1,25 @@
 import {
+  Flex,
   Modal,
-  ModalOverlay,
   ModalContent,
   ModalHeader,
+  ModalOverlay,
   Spinner,
   Stack,
-  Flex,
 } from '@chakra-ui/react'
+import { useApplication } from 'contexts/applictionContext'
 
-export const LoadingModal = ({
-  open,
-  message,
-}: {
-  open: boolean
-  message: string
-}) => {
+export const LoadingModal = () => {
+  const { isAppLoading, loadingMessage } = useApplication()
+
   return (
-    <Modal isCentered isOpen={open} onClose={() => null}>
+    <Modal isCentered isOpen={isAppLoading} onClose={() => null}>
       <ModalOverlay />
       <ModalContent>
         <Flex align="center" justify="center">
-          {message && (
+          {loadingMessage && (
             <Stack>
-              <ModalHeader>{message}</ModalHeader>
+              <ModalHeader>{loadingMessage}</ModalHeader>
             </Stack>
           )}
           <Stack>
