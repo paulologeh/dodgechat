@@ -1,8 +1,16 @@
+import { delay } from './delay'
+
+const environment = process.env.ENVIRONMENT
+
 export const fetcher = async (
   url: string,
   method: string,
   body: unknown = null
 ) => {
+  if (environment === 'DEVELOPMENT') {
+    await delay(1000)
+  }
+
   if (!body) {
     return fetch(url, {
       method: method,
