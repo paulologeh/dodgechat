@@ -5,6 +5,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from marshmallow.exceptions import ValidationError
 
 from app import db
+from app.models.conversation import Conversation
 from app.models.user import User
 from app.serde import (
     ChangeEmailSchema,
@@ -45,6 +46,8 @@ def delete_user():
     if not current_user.verify_password(data["password"]):
         abort(400, "Invalid credentials")
 
+    Conversation.query.filter_by(_sender_id=current_user.id, recipient_id=None).delete()
+    Conversation.query.filter_by(recipient_id=current_user.id, _sender_id=None).delete()
     db.session.delete(current_user)
     db.session.commit()
 
