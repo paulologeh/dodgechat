@@ -2,7 +2,6 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import backref
 
 from app import db
 
@@ -10,7 +9,9 @@ from app import db
 class Message(db.Model):
     __tablename__ = "messages"
     id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    sender_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     user = db.relationship("User", back_populates="message")
     conversation_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("conversations.id", ondelete="CASCADE")

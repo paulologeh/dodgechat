@@ -17,8 +17,15 @@ class UniqueConstraint(Exception):
 class Conversation(db.Model):
     __tablename__ = "conversations"
     id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    _sender_id = db.Column("sender_id", db.Integer, db.ForeignKey("users.id"))
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    _sender_id = db.Column(
+        "sender_id",
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    recipient_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
     message = db.relationship(
         "Message",

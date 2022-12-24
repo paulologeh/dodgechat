@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
         cascade="all, delete",
         passive_deletes=True,
     )
-    message = db.relationship("Message", back_populates="user")
+    message = db.relationship("Message", back_populates="user", passive_deletes=True)
 
     __ts_vector__ = db.Column(
         TSVector(),
