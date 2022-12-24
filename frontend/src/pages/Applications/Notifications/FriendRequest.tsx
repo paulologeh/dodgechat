@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, ButtonGroup, Text } from '@chakra-ui/react'
 import { useState } from 'react'
-import { useDashboardStore } from 'contexts/dashboardContext'
 import { Relationships } from 'api'
+import { useApplication } from 'contexts/applictionContext'
 
 type FriendRequestProps = {
   username: string
@@ -13,58 +13,24 @@ export const FriendRequest = ({ username, gravatar }: FriendRequestProps) => {
     accept: false,
     decline: false,
   })
-  const { setDashboardStore } = useDashboardStore()
+  const { syncData, requestOrAppError } = useApplication()
 
   const handleClick = async (button: string) => {
-    const cleanUp = () => {
-      setLoading({ ...loading, [button]: false })
-    }
     setLoading({ ...loading, [button]: true })
 
-    try {
-      let response
-
+    const request = async () => {
       if (button === 'accept') {
-        response = await Relationships.addUser(username)
+        return Relationships.addUser(username)
       } else if (button === 'decline') {
-        response = await Relationships.deleteUser(username)
+        return Relationships.deleteUser(username)
       } else {
-        console.error('unrecognised button')
-        cleanUp()
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: 'Something went wrong. Please try again',
-          openErrorModal: true,
-        }))
-        return
+        return new Response()
       }
-
-      if (response && response.status === 200) {
-        const refetchResponse = await Relationships.getFriends()
-        const data = await refetchResponse.json()
-        cleanUp()
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          friendRequests: data.friendRequests,
-          friends: data.friends,
-        }))
-      } else {
-        const data = await response.json()
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: data.message,
-          openErrorModal: true,
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-      cleanUp()
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        modalError: 'Something went wrong. Please try again',
-        openErrorModal: true,
-      }))
     }
+
+    await requestOrAppError('TOAST', null, request)
+    await syncData(true)
+    setLoading({ ...loading, [button]: false })
   }
 
   return (

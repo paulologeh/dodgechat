@@ -23,9 +23,9 @@ import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { FriendMinimal } from 'types/api'
 import { Search as SearchService } from 'api/search'
 import { debounce, isEmpty } from 'lodash'
-import { useDashboardStore } from 'contexts/dashboardContext'
 import './SearchModal.css'
 import { FiSearch, FiUsers } from 'react-icons/fi'
+import { useApplication } from '../../../contexts/applictionContext'
 
 export const SearchNoResults = ({ message }: { message: string }) => (
   <Alert status="warning">{message}</Alert>
@@ -57,7 +57,7 @@ export const UserSearch = ({
   const modal = useDisclosure()
   const menuRef = useRef<HTMLDivElement>(null)
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
-  const { setDashboardStore } = useDashboardStore()
+  const { requestOrAppError, setDisplayedProfile } = useApplication()
   const resultsLength = results?.length ?? 0
 
   useEventListener('keydown', (event) => {
@@ -223,45 +223,20 @@ export const UserSearch = ({
 
   const handleUserSelect = (username: string) => {
     const fetchAndViewProfile = async () => {
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        loading: true,
-        loadingMessage: 'Fetching user',
-      }))
-      try {
-        const response = await SearchService.searchUser(username)
-        const responseData = await response.json()
-        if (response.status === 200) {
-          setDashboardStore((prevState) => ({
-            ...prevState,
-            openUserProfileModal: true,
-            selectedUser: responseData,
-            loading: false,
-            loadingMessage: '',
-          }))
-        } else {
-          setDashboardStore((prevState) => ({
-            ...prevState,
-            loading: false,
-            loadingMessage: '',
-            openErrorModal: true,
-            modalError: responseData.message,
-          }))
-        }
-      } catch (error) {
-        console.error(error)
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          loading: false,
-          loadingMessage: '',
-          openErrorModal: true,
-          modalError: 'We cannot view this user right now. Try again later',
-        }))
+      const request = async () => await SearchService.searchUser(username)
+      const response = await requestOrAppError(
+        'MODAL',
+        'Fetching user',
+        request
+      )
+      if (!isEmpty(response)) {
+        setDisplayedProfile(response)
       }
     }
 
     if (shouldCloseModal) {
       modal.onClose()
+      setDisplayedProfile(null)
     }
     fetchAndViewProfile().catch(console.error)
   }

@@ -127,6 +127,7 @@ export const Account = () => {
     } catch (e) {
       console.error(e)
       setError('Something went wrong')
+      setSubmitting(false)
     }
   }
 

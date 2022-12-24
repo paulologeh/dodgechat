@@ -16,7 +16,6 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react'
-import { useDashboardStore } from 'contexts/dashboardContext'
 import { getLastSeen, months } from 'utils/index'
 import { useState } from 'react'
 import { Relationships, Search as SearchService } from 'api'
@@ -33,10 +32,8 @@ import {
 } from 'react-icons/fi'
 import { useUser } from 'contexts/userContext'
 import { Conversation } from 'types/api'
-
-type UserProfileModalProps = {
-  open: boolean
-}
+import { useApplication } from 'contexts/applictionContext'
+import { isEmpty } from 'lodash'
 
 type UserProfileButtonGroup = {
   add: boolean
@@ -53,16 +50,26 @@ const getJoined = (date: Date) => {
   return `Joined ${months[month - 1]} ${year}`
 }
 
-export const UserProfileModal = ({ open }: UserProfileModalProps) => {
+export const UserProfileModal = () => {
   const [loading, setLoading] = useState<UserProfileButtonGroup>({
     add: false,
     delete: false,
     block: false,
     unblock: false,
   })
-  const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { currentUser } = useUser()
-  const { selectedUser, conversations, friends } = dashboardStore
+  const {
+    requestSilent,
+    displayedProfile,
+    setDisplayedProfile,
+    userFriends,
+    userConversations,
+    addNewConversation,
+    setActiveConversation,
+    requestOrAppError,
+    syncData,
+  } = useApplication()
+  const open = !isEmpty(displayedProfile)
   const {
     name,
     username,
@@ -73,47 +80,25 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
     relationshipState,
     memberSince,
     numberOfFriends,
-  } = selectedUser ?? {}
+  } = displayedProfile ?? {}
 
   const refetch = async (username: string) => {
-    setDashboardStore((prevState) => ({
-      ...prevState,
-      loading: true,
-      loadingMessage: 'Refetching User',
-    }))
-    const response = await SearchService.searchUser(username)
-    const friendsResponse = await Relationships.getFriends()
-
-    if (response.status === 200 && friendsResponse.status === 200) {
-      const user = await response.json()
-      const friends = await friendsResponse.json()
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        selectedUser: user,
-        friendRequests: friends.friendRequests,
-        friends: friends.friends,
-        others: friends.others,
-        loading: false,
-        loadingMessage: '',
-      }))
-    } else {
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        modalError: 'Something went wrong. Please try again later',
-        openErrorModal: true,
-        loading: false,
-        loadingMessage: '',
-      }))
+    const request = async () => SearchService.searchUser(username)
+    const response = await requestSilent(request)
+    if (response) {
+      setDisplayedProfile(response)
     }
+    await syncData(true)
   }
 
   const handleClick = async (button: string) => {
-    if (!username) return
+    if (!username || !currentUser.id) return
+
+    const friend = userFriends.find((friend) => friend.username === username)
 
     if (button === 'message') {
-      const friend = friends.find((friend) => friend.username === username)
-      if (!friend) return
-      const conversation = conversations.find(
+      if (!friend || !friend.id) return
+      const conversation = userConversations.find(
         (conv: Conversation) =>
           conv.senderId === friend.id || conv.recipientId === friend.id
       ) ?? {
@@ -123,61 +108,27 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
         messages: [],
       }
 
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        activeConversationId: conversation.id,
-        selectedUser: null,
-        openUserProfileModal: false,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        conversations:
-          conversation.id === null
-            ? [...prevState.conversations, conversation]
-            : prevState.conversations,
-      }))
+      if (!conversation.id) {
+        addNewConversation(conversation)
+      }
+      setActiveConversation(conversation.id)
+      setDisplayedProfile(null)
       return
     }
 
     setLoading({ ...loading, [button]: true })
 
-    try {
-      let response
-
-      if (button === 'add') response = await Relationships.addUser(username)
-      else if (button === 'delete')
-        response = await Relationships.deleteUser(username)
-      else if (button === 'block')
-        response = await Relationships.blockUser(username)
-      else if (button === 'unblock')
-        response = await Relationships.unBlockUser(username)
-
-      if (!response) {
-        console.error('undefined response')
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: 'Something went wrong. Please try again',
-          openErrorModal: true,
-        }))
-      } else if (response.status !== 200) {
-        const data = await response.json()
-        setLoading({ ...loading, [button]: false })
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: data.message,
-          openErrorModal: true,
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        modalError: 'Something went wrong. Please try again',
-        openErrorModal: true,
-      }))
-    } finally {
-      setLoading({ ...loading, [button]: false })
-      await refetch(username)
+    const request = async () => {
+      if (button === 'add') return Relationships.addUser(username)
+      else if (button === 'delete') return Relationships.deleteUser(username)
+      else if (button === 'block') return Relationships.blockUser(username)
+      else if (button === 'unblock') return Relationships.unBlockUser(username)
+      else return new Response(null)
     }
+
+    await requestOrAppError('TOAST', null, request)
+    await refetch(username)
+    setLoading({ ...loading, [button]: false })
   }
 
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
@@ -194,16 +145,7 @@ export const UserProfileModal = ({ open }: UserProfileModalProps) => {
   }
 
   return (
-    <Modal
-      isOpen={open}
-      onClose={() => {
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          openUserProfileModal: false,
-        }))
-      }}
-      size="sm"
-    >
+    <Modal isOpen={open} onClose={() => setDisplayedProfile(null)} size="sm">
       <ModalOverlay />
       <ModalContent>
         <ModalCloseButton />

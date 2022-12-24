@@ -8,31 +8,22 @@ import {
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react'
-import { useDashboardStore } from 'contexts/dashboardContext'
+import { useApplication } from 'contexts/applictionContext'
 
-type ErrorModalProps = {
-  open: boolean
-  message: string
-}
+export const ErrorModal = () => {
+  const { errorMessage, errorKind, clearAppError } = useApplication()
 
-export const ErrorModal = ({ open, message }: ErrorModalProps) => {
-  const { setDashboardStore } = useDashboardStore()
-
-  const handleClose = () =>
-    setDashboardStore((prevState) => ({
-      ...prevState,
-      openErrorModal: false,
-    }))
+  const open = Boolean(errorMessage) && errorKind === 'MODAL'
 
   return (
-    <Modal isOpen={open} onClose={handleClose}>
+    <Modal isOpen={open} onClose={() => clearAppError()}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Error </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>{message}</ModalBody>
+        <ModalBody>{errorMessage}</ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={handleClose} bg="blue.400">
+          <Button mr={3} onClick={() => clearAppError()} bg="blue.400">
             Close
           </Button>
         </ModalFooter>

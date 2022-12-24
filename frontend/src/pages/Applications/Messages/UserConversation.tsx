@@ -1,4 +1,4 @@
-import { FriendMinimal, Message } from 'types/api'
+import { Conversation, Message } from 'types/api'
 import {
   Avatar,
   AvatarBadge,
@@ -19,33 +19,35 @@ import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { Conversations } from 'api'
 import { isEmpty } from 'lodash'
 import { useIsInViewport } from 'hooks'
-import { useDashboardStore } from 'contexts/dashboardContext'
+import { useApplication } from 'contexts/applictionContext'
 
-type UserConversationsProp = {
-  friend: FriendMinimal
-  messages: Message[]
-  handleBackwardsClick: () => void
-  conversationId: string | null
-  handleReadMessages: (ids: string[]) => void
-}
-
-export const UserConversations = ({
-  friend,
-  messages,
-  handleBackwardsClick,
-  conversationId,
-  handleReadMessages,
-}: UserConversationsProp) => {
-  const { lastSeen, name, gravatar } = friend
-  const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
+export const UserConversation = ({
+  conversation,
+}: {
+  conversation: Conversation
+}) => {
+  const {
+    setActiveConversation,
+    readLocalMessages,
+    getUserById,
+    olderMessages,
+    setOlderMessages,
+    addNewConversation,
+    addMessageToActiveConversation,
+    userFriends,
+  } = useApplication()
   const { currentUser } = useUser()
-  const { dashboardStore, setDashboardStore } = useDashboardStore()
-  const { olderMessages } = dashboardStore
+  const { senderId, recipientId, messages } = conversation
+  const userId = senderId === currentUser.id ? recipientId : senderId
+  const user = getUserById(userId)
+  const { lastSeen, name, gravatar } = user
+  const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
+  const isUserFriend = userFriends.some((user) => user.id === userId)
+
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const isBottomRefInViewport = useIsInViewport(bottomRef)
-  const [localMessages, setLocalMessages] = useState<Message[]>([])
   const [isFailed, setIsFailed] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState(false)
@@ -62,28 +64,24 @@ export const UserConversations = ({
     }
   }, [isBottomRefInViewport])
 
-  const fetchMoreMessages = async () => {
-    if (!conversationId) return
+  const loadMoreMessages = async () => {
+    if (!conversation.id) return
 
     const timestamp =
       ((olderMessages ?? [])[0] ?? {}).createdAt ?? messages[0].createdAt
     setIsLoadingMore(true)
     try {
       const response = await Conversations.getConversation(
-        conversationId,
+        conversation.id,
         10,
         timestamp
       )
       if (response.status === 200) {
         const msgs: Message[] = await response.json()
         if (isEmpty(msgs)) {
-          console.log('messages are empty')
           setIsLoadMoreDisabled(true)
         } else {
-          setDashboardStore((prevState) => ({
-            ...prevState,
-            olderMessages: msgs.concat([...(olderMessages ?? [])]),
-          }))
+          setOlderMessages(msgs.concat([...(olderMessages ?? [])]))
         }
       }
     } catch (error) {
@@ -104,7 +102,7 @@ export const UserConversations = ({
 
     const unreadMessageIds =
       messages
-        .filter((msg) => msg.senderId === friend.id && !msg.read)
+        .filter((msg) => msg.senderId === user.id && !msg.read)
         .map((msg) => msg.id) ?? []
 
     if (isEmpty(unreadMessageIds)) return
@@ -112,7 +110,7 @@ export const UserConversations = ({
     try {
       const response = await Conversations.readMessages(unreadMessageIds)
       if (response.status === 200) {
-        handleReadMessages(unreadMessageIds)
+        readLocalMessages(unreadMessageIds)
       }
     } catch (err) {
       console.error(err)
@@ -124,27 +122,21 @@ export const UserConversations = ({
 
     try {
       let response
-      if (conversationId) {
-        response = await Conversations.sendMessage(conversationId, text)
-      } else if (friend.id) {
+      if (conversation.id) {
+        response = await Conversations.sendMessage(conversation.id, text)
+      } else if (user.id) {
         response = await Conversations.createConversation({
-          recipientId: friend.id,
+          recipientId: user.id,
           messageBody: text,
         })
       }
       if (response?.status === 200) {
         const data = await response.json()
-        if (conversationId) {
-          setLocalMessages([...localMessages, data])
-        } else if (conversationId === null) {
-          const conversationsUpdate = [...dashboardStore.conversations].filter(
-            (conv) => conv.id !== null
-          )
-          setDashboardStore((prevState) => ({
-            ...prevState,
-            conversations: [...conversationsUpdate, data],
-            activeConversationId: data.id,
-          }))
+        if (conversation.id) {
+          addMessageToActiveConversation(data)
+        } else if (conversation.id === null) {
+          addNewConversation(data)
+          setActiveConversation(data.id)
         }
 
         setText('')
@@ -181,7 +173,7 @@ export const UserConversations = ({
             size="lg"
             variant="link"
             icon={<FiChevronLeft />}
-            onClick={handleBackwardsClick}
+            onClick={() => setActiveConversation(undefined)}
           />
           <Avatar size="lg" src={gravatar}>
             <AvatarBadge
@@ -195,10 +187,7 @@ export const UserConversations = ({
           <Stack direction="row" spacing={3}>
             <Button
               rightIcon={<FiRefreshCcw />}
-              onClick={() => {
-                fetchMoreMessages().catch(console.error)
-                setLocalMessages([])
-              }}
+              onClick={() => loadMoreMessages().catch(console.error)}
               isLoading={isLoadingMore}
               isDisabled={isLoadMoreDisabled}
             >
@@ -231,13 +220,6 @@ export const UserConversations = ({
             isSender={currentUser.id === msg.senderId}
           />
         ))}
-        {localMessages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            message={msg}
-            isSender={currentUser.id === msg.senderId}
-          />
-        ))}
         <div ref={bottomRef} />
       </Box>
       <Box
@@ -248,13 +230,17 @@ export const UserConversations = ({
       >
         <Stack direction="row">
           <Input
-            placeholder="Type a message"
+            placeholder={
+              isUserFriend
+                ? 'Type a message'
+                : 'You are no longer friends with this user'
+            }
             bg={useColorModeValue('gray.100', 'gray.600')}
             border={0}
             flex={1}
             size="lg"
             value={text}
-            isDisabled={friend.id === 0}
+            isDisabled={!isUserFriend}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={async (e: KeyboardEvent) => {
               if (e.key === 'Enter') {
@@ -268,7 +254,7 @@ export const UserConversations = ({
             aria-label="send message"
             icon={isSending ? <Spinner color="teal.500" /> : <FiSend />}
             size="lg"
-            isDisabled={friend.id === 0}
+            isDisabled={user.id === 0}
             onClick={handleMessageSend}
           />
         </Stack>

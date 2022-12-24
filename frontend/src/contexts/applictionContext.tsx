@@ -1,5 +1,9 @@
-import { createContext, FC, useContext, useState } from 'react'
+import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Conversation, FriendMinimal, Message, UserProfile } from 'types/api'
+import { unknownProfile } from 'utils'
+import { isEmpty } from 'lodash'
+import { Conversations, Relationships } from 'api'
+import { PageLoading } from '../components/common'
 
 type LoadingState = {
   isAppLoading: boolean
@@ -66,6 +70,14 @@ type ContextType = LoadingState &
     setDisplayedProfile: (profile: UserProfile | null) => void
     activeConversation: Conversation | undefined
     userConversations: Conversation[]
+    olderMessages: Message[]
+    getUserById: (userId: number) => FriendMinimal
+    setActiveConversation: (conversationId: string | undefined | null) => void
+    readLocalMessages: (messageIds: string[]) => void
+    setOlderMessages: (messages: Message[]) => void
+    addNewConversation: (conversation: Conversation) => void
+    addMessageToActiveConversation: (message: Message) => void
+    syncData: (silent: boolean) => void
   }
 
 const ApplicationContext = createContext<ContextType>({
@@ -96,6 +108,18 @@ const ApplicationContext = createContext<ContextType>({
   setDisplayedProfile: (profile: UserProfile | null) => void profile,
   activeConversation: undefined,
   userConversations: [],
+  olderMessages: [],
+  getUserById: (userId: number) => {
+    void userId
+    return unknownProfile
+  },
+  setActiveConversation: (conversationId: string | undefined | null) =>
+    void conversationId,
+  readLocalMessages: (messageIds: string[]) => void messageIds,
+  setOlderMessages: (messages: Message[]) => void messages,
+  addNewConversation: (conversation: Conversation) => void conversation,
+  addMessageToActiveConversation: (message: Message) => void message,
+  syncData: (silent: boolean) => void silent,
 })
 
 export function useApplication() {
@@ -105,15 +129,119 @@ export function useApplication() {
 const DEFAULT_ERROR = 'Something went wrong. Please try again later'
 
 export const ApplicationProvider: FC = ({ children }) => {
+  const [loading, setLoading] = useState(true)
   const [appLoading, setAppLoading] = useState<LoadingState>(initialAppLoading)
   const [appError, setAppError] = useState<ErrorsState>(initialAppError)
-  const [chat] = useState<ChatState>(initialChatState)
+  const [chat, setChat] = useState<ChatState>(initialChatState)
   const [displayedProfile, setDisplayedProfile] = useState<UserProfile | null>(
     null
   )
-  const [userRelationships] = useState<UserRelationshipsState>(
-    initialUserRelationshipState
+  const [userRelationships, setUserRelationships] =
+    useState<UserRelationshipsState>(initialUserRelationshipState)
+
+  const { errorMessage, errorKind } = appError
+  const { isAppLoading, loadingMessage } = appLoading
+  const { userConversations, activeConversationId, olderMessages } = chat
+  const activeConversation = userConversations.find(
+    ({ id }) => id === activeConversationId
   )
+  const { userFriends, userRequests, otherUsers } = userRelationships
+
+  useEffect(() => {
+    syncData().catch(console.error)
+  }, [])
+
+  const syncData = async (silent = false) => {
+    if (!silent) setLoading(true)
+    const values = await Promise.all([
+      Conversations.getAllConversations(),
+      Relationships.getFriends(),
+    ])
+    const data1 = await values[0].json()
+    const data2 = await values[1].json()
+
+    setChat((prevState) => ({ ...prevState, userConversations: data1 }))
+
+    const { friends, friendRequests, others } = data2
+    setUserRelationships({
+      userFriends: friends,
+      userRequests: friendRequests,
+      otherUsers: others,
+    })
+    if (!silent) setLoading(false)
+  }
+
+  const addMessageToActiveConversation = (message: Message) => {
+    if (isEmpty(activeConversation)) return
+
+    const userConversationUpdate = userConversations.filter(
+      (conv) => conv.id !== activeConversationId
+    )
+    const messagesUpdate = [...activeConversation.messages]
+    messagesUpdate.push(message)
+    const activeConverstionUpdate = {
+      ...activeConversation,
+      messages: messagesUpdate,
+    }
+    setChat((prevState) => ({
+      ...prevState,
+      userConversations: [...userConversationUpdate, activeConverstionUpdate],
+    }))
+  }
+
+  const setOlderMessages = (messages: Message[]) => {
+    setChat((prevState) => ({ ...prevState, olderMessages: messages }))
+  }
+
+  const addNewConversation = (conversation: Conversation) => {
+    const userConversationsUpdate = userConversations.filter(
+      (conv) => conv.id !== null
+    )
+    setChat((prevState) => ({
+      ...prevState,
+      userConversations: [...userConversationsUpdate, conversation],
+    }))
+  }
+
+  const readLocalMessages = (messageIds: string[]) => {
+    if (!activeConversationId || isEmpty(activeConversation)) return
+
+    const userConversationsUpdate = userConversations.filter(
+      ({ id }) => id !== activeConversationId
+    )
+    const messages = [...activeConversation.messages]
+    let count = 0
+    for (let i = 0; i < messages.length; i++) {
+      if (messages[i].id && messageIds.includes(messages[i].id)) {
+        messages[i].read = true
+        count++
+      }
+    }
+    if (count > 0) {
+      const conversationUpdate = { ...activeConversation, messages: messages }
+      setChat((prevState) => ({
+        ...prevState,
+        userConversations: [...userConversationsUpdate, conversationUpdate],
+      }))
+    }
+  }
+
+  const setActiveConversation = (conversationId: string | undefined | null) => {
+    if (conversationId === undefined) {
+      const userConversationsUpdate = userConversations.filter(
+        ({ id }) => id !== null
+      )
+      setChat((prevState) => ({
+        ...prevState,
+        userConversations: userConversationsUpdate,
+      }))
+    }
+
+    setChat((prevState) => ({
+      ...prevState,
+      activeConversationId: conversationId,
+    }))
+  }
 
   const clearAppLoading = () => {
     setAppLoading(initialAppLoading)
@@ -129,7 +257,7 @@ export const ApplicationProvider: FC = ({ children }) => {
   const showAppLoadingWithMessage = (message: string) => {
     setAppLoading({
       isAppLoading: true,
-      loadingMessage: message,
+      loadingMessage: message ? message : DEFAULT_ERROR,
     })
   }
 
@@ -162,9 +290,11 @@ export const ApplicationProvider: FC = ({ children }) => {
 
     let responseBody
 
-    appLoadingMessage
-      ? showAppLoadingWithMessage(appLoadingMessage)
-      : showAppLoading
+    if (errorKind === 'MODAL') {
+      appLoadingMessage
+        ? showAppLoadingWithMessage(appLoadingMessage)
+        : showAppLoading
+    }
 
     try {
       const response = await request()
@@ -216,13 +346,15 @@ export const ApplicationProvider: FC = ({ children }) => {
     return responseBody
   }
 
-  const { errorMessage, errorKind } = appError
-  const { isAppLoading, loadingMessage } = appLoading
-  const { userConversations, activeConversationId } = chat
-  const activeConversation = userConversations.find(
-    ({ id }) => id === activeConversationId
-  )
-  const { userFriends, userRequests, otherUsers } = userRelationships
+  const getUserById = (userId: number) => {
+    for (const relation in userRelationships) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const user = userRelationships[relation].find(({ id }) => id === userId)
+      if (user) return user
+    }
+    return unknownProfile
+  }
 
   const value = {
     isAppLoading,
@@ -238,17 +370,26 @@ export const ApplicationProvider: FC = ({ children }) => {
     requestOrAppError,
     activeConversation,
     userConversations,
+    olderMessages,
     requestSilent,
     displayedProfile,
     setDisplayedProfile,
     userFriends,
     userRequests,
     otherUsers,
+    getUserById,
+    setActiveConversation,
+    readLocalMessages,
+    setOlderMessages,
+    addNewConversation,
+    addMessageToActiveConversation,
+    syncData,
   }
 
   return (
     <ApplicationContext.Provider value={value}>
-      {children}
+      {!loading && children}
+      {loading && <PageLoading />}
     </ApplicationContext.Provider>
   )
 }

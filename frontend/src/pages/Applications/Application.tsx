@@ -15,12 +15,12 @@ import {
   Tooltip,
   useColorMode,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
 import { useUser } from 'contexts/userContext'
 import { ProfileEdit } from './ProfileEdit'
 import { Account } from './Account'
 import { Users } from 'api'
-import { useDashboardStore } from 'contexts/dashboardContext'
 import { LoadingModal } from './LoadingModal'
 import { ErrorModal } from './ErrorModal'
 import { UserProfileModal } from 'components/common/UserProfile'
@@ -29,62 +29,40 @@ import { Messages } from './Messages'
 import { FiMoon, FiSun } from 'react-icons/fi'
 import { UserSearch } from './Search'
 import { Notifications } from './Notifications'
+import { useApplication } from 'contexts/applictionContext'
+import { useEffect } from 'react'
 
 export const Application = () => {
+  const { userFriends, requestOrAppError, errorMessage, errorKind } =
+    useApplication()
   const { colorMode, toggleColorMode } = useColorMode()
   const { currentUser, setLoggedIn, setCurrentUser } = useUser()
-  const { dashboardStore, setDashboardStore } = useDashboardStore()
   const { avatarHash, name, username, email } = currentUser
   const displayName = name ?? username ?? 'Unknown user'
+  const toast = useToast()
   const displayGravatar =
     avatarHash && email ? getGravatarUrl(avatarHash, email, 100) : undefined
 
-  const logout = async () => {
-    setDashboardStore((prevState) => ({
-      ...prevState,
-      loading: true,
-      loadingMessage: 'Logging out',
-    }))
-    try {
-      const response = await Users.logout()
-      const data = await response.json()
+  useEffect(() => {
+    if (errorKind === 'TOAST' && errorMessage) {
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
+    }
+  }, [errorKind])
 
-      if (response.status === 200) {
-        setLoggedIn(false)
-        setCurrentUser({})
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          loading: false,
-          loadingMessage: '',
-        }))
-      } else {
-        setDashboardStore((prevState) => ({
-          ...prevState,
-          modalError: data.message,
-          openErrorModal: true,
-          loading: false,
-          loadingMessage: '',
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        modalError: 'Something went wrong. Please try again',
-        openErrorModal: true,
-        loading: false,
-        loadingMessage: '',
-      }))
+  const logout = async () => {
+    const request = async () => await Users.logout()
+    const response = requestOrAppError('MODAL', 'Logging out', request)
+    if (response !== null) {
+      setLoggedIn(false)
+      setCurrentUser({})
     }
   }
-
-  const {
-    openErrorModal,
-    modalError,
-    openUserProfileModal,
-    friendRequests = [],
-    friends = [],
-  } = dashboardStore
 
   return (
     <>
@@ -95,10 +73,10 @@ export const Application = () => {
               <UserSearch key="search" />
               <UserSearch
                 key="friends"
-                friends={friends}
+                friends={userFriends}
                 isFriendSearch={true}
               />
-              <Notifications friendRequests={friendRequests} />
+              <Notifications />
               <Tooltip
                 label={colorMode === 'light' ? 'dark mode' : 'light mode'}
               >
@@ -149,8 +127,8 @@ export const Application = () => {
       </Center>
       <>
         <LoadingModal />
-        <ErrorModal open={openErrorModal} message={modalError} />
-        <UserProfileModal open={openUserProfileModal} />
+        <ErrorModal />
+        <UserProfileModal />
       </>
     </>
   )

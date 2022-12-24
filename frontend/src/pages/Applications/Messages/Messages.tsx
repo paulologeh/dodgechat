@@ -1,6 +1,5 @@
-import { useDashboardStore } from 'contexts/dashboardContext'
 import { useEffect, useRef, useState } from 'react'
-import { Conversation, FriendMinimal } from 'types/api'
+import { Conversation } from 'types/api'
 import {
   Alert,
   Avatar,
@@ -17,125 +16,74 @@ import { SearchIcon } from '@chakra-ui/icons'
 import { isEmpty, orderBy } from 'lodash'
 import { OptionText } from './OptionText'
 import { UnreadIcon } from './UnreadIcon'
-import { UserConversations } from './UserConversations'
+import { UserConversation } from './UserConversation'
 import { useUser } from 'contexts/userContext'
-import { unknownProfile } from 'utils'
-
-const getFriend = (
-  friends: FriendMinimal[],
-  others: FriendMinimal[],
-  senderId: number,
-  recipientId: number
-) => {
-  const maybeFriend = friends.find(
-    ({ id }) => id === senderId || id === recipientId
-  )
-
-  const maybeOther = others.find(
-    ({ id }) => id === senderId || id === recipientId
-  )
-
-  return maybeFriend ?? maybeOther ?? unknownProfile
-}
+import { useApplication } from 'contexts/applictionContext'
 
 export const Messages = () => {
-  const { dashboardStore, setDashboardStore, refreshStore } =
-    useDashboardStore()
-  const { conversations, friends, activeConversationId, others } =
-    dashboardStore
-  const [allConversations, setAllConversations] = useState<Conversation[]>([])
+  const {
+    userConversations,
+    getUserById,
+    setActiveConversation,
+    activeConversation,
+  } = useApplication()
+  const [results, setResults] = useState<Conversation[]>()
   const [active, setActive] = useState(-1)
   const [query, setQuery] = useState('')
   const { currentUser } = useUser()
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
 
-  const searchConversations = (term: string) => {
-    if (term === '') {
-      setAllConversations(conversations)
-      return
-    }
-    const results = []
-
-    const searchTerm = term.toLowerCase()
-    for (let i = 0; i < conversations.length; i++) {
-      const messages = conversations[i].messages.filter((message) =>
-        message.body.toLowerCase().includes(searchTerm)
-      )
-      const { senderId, recipientId } = conversations[i]
-      const maybeFriend = friends.find(
-        ({ id }) => id === senderId || id === recipientId
-      )
-      const maybeOther = others.find(
-        ({ id }) => id === senderId || id === recipientId
-      )
-
-      const friend = maybeFriend ?? maybeOther ?? unknownProfile
-
-      if (messages.length > 0) {
-        results.push({
-          ...conversations[i],
-          bottomMessage: messages[messages.length - 1],
-        })
-      } else if (
-        friend.name.toLowerCase().includes(searchTerm) ||
-        friend.username.toLowerCase().includes(searchTerm)
-      ) {
-        results.push({ ...conversations[i] })
-      }
-    }
-
-    setAllConversations(results)
-  }
-
-  useEffect(() => {
-    const sortedConversations = orderBy(
-      conversations,
+  const setSortedResults = (results: Conversation[]) => {
+    const sortedResults = orderBy(
+      results,
       (conv) => new Date(conv.messages[conv.messages.length - 1]?.createdAt),
       ['desc']
     )
-    setAllConversations(sortedConversations)
-  }, [conversations])
+    setResults(sortedResults)
+  }
+
+  const searchConversations = (term: string) => {
+    if (term === '') {
+      setSortedResults(userConversations)
+      return
+    }
+    const searchResults = []
+
+    const searchTerm = term.toLowerCase()
+    for (let i = 0; i < userConversations.length; i++) {
+      const messages = userConversations[i].messages.filter((message) =>
+        message.body.toLowerCase().includes(searchTerm)
+      )
+      const { senderId, recipientId } = userConversations[i]
+      const userId = senderId === currentUser.id ? recipientId : senderId
+      const user = getUserById(userId)
+
+      if (messages.length > 0) {
+        searchResults.push({
+          ...userConversations[i],
+          bottomMessage: messages[messages.length - 1],
+        })
+      } else if (
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.username.toLowerCase().includes(searchTerm)
+      ) {
+        searchResults.push({ ...userConversations[i] })
+      }
+    }
+
+    setSortedResults(searchResults)
+  }
+
+  useEffect(() => {
+    setSortedResults(userConversations)
+  }, [userConversations])
 
   useUpdateEffect(() => {
     setActive(0)
     searchConversations(query)
   }, [query])
 
-  const clearSelectedConversation = () => {
-    setDashboardStore((prevState) => ({
-      ...prevState,
-      activeConversationId: undefined,
-    }))
-  }
-  const handleReadMessages = (messageIds: string[]) => {
-    const messages = (
-      conversations.filter((conv) => conv.id === activeConversationId)[0] ?? {}
-    ).messages
-    const msgs = [...(messages ?? [])] ?? []
-    let count = 0
-    for (let i = 0; i < msgs.length; i++) {
-      if (msgs[i].id && messageIds.includes(msgs[i].id)) {
-        msgs[i].read = true
-        count++
-      }
-    }
-
-    const activeConversation =
-      conversations.filter((conv) => conv.id === activeConversationId)[0] ?? {}
-    if (count > 0 && msgs && !isEmpty(activeConversation)) {
-      activeConversation.messages = msgs
-      const conversationUpdate = conversations.filter(
-        (conv) => conv.id !== activeConversationId
-      )
-      setDashboardStore((prevState) => ({
-        ...prevState,
-        conversations: [...conversationUpdate, activeConversation],
-      }))
-      refreshStore().catch(console.error)
-    }
-  }
-
-  const renderConversations = () => {
+  const showAllConversations = () => {
     return (
       <Box as="ul" role="listbox" pt={2} pb={4}>
         <Flex pos="relative" align="stretch">
@@ -170,14 +118,12 @@ export const Messages = () => {
           }}
         />
         <div>
-          {isEmpty(allConversations) && (
-            <Alert status="warning">No messages</Alert>
-          )}
-          {(allConversations ?? []).map((conv, index) => {
+          {isEmpty(results) && <Alert status="warning">No messages</Alert>}
+          {(results ?? []).map((conv, index) => {
             const { bottomMessage, messages, senderId, recipientId } = conv
             const lastMessage = bottomMessage ?? messages[messages.length - 1]
-
-            const friend = getFriend(friends, others, senderId, recipientId)
+            const userId = senderId === currentUser.id ? recipientId : senderId
+            const user = getUserById(userId)
 
             const unreadCount =
               messages.filter(
@@ -185,7 +131,7 @@ export const Messages = () => {
               ).length ?? 0
             const selected = index === active
             const content = `${
-              lastMessage.senderId === friend.id ? '' : 'You: '
+              lastMessage.senderId === user.id ? '' : 'You: '
             }${lastMessage.body}`
 
             return (
@@ -199,12 +145,7 @@ export const Messages = () => {
                     setActive(index)
                     eventRef.current = 'mouse'
                   }}
-                  onClick={() =>
-                    setDashboardStore((prevState) => ({
-                      ...prevState,
-                      activeConversationId: conv.id,
-                    }))
-                  }
+                  onClick={() => setActiveConversation(conv.id)}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -225,9 +166,9 @@ export const Messages = () => {
                     },
                   }}
                 >
-                  <Avatar size="sm" src={friend.gravatar} />
+                  <Avatar size="sm" src={user.gravatar} />
                   <Box flex="1" ml="4">
-                    <Box fontWeight="semibold">{friend.name}</Box>
+                    <Box fontWeight="semibold">{user.name}</Box>
                     <Text noOfLines={1}>
                       <OptionText
                         searchWords={[query]}
@@ -245,36 +186,6 @@ export const Messages = () => {
     )
   }
 
-  const renderMessages = () => {
-    if (activeConversationId === undefined) {
-      return renderConversations()
-    } else {
-      const activeConversation = conversations.filter(
-        (conv) => conv.id === activeConversationId
-      )[0]
-      const { senderId, recipientId, messages, id } = activeConversation
-
-      const maybeFriend = friends.find(
-        ({ id }) => id === senderId || id === recipientId
-      )
-      const maybeOther = others.find(
-        ({ id }) => id === senderId || id === recipientId
-      )
-
-      const friend = maybeFriend ?? maybeOther ?? unknownProfile
-
-      return (
-        <UserConversations
-          friend={friend}
-          messages={messages}
-          handleBackwardsClick={clearSelectedConversation}
-          handleReadMessages={handleReadMessages}
-          conversationId={id}
-        />
-      )
-    }
-  }
-
   return (
     <>
       <Box
@@ -284,7 +195,11 @@ export const Messages = () => {
           mt: 2,
         }}
       >
-        {renderMessages()}
+        {activeConversation === undefined ? (
+          showAllConversations()
+        ) : (
+          <UserConversation conversation={activeConversation} />
+        )}
       </Box>
     </>
   )

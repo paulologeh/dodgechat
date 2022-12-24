@@ -22,7 +22,7 @@ export const OptionText = ({
       const text = textToHighlight.substring(start, end)
       if (highlight) {
         return (
-          <Box as="mark" bg="transparent" color="teal.500">
+          <Box as="mark" bg="transparent" color="teal.500" key={text}>
             {text}
           </Box>
         )

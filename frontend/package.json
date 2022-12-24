@@ -26,7 +26,8 @@
     "react-multi-ref": "^1.0.1",
     "react-router-dom": "^6.2.1",
     "scroll-into-view-if-needed": "^2.2.29",
-    "socket.io-client": "^4.5.1"
+    "socket.io-client": "^4.5.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.2",

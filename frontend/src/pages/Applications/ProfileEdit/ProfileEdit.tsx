@@ -32,6 +32,7 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [success, setSuccess] = useState(false)
   const { setCurrentUser } = useUser()
   const modal = useDisclosure()
+
   const handleSubmit = async () => {
     const userUpdate: UserUpdate = {
       ...(formData.name !== currentUser.name && { name: formData.name }),
