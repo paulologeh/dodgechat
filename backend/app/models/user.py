@@ -26,13 +26,13 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
-    relationship = db.relationship(
+    relationships = db.relationship(
         "Relationship",
         back_populates="user",
         cascade="all, delete",
         passive_deletes=True,
     )
-    message = db.relationship("Message", back_populates="user", passive_deletes=True)
+    messages = db.relationship("Message", back_populates="user", passive_deletes=True)
 
     __ts_vector__ = db.Column(
         TSVector(),

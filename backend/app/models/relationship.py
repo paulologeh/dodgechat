@@ -24,7 +24,7 @@ class Relationship(db.Model):
         db.Integer, db.ForeignKey("users.id", ondelete="CASCADE")
     )  # requester
     addressee_id = db.Column(db.Integer, index=True)  # requestee
-    user = db.relationship("User", back_populates="relationship")
+    user = db.relationship("User", back_populates="relationships")
     relationship_type = db.Column(db.Enum(RelationshipType))
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
 

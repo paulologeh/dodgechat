@@ -27,7 +27,7 @@ class Conversation(db.Model):
         db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     created_at = db.Column(db.DateTime(), default=datetime.utcnow)
-    message = db.relationship(
+    messages = db.relationship(
         "Message",
         back_populates="conversation",
         cascade="all, delete",

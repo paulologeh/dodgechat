@@ -12,11 +12,11 @@ class Message(db.Model):
     sender_id = db.Column(
         db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
-    user = db.relationship("User", back_populates="message")
+    user = db.relationship("User", back_populates="messages")
     conversation_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("conversations.id", ondelete="CASCADE")
     )
-    conversation = db.relationship("Conversation", back_populates="message")
+    conversation = db.relationship("Conversation", back_populates="messages")
     body = db.Column(db.Text(), nullable=False)
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
