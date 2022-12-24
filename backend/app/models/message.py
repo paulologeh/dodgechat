@@ -11,7 +11,7 @@ class Message(db.Model):
     __tablename__ = "messages"
     id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship("User", backref=backref("messages", uselist=False))
+    user = db.relationship("User", back_populates="message")
     conversation_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("conversations.id", ondelete="CASCADE")
     )
