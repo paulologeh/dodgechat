@@ -59,7 +59,7 @@ export const UserConversation = ({
     if (isEmpty(olderMessages) && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }
-  })
+  }, [])
 
   useEffect(() => {
     if (isBottomRefInViewport) {

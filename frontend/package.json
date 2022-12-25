@@ -24,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
     "react-multi-ref": "^1.0.1",
+    "react-really-simple-infinite-scroll": "^1.3.0",
     "react-router-dom": "^6.2.1",
     "scroll-into-view-if-needed": "^2.2.29",
     "socket.io-client": "^4.5.1",
