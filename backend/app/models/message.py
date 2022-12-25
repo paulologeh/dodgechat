@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
-
+from enum import Enum
 from sqlalchemy.dialects.postgresql import UUID
+
 
 from app import db
 
@@ -20,3 +21,6 @@ class Message(db.Model):
     body = db.Column(db.Text(), nullable=False)
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    deleted_by = db.Column(
+        db.Integer, index=True
+    )  # if deleted by both, the message will not exist
