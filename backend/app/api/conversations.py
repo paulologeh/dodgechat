@@ -95,7 +95,7 @@ def get_or_update_or_remove_conversation(conversation_id):
         messages = [
             MessageSchema().dump(message)
             for message in conversation.get_messages(
-                messages_limt, current_user.id, timestamp
+                current_user.id, messages_limt, timestamp
             )
         ]
 
