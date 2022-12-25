@@ -140,16 +140,22 @@ def delete_message():
 
     messages = []
     msgs_non_existent = []
+    msgs_deleted = []
 
     for msg_id in data["ids"]:
         msg = Message.query.get(msg_id)
         if msg is None:
             msgs_non_existent.append(str(msg_id))
+        elif msg.deleted_by == current_user.id:
+            msgs_deleted.append(str(msg_id))
         else:
             messages.append(msg)
 
     if msgs_non_existent:
         abort(400, f"Messages {','.join(msgs_non_existent)} are not exist")
+
+    if msgs_deleted:
+        abort(400, f"Messages {','.join(msgs_deleted)} are already deleted")
 
     for message in messages:
         if message.deleted_by is None:
