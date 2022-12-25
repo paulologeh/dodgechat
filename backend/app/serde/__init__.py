@@ -10,7 +10,7 @@ from app.serde.utils import (
 )
 
 
-class MessagesToRead(BasicSchema):
+class Messages(BasicSchema):
     ids = fields.List(fields.UUID)
 
 

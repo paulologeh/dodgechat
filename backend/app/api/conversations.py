@@ -12,7 +12,7 @@ from app.serde import (
     ConversationSchema,
     MessageSchema,
     NewConversationSchema,
-    MessagesToRead,
+    Messages,
 )
 from app.utils import extract_all_errors
 
@@ -129,12 +129,46 @@ def get_or_update_or_remove_conversation(conversation_id):
             abort(400, "You do not have permission to delete this conversation")
 
 
+@conversations.route("/messages/delete", methods=["POST"])
+@login_required
+def delete_message():
+    payload = request.get_json()
+    try:
+        data = Messages().load(payload)
+    except ValidationError as err:
+        abort(422, extract_all_errors(err))
+
+    messages = []
+    msgs_non_existent = []
+
+    for msg_id in data["ids"]:
+        msg = Message.query.get(msg_id)
+        if msg is None:
+            msgs_non_existent.append(str(msg_id))
+        else:
+            messages.append(msg)
+
+    if msgs_non_existent:
+        abort(400, f"Messages {','.join(msgs_non_existent)} are not exist")
+
+    for message in messages:
+        if message.deleted_by is None:
+            message.deleted_by = current_user.id
+            db.session.add(message)
+        else:
+            db.session.delete(message)
+
+    db.session.commit()
+
+    return jsonify({"message": "Messages has been deleted"})
+
+
 @conversations.route("/messages/read", methods=["POST"])
 @login_required
 def read_messages():
     payload = request.get_json()
     try:
-        data = MessagesToRead().load(payload)
+        data = Messages().load(payload)
     except ValidationError as err:
         abort(422, extract_all_errors(err))
 
