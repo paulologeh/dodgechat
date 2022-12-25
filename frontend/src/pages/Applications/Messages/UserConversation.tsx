@@ -35,6 +35,8 @@ export const UserConversation = ({
     addNewConversation,
     addMessageToActiveConversation,
     userFriends,
+    requestOrAppError,
+    removeConversation,
   } = useApplication()
   const { currentUser } = useUser()
   const { senderId, recipientId, messages } = conversation
@@ -51,6 +53,7 @@ export const UserConversation = ({
   const [isFailed, setIsFailed] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (isEmpty(olderMessages) && bottomRef.current) {
@@ -151,6 +154,20 @@ export const UserConversation = ({
     setIsSending(false)
   }
 
+  const handleConversationDelete = async () => {
+    if (!conversation.id) return
+
+    const request = async () =>
+      Conversations.deleteConversation(conversation.id ?? '')
+    setIsDeleting(true)
+    const response = requestOrAppError('TOAST', null, request)
+    setIsDeleting(false)
+    if (response !== null) {
+      setActiveConversation(undefined)
+      removeConversation(conversation.id)
+    }
+  }
+
   return (
     <Box pt={2} pb={4}>
       <Box
@@ -184,19 +201,26 @@ export const UserConversation = ({
           <Box flex="1" ml="4">
             <Box fontWeight="extrabold">{name}</Box>
           </Box>
-          <Stack direction="row" spacing={3}>
-            <Button
-              rightIcon={<FiRefreshCcw />}
-              onClick={() => loadMoreMessages().catch(console.error)}
-              isLoading={isLoadingMore}
-              isDisabled={isLoadMoreDisabled}
-            >
-              Load more
-            </Button>
-            <Button rightIcon={<FiTrash2 />} colorScheme="red">
-              Delete
-            </Button>
-          </Stack>
+          {conversation.id && (
+            <Stack direction="row" spacing={3}>
+              <Button
+                rightIcon={<FiRefreshCcw />}
+                onClick={() => loadMoreMessages().catch(console.error)}
+                isLoading={isLoadingMore}
+                isDisabled={isLoadMoreDisabled}
+              >
+                Load more
+              </Button>
+              <Button
+                rightIcon={<FiTrash2 />}
+                colorScheme="red"
+                onClick={() => handleConversationDelete()}
+                isLoading={isDeleting}
+              >
+                Delete
+              </Button>
+            </Stack>
+          )}
         </Box>
         <Divider
           sx={{

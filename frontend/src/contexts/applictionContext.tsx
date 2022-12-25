@@ -78,6 +78,7 @@ type ContextType = LoadingState &
     addNewConversation: (conversation: Conversation) => void
     addMessageToActiveConversation: (message: Message) => void
     syncData: (silent: boolean) => void
+    removeConversation: (conversationId: string) => void
   }
 
 const ApplicationContext = createContext<ContextType>({
@@ -120,6 +121,7 @@ const ApplicationContext = createContext<ContextType>({
   addNewConversation: (conversation: Conversation) => void conversation,
   addMessageToActiveConversation: (message: Message) => void message,
   syncData: (silent: boolean) => void silent,
+  removeConversation: (conversationId: string) => void conversationId,
 })
 
 export function useApplication() {
@@ -200,6 +202,15 @@ export const ApplicationProvider: FC = ({ children }) => {
     setChat((prevState) => ({
       ...prevState,
       userConversations: [...userConversationsUpdate, conversation],
+    }))
+  }
+
+  const removeConversation = (conversationId: string) => {
+    setChat((prevState) => ({
+      ...prevState,
+      userConversations: userConversations.filter(
+        (conv) => conv.id !== conversationId
+      ),
     }))
   }
 
@@ -384,6 +395,7 @@ export const ApplicationProvider: FC = ({ children }) => {
     addNewConversation,
     addMessageToActiveConversation,
     syncData,
+    removeConversation,
   }
 
   return (
