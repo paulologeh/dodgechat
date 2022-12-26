@@ -1,9 +1,8 @@
-import { Conversation, Message } from 'types/api'
+import { Conversation } from 'types/api'
 import {
   Avatar,
   AvatarBadge,
   Box,
-  Button,
   Divider,
   IconButton,
   Input,
@@ -11,15 +10,15 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FiChevronLeft, FiRefreshCcw, FiSend, FiTrash2 } from 'react-icons/fi'
+import { FiChevronLeft, FiSend } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
-import { KeyboardEvent, useEffect, useRef, useState } from 'react'
+import { KeyboardEvent, SetStateAction, useState } from 'react'
 import { Conversations } from 'api'
 import { isEmpty } from 'lodash'
-import { useIsInViewport } from 'hooks'
 import { useApplication } from 'contexts/applictionContext'
+import { useKeepScrollPosition, useMessages } from 'hooks'
 
 export const UserConversation = ({
   conversation,
@@ -37,58 +36,18 @@ export const UserConversation = ({
     removeConversation,
   } = useApplication()
   const { currentUser } = useUser()
-  const { senderId, recipientId, messages } = conversation
+  const { senderId, recipientId } = conversation
   const userId = senderId === currentUser.id ? recipientId : senderId
   const user = getUserById(userId)
   const { lastSeen, name, gravatar } = user
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
   const isUserFriend = userFriends.some((user) => user.id === userId)
-
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const isBottomRefInViewport = useIsInViewport(bottomRef)
   const [isFailed, setIsFailed] = useState(false)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
-  })
-
-  useEffect(() => {
-    if (isBottomRefInViewport) {
-      handleMessagesRead().catch(console.error)
-    }
-  }, [isBottomRefInViewport])
-
-  const loadMoreMessages = async () => {
-    if (!conversation.id) return
-
-    const timestamp = messages[0].createdAt
-    setIsLoadingMore(true)
-    try {
-      const response = await Conversations.getConversation(
-        conversation.id,
-        10,
-        timestamp
-      )
-      if (response.status === 200) {
-        const msgs: Message[] = await response.json()
-        if (isEmpty(msgs)) {
-          setIsLoadMoreDisabled(true)
-        } else {
-          addMessagesToActiveConversation(msgs)
-        }
-      }
-    } catch (error) {
-      console.error(error)
-    }
-    setIsLoadingMore(false)
-  }
+  const { messages, setLastMessageRef, isLoadingMessages } = useMessages()
+  const { containerRef } = useKeepScrollPosition([messages])
 
   const handleFailedMessage = async () => {
     setIsSending(false)
@@ -200,26 +159,6 @@ export const UserConversation = ({
           <Box flex="1" ml="4">
             <Box fontWeight="extrabold">{name}</Box>
           </Box>
-          {conversation.id && (
-            <Stack direction="row" spacing={3}>
-              <Button
-                rightIcon={<FiRefreshCcw />}
-                onClick={() => loadMoreMessages().catch(console.error)}
-                isLoading={isLoadingMore}
-                isDisabled={isLoadMoreDisabled}
-              >
-                Load more
-              </Button>
-              <Button
-                rightIcon={<FiTrash2 />}
-                colorScheme="red"
-                onClick={() => handleConversationDelete()}
-                isLoading={isDeleting}
-              >
-                Delete
-              </Button>
-            </Stack>
-          )}
         </Box>
         <Divider
           sx={{
@@ -228,16 +167,23 @@ export const UserConversation = ({
           }}
         />
       </Box>
-      <Box minHeight={'80vh'}>
-        {messages.map((msg) => (
+      <div style={{ minHeight: '80vh', overflow: 'auto' }} ref={containerRef}>
+        {isLoadingMessages && (
+          <Stack align="center" py={2} px={2}>
+            <Spinner thickness="4px" emptyColor="gray.200" color="blue.500" />
+          </Stack>
+        )}
+        {messages.map((msg, index) => (
           <MessageBubble
             key={msg.id}
             message={msg}
             isSender={currentUser.id === msg.senderId}
+            innerRef={(ref: SetStateAction<null>) =>
+              index === 0 ? setLastMessageRef(ref) : null
+            }
           />
         ))}
-        <div ref={bottomRef} />
-      </Box>
+      </div>
       <Box
         pos="sticky"
         zIndex={2}

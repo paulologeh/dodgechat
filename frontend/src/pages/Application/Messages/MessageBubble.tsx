@@ -17,11 +17,16 @@ const receiverStyle = {
 type MessageProps = {
   message: Message
   isSender: boolean
+  innerRef: any
 }
 
-export const MessageBubble = ({ message, isSender }: MessageProps) => {
+export const MessageBubble = ({
+  message,
+  isSender,
+  innerRef,
+}: MessageProps) => {
   return (
-    <Flex justify={isSender ? 'end' : 'start'}>
+    <Flex justify={isSender ? 'end' : 'start'} ref={innerRef}>
       <Card mb={4} sx={isSender ? senderStyle : receiverStyle}>
         <CardBody>
           <Text color={isSender ? 'white' : undefined}>{message.body}</Text>
