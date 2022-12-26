@@ -30,10 +30,8 @@ export const UserConversation = ({
     setActiveConversation,
     readLocalMessages,
     getUserById,
-    olderMessages,
-    setOlderMessages,
     addNewConversation,
-    addMessageToActiveConversation,
+    addMessagesToActiveConversation,
     userFriends,
     requestOrAppError,
     removeConversation,
@@ -56,10 +54,10 @@ export const UserConversation = ({
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    if (isEmpty(olderMessages) && bottomRef.current) {
+    if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [])
+  })
 
   useEffect(() => {
     if (isBottomRefInViewport) {
@@ -70,8 +68,7 @@ export const UserConversation = ({
   const loadMoreMessages = async () => {
     if (!conversation.id) return
 
-    const timestamp =
-      ((olderMessages ?? [])[0] ?? {}).createdAt ?? messages[0].createdAt
+    const timestamp = messages[0].createdAt
     setIsLoadingMore(true)
     try {
       const response = await Conversations.getConversation(
@@ -84,7 +81,7 @@ export const UserConversation = ({
         if (isEmpty(msgs)) {
           setIsLoadMoreDisabled(true)
         } else {
-          setOlderMessages(msgs.concat([...(olderMessages ?? [])]))
+          addMessagesToActiveConversation(msgs)
         }
       }
     } catch (error) {
@@ -136,7 +133,9 @@ export const UserConversation = ({
       if (response?.status === 200) {
         const data = await response.json()
         if (conversation.id) {
-          addMessageToActiveConversation(data)
+          const msgs = [data]
+          console.log('sending new messages', msgs)
+          addMessagesToActiveConversation(msgs)
         } else if (conversation.id === null) {
           addNewConversation(data)
           setActiveConversation(data.id)
@@ -230,13 +229,6 @@ export const UserConversation = ({
         />
       </Box>
       <Box minHeight={'80vh'}>
-        {(olderMessages ?? []).map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            message={msg}
-            isSender={currentUser.id === msg.senderId}
-          />
-        ))}
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}

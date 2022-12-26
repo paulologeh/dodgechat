@@ -1,7 +1,7 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Conversation, FriendMinimal, Message, UserProfile } from 'types/api'
 import { unknownProfile } from 'utils'
-import { isEmpty } from 'lodash'
+import { isEmpty, orderBy } from 'lodash'
 import { Conversations, Relationships } from 'api'
 import { PageLoading } from '../components/common'
 
@@ -20,7 +20,6 @@ type ErrorsState = {
 type ChatState = {
   userConversations: Conversation[]
   activeConversationId: string | null | undefined
-  olderMessages: Message[]
 }
 
 type UserRelationshipsState = {
@@ -42,7 +41,6 @@ const initialAppError: ErrorsState = {
 const initialChatState: ChatState = {
   userConversations: [],
   activeConversationId: undefined,
-  olderMessages: [],
 }
 
 const initialUserRelationshipState: UserRelationshipsState = {
@@ -70,13 +68,11 @@ type ContextType = LoadingState &
     setDisplayedProfile: (profile: UserProfile | null) => void
     activeConversation: Conversation | undefined
     userConversations: Conversation[]
-    olderMessages: Message[]
     getUserById: (userId: number) => FriendMinimal
     setActiveConversation: (conversationId: string | undefined | null) => void
     readLocalMessages: (messageIds: string[]) => void
-    setOlderMessages: (messages: Message[]) => void
     addNewConversation: (conversation: Conversation) => void
-    addMessageToActiveConversation: (message: Message) => void
+    addMessagesToActiveConversation: (message: Message[]) => void
     syncData: (silent: boolean) => void
     removeConversation: (conversationId: string) => void
   }
@@ -109,7 +105,6 @@ const ApplicationContext = createContext<ContextType>({
   setDisplayedProfile: (profile: UserProfile | null) => void profile,
   activeConversation: undefined,
   userConversations: [],
-  olderMessages: [],
   getUserById: (userId: number) => {
     void userId
     return unknownProfile
@@ -117,9 +112,8 @@ const ApplicationContext = createContext<ContextType>({
   setActiveConversation: (conversationId: string | undefined | null) =>
     void conversationId,
   readLocalMessages: (messageIds: string[]) => void messageIds,
-  setOlderMessages: (messages: Message[]) => void messages,
   addNewConversation: (conversation: Conversation) => void conversation,
-  addMessageToActiveConversation: (message: Message) => void message,
+  addMessagesToActiveConversation: (message: Message[]) => void message,
   syncData: (silent: boolean) => void silent,
   removeConversation: (conversationId: string) => void conversationId,
 })
@@ -143,7 +137,7 @@ export const ApplicationProvider: FC = ({ children }) => {
 
   const { errorMessage, errorKind } = appError
   const { isAppLoading, loadingMessage } = appLoading
-  const { userConversations, activeConversationId, olderMessages } = chat
+  const { userConversations, activeConversationId } = chat
   const activeConversation = userConversations.find(
     ({ id }) => id === activeConversationId
   )
@@ -173,14 +167,18 @@ export const ApplicationProvider: FC = ({ children }) => {
     if (!silent) setLoading(false)
   }
 
-  const addMessageToActiveConversation = (message: Message) => {
+  const addMessagesToActiveConversation = (messages: Message[]) => {
     if (isEmpty(activeConversation)) return
 
     const userConversationUpdate = userConversations.filter(
       (conv) => conv.id !== activeConversationId
     )
-    const messagesUpdate = [...activeConversation.messages]
-    messagesUpdate.push(message)
+
+    const messagesUpdate = orderBy(
+      messages.concat([...activeConversation.messages]),
+      (msg) => new Date(msg.createdAt)
+    )
+
     const activeConverstionUpdate = {
       ...activeConversation,
       messages: messagesUpdate,
@@ -189,10 +187,6 @@ export const ApplicationProvider: FC = ({ children }) => {
       ...prevState,
       userConversations: [...userConversationUpdate, activeConverstionUpdate],
     }))
-  }
-
-  const setOlderMessages = (messages: Message[]) => {
-    setChat((prevState) => ({ ...prevState, olderMessages: messages }))
   }
 
   const addNewConversation = (conversation: Conversation) => {
@@ -381,7 +375,6 @@ export const ApplicationProvider: FC = ({ children }) => {
     requestOrAppError,
     activeConversation,
     userConversations,
-    olderMessages,
     requestSilent,
     displayedProfile,
     setDisplayedProfile,
@@ -391,9 +384,8 @@ export const ApplicationProvider: FC = ({ children }) => {
     getUserById,
     setActiveConversation,
     readLocalMessages,
-    setOlderMessages,
     addNewConversation,
-    addMessageToActiveConversation,
+    addMessagesToActiveConversation,
     syncData,
     removeConversation,
   }
