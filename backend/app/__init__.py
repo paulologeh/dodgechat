@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -19,8 +20,7 @@ def create_app(config_name):
 
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-
-    cors_config = {"origins": ["http://localhost:8080"]}
+    cors_config = {"origins": [app.config.get('FRONT_END_URL')]}
 
     CORS(app, resources={"/*": cors_config}, supports_credentials=True)
 
