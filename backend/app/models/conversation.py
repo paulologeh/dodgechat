@@ -74,7 +74,7 @@ class Conversation(db.Model):
             ]
 
             while limit <= maximum_limit and all(
-                [not msg.read for msg in msgs if msg.sender_id != requester_id]
+                [msg.read is None for msg in msgs if msg.sender_id != requester_id]
             ):
                 limit += limit
                 logger.info(

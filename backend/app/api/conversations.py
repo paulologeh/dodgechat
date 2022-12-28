@@ -186,7 +186,7 @@ def read_messages():
         msg = Message.query.get(msg_id)
         if msg is None:
             msgs_non_existent.append(str(msg_id))
-        elif msg.read:
+        elif msg.read is not None:
             msgs_read.append(str(msg_id))
         else:
             messages.append(msg)
@@ -198,7 +198,7 @@ def read_messages():
         abort(400, f"Messages {','.join(msgs_read)} are already read")
 
     for msg in messages:
-        msg.read = True
+        msg.read = datetime.utcnow()
 
     db.session.add_all(messages)
     db.session.commit()
