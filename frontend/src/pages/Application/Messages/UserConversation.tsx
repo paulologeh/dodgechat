@@ -3,7 +3,6 @@ import {
   Avatar,
   AvatarBadge,
   Box,
-  Button,
   Divider,
   IconButton,
   Input,
@@ -11,14 +10,15 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FiChevronLeft, FiSend, FiTrash2 } from 'react-icons/fi'
+import { FiChevronLeft, FiSend } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
 import { KeyboardEvent, SetStateAction, useEffect, useState } from 'react'
-import { Conversations } from 'api'
+import { Conversations, Relationships } from 'api'
 import { useApplication } from 'contexts/applictionContext'
 import { useKeepScrollPosition, useMessages } from 'hooks'
+import { ConversationMenu } from './Menu/ConversationMenu'
 
 export const UserConversation = ({
   conversation,
@@ -33,18 +33,19 @@ export const UserConversation = ({
     userFriends,
     requestOrAppError,
     removeConversation,
+    fetchAndViewProfile,
+    syncData,
   } = useApplication()
   const { currentUser } = useUser()
   const { senderId, recipientId } = conversation
   const userId = senderId === currentUser.id ? recipientId : senderId
   const user = getUserById(userId)
-  const { lastSeen, name, gravatar } = user
+  const { lastSeen, name, gravatar, username } = user
   const isOnline = lastSeen && getLastSeen(lastSeen) === 'Now'
   const isUserFriend = userFriends.some((user) => user.id === userId)
   const [isSending, setIsSending] = useState(false)
   const [text, setText] = useState('')
   const [isFailed, setIsFailed] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const { messages, setLastMessageRef, isLoadingMessages, readUnreadMessages } =
     useMessages()
   const { containerRef } = useKeepScrollPosition([messages])
@@ -100,13 +101,17 @@ export const UserConversation = ({
 
     const request = async () =>
       Conversations.deleteConversation(conversation.id ?? '')
-    setIsDeleting(true)
     const response = requestOrAppError('TOAST', null, request)
-    setIsDeleting(false)
     if (response !== null) {
       setActiveConversation(undefined)
       removeConversation(conversation.id)
     }
+  }
+
+  const handleBlock = async () => {
+    const request = async () => Relationships.blockUser(username)
+    await requestOrAppError('TOAST', null, request)
+    await syncData(true)
   }
 
   return (
@@ -144,14 +149,11 @@ export const UserConversation = ({
           </Box>
           {conversation?.id && (
             <Stack direction="row" spacing={3}>
-              <Button
-                rightIcon={<FiTrash2 />}
-                colorScheme="red"
-                onClick={() => handleConversationDelete()}
-                isLoading={isDeleting}
-              >
-                Delete
-              </Button>
+              <ConversationMenu
+                handleViewUser={() => fetchAndViewProfile(username)}
+                handleChatDelete={handleConversationDelete}
+                handleBlock={handleBlock}
+              />
             </Stack>
           )}
         </Box>
@@ -162,7 +164,7 @@ export const UserConversation = ({
           }}
         />
       </Box>
-      <div style={{ height: '75vh', overflow: 'auto' }} ref={containerRef}>
+      <div style={{ height: '95vh', overflow: 'auto' }} ref={containerRef}>
         {isLoadingMessages && (
           <Stack align="center" py={2} px={2}>
             <Spinner thickness="4px" emptyColor="gray.200" color="blue.500" />

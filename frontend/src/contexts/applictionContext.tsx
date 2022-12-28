@@ -2,7 +2,7 @@ import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Conversation, FriendMinimal, Message, UserProfile } from 'types/api'
 import { unknownProfile } from 'utils'
 import { isEmpty, orderBy } from 'lodash'
-import { Conversations, Relationships } from 'api'
+import { Conversations, Relationships, Search as SearchService } from 'api'
 import { PageLoading } from '../components/common'
 
 type LoadingState = {
@@ -75,6 +75,7 @@ type ContextType = LoadingState &
     addMessagesToActiveConversation: (message: Message[]) => void
     syncData: (silent: boolean) => void
     removeConversation: (conversationId: string) => void
+    fetchAndViewProfile: (username: string) => void
   }
 
 const ApplicationContext = createContext<ContextType>({
@@ -116,6 +117,7 @@ const ApplicationContext = createContext<ContextType>({
   addMessagesToActiveConversation: (message: Message[]) => void message,
   syncData: (silent: boolean) => void silent,
   removeConversation: (conversationId: string) => void conversationId,
+  fetchAndViewProfile: (username: string) => void username,
 })
 
 export function useApplication() {
@@ -361,6 +363,14 @@ export const ApplicationProvider: FC = ({ children }) => {
     return unknownProfile
   }
 
+  const fetchAndViewProfile = async (username: string) => {
+    const request = async () => await SearchService.searchUser(username)
+    const response = await requestOrAppError('MODAL', 'Fetching user', request)
+    if (!isEmpty(response)) {
+      setDisplayedProfile(response)
+    }
+  }
+
   const value = {
     isAppLoading,
     loadingMessage,
@@ -388,6 +398,7 @@ export const ApplicationProvider: FC = ({ children }) => {
     addMessagesToActiveConversation,
     syncData,
     removeConversation,
+    fetchAndViewProfile,
   }
 
   return (

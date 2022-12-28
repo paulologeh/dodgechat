@@ -25,7 +25,7 @@ import { Search as SearchService } from 'api/search'
 import { debounce, isEmpty } from 'lodash'
 import './SearchModal.css'
 import { FiSearch, FiUsers } from 'react-icons/fi'
-import { useApplication } from '../../../contexts/applictionContext'
+import { useApplication } from 'contexts/applictionContext'
 
 export const SearchNoResults = ({ message }: { message: string }) => (
   <Alert status="warning">{message}</Alert>
@@ -57,7 +57,7 @@ export const UserSearch = ({
   const modal = useDisclosure()
   const menuRef = useRef<HTMLDivElement>(null)
   const eventRef = useRef<'mouse' | 'keyboard' | null>(null)
-  const { requestOrAppError, setDisplayedProfile } = useApplication()
+  const { setDisplayedProfile, fetchAndViewProfile } = useApplication()
   const resultsLength = results?.length ?? 0
 
   useEventListener('keydown', (event) => {
@@ -222,23 +222,11 @@ export const UserSearch = ({
   }, [active])
 
   const handleUserSelect = (username: string) => {
-    const fetchAndViewProfile = async () => {
-      const request = async () => await SearchService.searchUser(username)
-      const response = await requestOrAppError(
-        'MODAL',
-        'Fetching user',
-        request
-      )
-      if (!isEmpty(response)) {
-        setDisplayedProfile(response)
-      }
-    }
-
     if (shouldCloseModal) {
       modal.onClose()
       setDisplayedProfile(null)
     }
-    fetchAndViewProfile().catch(console.error)
+    fetchAndViewProfile(username)
   }
 
   const open = menu.isOpen && resultsLength > 0
