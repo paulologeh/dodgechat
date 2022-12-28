@@ -4,15 +4,49 @@ import { useApplication } from 'contexts/applictionContext'
 import { Conversations } from 'api'
 import { Message } from 'types/api'
 import { isEmpty } from 'lodash'
+import { useUser } from 'contexts/userContext'
 
 export const useMessages = () => {
-  const { activeConversation, addMessagesToActiveConversation } =
-    useApplication()
-  const { messages } = activeConversation ?? { messages: [] }
-  const [lastMessageRef, setLastMessageRef] = useState(null)
+  const {
+    activeConversation,
+    addMessagesToActiveConversation,
+    readLocalMessages,
+    getUserById,
+  } = useApplication()
+  const { currentUser } = useUser()
+  const { messages, recipientId, senderId } = activeConversation ?? {
+    messages: [],
+  }
+  const [lastMessageRef, setLastMessageRef] = useState<HTMLElement | null>(null)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [hasMore, setHasMore] = useState(!!activeConversation?.id)
+  const [isReading, setIsReading] = useState(false)
   const isIntersecting = useOnScreen({ current: lastMessageRef })
+  const userId = senderId === currentUser.id ? recipientId : senderId
+  const user = getUserById(userId ?? 0)
+
+  const readUnreadMessages = async () => {
+    if (isEmpty(messages) || isReading) return
+
+    setIsReading(true)
+
+    const unreadMessageIds =
+      messages
+        .filter((msg) => msg.senderId === user.id && !msg.read)
+        .map((msg) => msg.id) ?? []
+
+    if (isEmpty(unreadMessageIds)) return
+
+    try {
+      const response = await Conversations.readMessages(unreadMessageIds)
+      if (response.status === 200) {
+        readLocalMessages(unreadMessageIds)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+    setIsReading(false)
+  }
 
   const loadMoreMessages = async () => {
     if (!activeConversation?.id || isLoadingMessages || !hasMore) return
@@ -51,5 +85,6 @@ export const useMessages = () => {
     messages,
     isLoadingMessages,
     setLastMessageRef,
+    readUnreadMessages,
   }
 }

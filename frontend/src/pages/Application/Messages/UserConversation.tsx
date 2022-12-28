@@ -3,6 +3,7 @@ import {
   Avatar,
   AvatarBadge,
   Box,
+  Button,
   Divider,
   IconButton,
   Input,
@@ -10,13 +11,12 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FiChevronLeft, FiSend } from 'react-icons/fi'
+import { FiChevronLeft, FiSend, FiTrash2 } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
-import { KeyboardEvent, SetStateAction, useState } from 'react'
+import { KeyboardEvent, SetStateAction, useEffect, useState } from 'react'
 import { Conversations } from 'api'
-import { isEmpty } from 'lodash'
 import { useApplication } from 'contexts/applictionContext'
 import { useKeepScrollPosition, useMessages } from 'hooks'
 
@@ -27,7 +27,6 @@ export const UserConversation = ({
 }) => {
   const {
     setActiveConversation,
-    readLocalMessages,
     getUserById,
     addNewConversation,
     addMessagesToActiveConversation,
@@ -46,34 +45,19 @@ export const UserConversation = ({
   const [text, setText] = useState('')
   const [isFailed, setIsFailed] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const { messages, setLastMessageRef, isLoadingMessages } = useMessages()
+  const { messages, setLastMessageRef, isLoadingMessages, readUnreadMessages } =
+    useMessages()
   const { containerRef } = useKeepScrollPosition([messages])
+
+  useEffect(() => {
+    readUnreadMessages().catch(console.error)
+  }, [])
 
   const handleFailedMessage = async () => {
     setIsSending(false)
     setIsFailed(true)
     await delay(1000)
     setIsFailed(false)
-  }
-
-  const handleMessagesRead = async () => {
-    if (isEmpty(messages)) return
-
-    const unreadMessageIds =
-      messages
-        .filter((msg) => msg.senderId === user.id && !msg.read)
-        .map((msg) => msg.id) ?? []
-
-    if (isEmpty(unreadMessageIds)) return
-
-    try {
-      const response = await Conversations.readMessages(unreadMessageIds)
-      if (response.status === 200) {
-        readLocalMessages(unreadMessageIds)
-      }
-    } catch (err) {
-      console.error(err)
-    }
   }
 
   const handleMessageSend = async () => {
@@ -93,7 +77,6 @@ export const UserConversation = ({
         const data = await response.json()
         if (conversation.id) {
           const msgs = [data]
-          console.log('sending new messages', msgs)
           addMessagesToActiveConversation(msgs)
         } else if (conversation.id === null) {
           addNewConversation(data)
@@ -159,6 +142,18 @@ export const UserConversation = ({
           <Box flex="1" ml="4">
             <Box fontWeight="extrabold">{name}</Box>
           </Box>
+          {conversation?.id && (
+            <Stack direction="row" spacing={3}>
+              <Button
+                rightIcon={<FiTrash2 />}
+                colorScheme="red"
+                onClick={() => handleConversationDelete()}
+                isLoading={isDeleting}
+              >
+                Delete
+              </Button>
+            </Stack>
+          )}
         </Box>
         <Divider
           sx={{
@@ -167,7 +162,7 @@ export const UserConversation = ({
           }}
         />
       </Box>
-      <div style={{ minHeight: '80vh', overflow: 'auto' }} ref={containerRef}>
+      <div style={{ height: '75vh', overflow: 'auto' }} ref={containerRef}>
         {isLoadingMessages && (
           <Stack align="center" py={2} px={2}>
             <Spinner thickness="4px" emptyColor="gray.200" color="blue.500" />
@@ -178,7 +173,7 @@ export const UserConversation = ({
             key={msg.id}
             message={msg}
             isSender={currentUser.id === msg.senderId}
-            innerRef={(ref: SetStateAction<null>) =>
+            innerRef={(ref: SetStateAction<HTMLElement | null>) =>
               index === 0 ? setLastMessageRef(ref) : null
             }
           />

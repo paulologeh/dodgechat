@@ -1,5 +1,6 @@
 import { Card, CardBody, Flex, Text } from '@chakra-ui/react'
 import { Message } from 'types/api'
+import { SetStateAction } from 'react'
 
 const senderStyle = {
   bg: 'teal.500',
@@ -17,7 +18,7 @@ const receiverStyle = {
 type MessageProps = {
   message: Message
   isSender: boolean
-  innerRef: any
+  innerRef: (ref: SetStateAction<HTMLElement | null>) => void
 }
 
 export const MessageBubble = ({
