@@ -26,26 +26,20 @@
 
 ### About The Project
 
-<p float="left">
+<div>
   <img src="images/product1.png" width="400">
   <img src="images/product2.png" width="400"/>
   <img src="images/product3.png" width="400"/>
-</p>
-<p float="left">
   <img src="images/product4.png" width="400">
   <img src="images/product5.png" width="400"/>
   <img src="images/product6.png" width="400"/>
-</p>
-<p float="left">
   <img src="images/product7.png" width="400">
   <img src="images/product8.png" width="400"/>
   <img src="images/product9.png" width="400"/>
-</p>
-<p float="left">
   <img src="images/product10.png" width="400">
   <img src="images/product11.png" width="400"/>
   <img src="images/product12.png" width="400"/>
-</p>
+</div>
 
 Dodgechat is an app to help you connect with friends while keeping up with the latest
 on dodge coin
