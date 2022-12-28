@@ -20,7 +20,7 @@ def create_app(config_name):
 
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    cors_config = {"origins": [app.config.get('FRONT_END_URL')]}
+    cors_config = {"origins": [app.config.get("FRONT_END_URL")]}
 
     CORS(app, resources={"/*": cors_config}, supports_credentials=True)
 

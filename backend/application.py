@@ -11,6 +11,7 @@ from app.models import *
 load_dotenv()
 
 LOG_LEVEL = int(os.environ.get("LOG_LEVEL", 20))
+LOG_LEVEL_PACKAGES = int(os.environ.get("LOG_LEVEL_PACKAGES", 30))
 
 logging.basicConfig(
     filename=os.environ.get("LOG_FILE_NAME", "flask.log"),
@@ -31,19 +32,18 @@ def record_factory(*args, **kwargs):
 
 logging.setLogRecordFactory(record_factory)
 
-werkzeug_logger = logging.getLogger("werkzeug")
-werkzeug_logger.level = LOG_LEVEL
-
 app = create_app(os.getenv("ENVIRONMENT"))
 migrate = Migrate(app, db)
 
-for logger in (
-    app.logger,
-    logging.getLogger("sqlalchemy"),
-    logging.getLogger("werkzeug"),
-    logging.getLogger("flask_cors"),
-):
+for logger in (app.logger, logging.getLogger("werkzeug")):
     logger.setLevel(LOG_LEVEL)
+
+for logger in (
+    logging.getLogger("sqlalchemy"),
+    logging.getLogger("flask_cors"),
+    logging.getLogger("flask_socketio"),
+):
+    logger.setLevel(LOG_LEVEL_PACKAGES)
 
 
 @app.cli.command("setup-database")
