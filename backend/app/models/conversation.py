@@ -1,4 +1,5 @@
 import uuid
+import logging
 from datetime import datetime
 
 from sqlalchemy import and_, or_
@@ -8,6 +9,9 @@ from typing import Optional
 from app import db
 from app.models.message import Message
 from app.models.relationship import Relationship
+
+
+logger = logging.getLogger(__name__)
 
 
 class UniqueConstraint(Exception):
@@ -45,6 +49,7 @@ class Conversation(db.Model):
                 for message in db.session.query(Message)
                 .filter(Message.conversation_id == self.id)
                 .filter(Message.created_at < timestamp)
+                .filter(or_(Message.deleted_by.is_(None), Message.deleted_by != 1))
                 .order_by(Message.created_at.desc())
                 .limit(limit)
                 .all()
@@ -62,6 +67,7 @@ class Conversation(db.Model):
                 message
                 for message in db.session.query(Message)
                 .filter(Message.conversation_id == self.id)
+                .filter(or_(Message.deleted_by.is_(None), Message.deleted_by != 1))
                 .order_by(Message.created_at.desc())
                 .limit(limit)
                 .all()
@@ -71,11 +77,16 @@ class Conversation(db.Model):
                 [not msg.read for msg in msgs if msg.sender_id != requester_id]
             ):
                 limit += limit
+                logger.info(
+                    "Fetching additional messages for user_id: %d limit: %d"
+                    % (requester_id, limit)
+                )
 
                 msgs = [
                     message
                     for message in db.session.query(Message)
                     .filter(Message.conversation_id == self.id)
+                    .filter(or_(Message.deleted_by.is_(None), Message.deleted_by != 1))
                     .order_by(Message.created_at.desc())
                     .limit(limit)
                     .all()

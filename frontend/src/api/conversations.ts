@@ -42,4 +42,10 @@ export class Conversations {
       ids: ids,
     })
   }
+
+  static deleteMessages(ids: string[]) {
+    return fetcher(`${ROOT}/messages/delete`, 'DELETE', {
+      ids: ids,
+    })
+  }
 }

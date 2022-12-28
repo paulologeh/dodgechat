@@ -129,7 +129,7 @@ def get_or_update_or_remove_conversation(conversation_id):
             abort(400, "You do not have permission to delete this conversation")
 
 
-@conversations.route("/messages/delete", methods=["POST"])
+@conversations.route("/messages/delete", methods=["DELETE"])
 @login_required
 def delete_message():
     payload = request.get_json()
