@@ -18,7 +18,7 @@ class Message(db.Model):
     )
     conversation = db.relationship("Conversation", back_populates="messages")
     body = db.Column(db.Text(), nullable=False)
-    read = db.Column(db.Boolean, default=False)
+    read = db.Column(db.DateTime())
     created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
     deleted_by = db.Column(
         db.Integer, index=True
