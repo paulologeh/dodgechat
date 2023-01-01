@@ -14,7 +14,13 @@ import { FiChevronLeft, FiSend } from 'react-icons/fi'
 import { delay, getLastSeen } from 'utils'
 import { useUser } from 'contexts/userContext'
 import { MessageBubble } from './MessageBubble'
-import { KeyboardEvent, SetStateAction, useEffect, useState } from 'react'
+import {
+  KeyboardEvent,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Conversations, Relationships } from 'api'
 import { useApplication } from 'contexts/applictionContext'
 import { useKeepScrollPosition, useMessages } from 'hooks'
@@ -49,10 +55,17 @@ export const UserConversation = ({
   const { messages, setLastMessageRef, isLoadingMessages, readUnreadMessages } =
     useMessages()
   const { containerRef } = useKeepScrollPosition([messages])
+  const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     readUnreadMessages().catch(console.error)
   })
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView()
+    }
+  }, [])
 
   const handleFailedMessage = async () => {
     setIsSending(false)
@@ -180,6 +193,7 @@ export const UserConversation = ({
             }
           />
         ))}
+        <div ref={bottomRef} />
       </div>
       <Box
         pos="sticky"
