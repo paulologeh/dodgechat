@@ -18,13 +18,25 @@ export class Conversations {
 
   static getConversation(
     conversationId: string,
-    limit: number,
-    timestamp: Date
+    limit: number | null,
+    timestamp: Date | null
   ) {
-    return fetcher(
-      `${ROOT}/${conversationId}?limit=${limit}&timestamp=${timestamp}`,
-      'GET'
-    )
+    const params = new URLSearchParams()
+    if (limit) {
+      params.append('limit', limit.toString())
+    }
+    if (timestamp) {
+      params.append('timestamp', timestamp.toString())
+    }
+
+    let url = `${ROOT}/${conversationId}`
+
+    if (timestamp || limit) {
+      url = url.concat('?')
+      return fetcher(url + params, 'GET')
+    } else {
+      return fetcher(url, 'GET')
+    }
   }
 
   static sendMessage(conversationId: string, text: string) {
