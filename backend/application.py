@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 
 from app import create_app, db
 from app.models import *
+from websockets import *
 
 load_dotenv()
 

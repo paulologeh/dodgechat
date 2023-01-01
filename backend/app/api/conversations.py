@@ -15,6 +15,7 @@ from app.serde import (
     Messages,
 )
 from app.utils import extract_all_errors
+from websockets import conversation_changed_event
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +116,12 @@ def get_or_update_or_remove_conversation(conversation_id):
         )
         db.session.add(message)
         db.session.commit()
+
+        event_data = {
+            'id': str(conversation.id),
+            'kind': 'UPDATE'
+        }
+        conversation_changed_event(event_data)
 
         return jsonify(MessageSchema().dump(message))
     elif request.method == "DELETE":

@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -20,14 +19,16 @@ def create_app(config_name):
 
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    cors_config = {"origins": [app.config.get("FRONT_END_URL")]}
+
+    client = app.config.get("FRONT_END_URL")
+    cors_config = {"origins": [client]}
 
     CORS(app, resources={"/*": cors_config}, supports_credentials=True)
 
     mail.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
-    # socketio.init_app(app)
+    socketio.init_app(app, cors_allowed_origins=client, async_mode="eventlet")
 
     from app.api import api as api_blueprint
     from app.api.users import users as users_blueprint
