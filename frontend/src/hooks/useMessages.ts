@@ -30,14 +30,14 @@ export const useMessages = () => {
   const readUnreadMessages = async () => {
     if (isEmpty(messages) || isReading) return
 
-    setIsReading(true)
-
     const unreadMessageIds =
       messages
         .filter((msg) => msg.senderId === user.id && !msg.read)
         .map((msg) => msg.id) ?? []
 
     if (isEmpty(unreadMessageIds)) return
+
+    setIsReading(true)
 
     try {
       const response = await Conversations.readMessages(unreadMessageIds)
@@ -46,8 +46,9 @@ export const useMessages = () => {
       }
     } catch (err) {
       console.error(err)
+    } finally {
+      setIsReading(false)
     }
-    setIsReading(false)
   }
 
   const loadMoreMessages = async () => {

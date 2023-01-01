@@ -52,7 +52,7 @@ export const UserConversation = ({
 
   useEffect(() => {
     readUnreadMessages().catch(console.error)
-  }, [])
+  })
 
   const handleFailedMessage = async () => {
     setIsSending(false)
