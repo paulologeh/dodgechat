@@ -3,7 +3,9 @@ import { Conversation, FriendMinimal, Message, UserProfile } from 'types/api'
 import { unknownProfile } from 'utils'
 import { isEmpty, orderBy } from 'lodash'
 import { Conversations, Relationships, Search as SearchService } from 'api'
-import { PageLoading } from '../components/common'
+import { PageLoading } from 'components/common'
+import { useWebsockets } from 'hooks'
+import { ConversationSyncKind } from 'types/sockets'
 
 type LoadingState = {
   isAppLoading: boolean
@@ -136,6 +138,7 @@ export const ApplicationProvider: FC = ({ children }) => {
   )
   const [userRelationships, setUserRelationships] =
     useState<UserRelationshipsState>(initialUserRelationshipState)
+  const { events, setEvents } = useWebsockets()
 
   const { errorMessage, errorKind } = appError
   const { isAppLoading, loadingMessage } = appLoading
@@ -144,6 +147,60 @@ export const ApplicationProvider: FC = ({ children }) => {
     ({ id }) => id === activeConversationId
   )
   const { userFriends, userRequests, otherUsers } = userRelationships
+
+  useEffect(() => {
+    if (!isEmpty(events)) {
+      const newEvents = [...events]
+      const event = newEvents.pop()
+      if (event?.name === 'message') {
+        const id = event?.id
+        const kind = event?.kind
+        if (!id || !kind) return
+        syncConversation(id, kind).catch(console.error)
+        setEvents(newEvents)
+      }
+    }
+  }, [events])
+  const syncConversation = async (
+    conversationId: string,
+    updateKind: ConversationSyncKind
+  ) => {
+    const request = async () =>
+      Conversations.getConversation(conversationId, null, null)
+
+    if (updateKind === 'DELETE') {
+      removeConversation(conversationId)
+    } else if (updateKind === 'NEW') {
+      const conversation = await requestSilent(request)
+      if (!conversation) return
+      addNewConversation(conversation)
+    } else if (updateKind === 'UPDATE') {
+      const messagesNew = await requestSilent(request)
+      if (!messagesNew) return
+      const conversationsUpdate = [...userConversations]
+      for (let i = 0; i < conversationsUpdate.length; i++) {
+        if (conversationId === conversationsUpdate[i].id) {
+          const previousMessages = conversationsUpdate[i].messages
+          const messageIds = new Set(previousMessages.map((msg) => msg.id))
+          const messages = [...previousMessages]
+          for (let j = 0; j < messagesNew.length; j++) {
+            if (!messageIds.has(messagesNew[j].id)) {
+              messages.push(messagesNew[j])
+            }
+          }
+          conversationsUpdate[i].messages = orderBy(
+            messages,
+            (msg) => new Date(msg.createdAt)
+          )
+          setChat((prevState) => ({
+            ...prevState,
+            userConversations: conversationsUpdate,
+          }))
+          break
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     syncData().catch(console.error)
