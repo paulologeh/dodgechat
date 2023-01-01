@@ -19,7 +19,9 @@ export const useMessages = () => {
   }
   const [lastMessageRef, setLastMessageRef] = useState<HTMLElement | null>(null)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
-  const [hasMore, setHasMore] = useState(!!activeConversation?.id)
+  const [hasMore, setHasMore] = useState(
+    !activeConversation?.id || messages.length >= 10
+  )
   const [isReading, setIsReading] = useState(false)
   const isIntersecting = useOnScreen({ current: lastMessageRef })
   const userId = senderId === currentUser.id ? recipientId : senderId
