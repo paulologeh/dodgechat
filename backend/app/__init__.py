@@ -4,13 +4,14 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session
 
 from config import config
 
 mail = Mail()
 db = SQLAlchemy()
 socketio = SocketIO()
-
+session = Session()
 login_manager = LoginManager()
 
 
@@ -27,6 +28,7 @@ def create_app(config_name):
 
     mail.init_app(app)
     db.init_app(app)
+    session.init_app(app)
     login_manager.init_app(app)
     socketio.init_app(app, cors_allowed_origins=client, async_mode="eventlet")
 

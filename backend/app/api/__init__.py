@@ -1,8 +1,6 @@
 import logging
-import time
-from datetime import datetime
 
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask_login import current_user
 
 from app import db
