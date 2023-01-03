@@ -1,4 +1,5 @@
 import os
+import redis
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -9,10 +10,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     DODGECHAT_SLOW_DB_QUERY_TIME = 0.5
-    FRONT_END_URL = os.getenv("FRONT_END_URL", "http://localhost:8080")
+    FRONT_END_URL = os.getenv("FRONT_END_URL")
     SQLALCHEMY_DATABASE_URI = (
         f'{os.environ.get("POSTGRESQL_URI")}/{os.environ.get("POSTGRES_DB")}'
     )
+    SESSION_TYPE = "redis"
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    SESSION_REDIS = redis.from_url(os.environ.get("REDIS_URI"))
 
     @staticmethod
     def init_app(app):
