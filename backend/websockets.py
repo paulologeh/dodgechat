@@ -12,11 +12,14 @@ def conversation_changed_event(data):
 @socketio.event
 def connect():
     if current_user.is_authenticated:
-        logger.info("Client connected %s" % current_user.id)
+        logger.info("Client connected - id:%s" % current_user.id)
     else:
         return False
 
 
 @socketio.event()
 def disconnect():
-    logger.info("Client disconnected")
+    if getattr(current_user, "id", None) is not None:
+        logger.info("Client disconnected - id:%s" % current_user.id)
+    else:
+        logger.warning("Client disconnected - id:Unknown")

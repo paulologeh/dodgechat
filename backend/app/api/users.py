@@ -58,8 +58,9 @@ def delete_user():
 @users.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    disconnect()
+    id = current_user.id
     logout_user()
+    logger.info("Logged out user %s" % id)
     return jsonify({"message": "Logged out"})
 
 
@@ -73,7 +74,7 @@ def login():
         abort(422, extract_all_errors(err))
 
     login_user(user)
-
+    logger.info("Logged in user %s" % user.id)
     return jsonify(UserSchema().dump(user))
 
 
