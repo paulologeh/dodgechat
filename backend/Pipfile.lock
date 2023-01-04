@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9b0c3e41f925a54b9a76e54b6a55e6cf1d8c72fadb07e3364b9930aba15b6508"
+            "sha256": "b2e654cf9ec35d431d51e377c07630d5ef5ff74479a43a19374290f2af68f415"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -371,9 +371,11 @@
             "version": "==2.0.1"
         },
         "gunicorn": {
-            "file": "https://github.com/benoitc/gunicorn/archive/refs/heads/master.zip",
+            "file": "https://github.com/paul-ologeh/dodgechat/raw/main/backend/gunicorn-master.zip",
             "hashes": [
-                "sha256:4d2c171c80cce801c2cc9b7fee84479a5c1141785b457f8ec033fd4a8ebee297"
+                "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e",
+                "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8",
+                "sha256:f38ea67e8196148dce3094af9af43c0b56524e27f5e6ce5aab4dc6ff04b870b8"
             ],
             "version": "==20.1.0"
         },
