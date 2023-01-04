@@ -149,6 +149,7 @@ export const LoginForm = () => {
                       emailOrUsername: e.target.value,
                     }))
                   }
+                  autoComplete="username"
                 />
                 <FormErrorMessage>{error.emailOrUsername}</FormErrorMessage>
               </FormControl>
@@ -169,6 +170,7 @@ export const LoginForm = () => {
                       password: e.target.value,
                     }))
                   }
+                  autoComplete="current-password"
                 />
                 <FormErrorMessage>{error.password}</FormErrorMessage>
               </FormControl>

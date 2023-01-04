@@ -93,36 +93,38 @@ export const Application = () => {
                   onClick={toggleColorMode}
                 />
               </Tooltip>
+              <Box>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rounded={'full'}
+                    variant={'link'}
+                    cursor={'pointer'}
+                  >
+                    <Avatar size="sm" src={displayGravatar} />
+                  </MenuButton>
 
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded={'full'}
-                  variant={'link'}
-                  cursor={'pointer'}
-                >
-                  <Avatar size="sm" src={displayGravatar} />
-                </MenuButton>
-                <MenuList
-                  alignItems={'center'}
-                  bg={useColorModeValue('white', 'gray.700')}
-                  borderColor={useColorModeValue('gray.200', 'gray.900')}
-                >
-                  <br />
-                  <Center>
-                    <Avatar size={'2xl'} src={displayGravatar} />
-                  </Center>
-                  <br />
-                  <Center>
-                    <Text fontSize="md">{displayName}</Text>
-                  </Center>
-                  <br />
-                  <MenuDivider />
-                  <ProfileEdit currentUser={currentUser} />
-                  <Account />
-                  <MenuItem onClick={logout}>Sign out</MenuItem>
-                </MenuList>
-              </Menu>
+                  <MenuList
+                    alignItems={'center'}
+                    bg={useColorModeValue('white', 'gray.700')}
+                    borderColor={useColorModeValue('gray.200', 'gray.900')}
+                  >
+                    <br />
+                    <Center>
+                      <Avatar size={'2xl'} src={displayGravatar} />
+                    </Center>
+                    <br />
+                    <Center>
+                      <Text fontSize="md">{displayName}</Text>
+                    </Center>
+                    <br />
+                    <MenuDivider />
+                    <ProfileEdit currentUser={currentUser} />
+                    <Account />
+                    <MenuItem onClick={logout}>Sign out</MenuItem>
+                  </MenuList>
+                </Menu>
+              </Box>
             </Stack>
           </Flex>
         </Flex>
