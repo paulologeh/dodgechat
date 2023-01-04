@@ -31,6 +31,7 @@ import { UserSearch } from './Search'
 import { Notifications } from './Notifications'
 import { useApplication } from 'contexts/applictionContext'
 import { useEffect } from 'react'
+import { useWebsockets } from 'hooks'
 
 export const Application = () => {
   const { userFriends, requestOrAppError, errorMessage, errorKind } =
@@ -42,6 +43,7 @@ export const Application = () => {
   const toast = useToast()
   const displayGravatar =
     avatarHash && email ? getGravatarUrl(avatarHash, email, 100) : undefined
+  const { disconnect } = useWebsockets()
 
   useEffect(() => {
     if (errorKind === 'TOAST' && errorMessage) {
@@ -56,8 +58,11 @@ export const Application = () => {
   }, [errorKind])
 
   const logout = async () => {
-    const request = async () => await Users.logout()
-    const response = requestOrAppError('MODAL', 'Logging out', request)
+    const request = async () => {
+      await disconnect() // disconnect from websocket first
+      return Users.logout()
+    }
+    const response = await requestOrAppError('MODAL', 'Logging out', request)
     if (response !== null) {
       setLoggedIn(false)
       setCurrentUser({})
