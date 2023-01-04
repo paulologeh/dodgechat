@@ -30,7 +30,9 @@ def create_app(config_name):
     db.init_app(app)
     session.init_app(app)
     login_manager.init_app(app)
-    socketio.init_app(app, cors_allowed_origins=client, async_mode="eventlet")
+    socketio.init_app(
+        app, cors_allowed_origins=client, async_mode="eventlet", manage_session=False
+    )
 
     from app.api import api as api_blueprint
     from app.api.users import users as users_blueprint

@@ -2,6 +2,7 @@ import logging
 
 from flask import Blueprint, abort, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
+from flask_socketio import disconnect
 from marshmallow.exceptions import ValidationError
 
 from app import db
@@ -57,6 +58,7 @@ def delete_user():
 @users.route("/logout", methods=["POST"])
 @login_required
 def logout():
+    disconnect()
     logout_user()
     return jsonify({"message": "Logged out"})
 

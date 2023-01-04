@@ -117,10 +117,7 @@ def get_or_update_or_remove_conversation(conversation_id):
         db.session.add(message)
         db.session.commit()
 
-        event_data = {
-            'id': str(conversation.id),
-            'kind': 'UPDATE'
-        }
+        event_data = {"id": str(conversation.id), "kind": "UPDATE"}
         conversation_changed_event(event_data)
 
         return jsonify(MessageSchema().dump(message))

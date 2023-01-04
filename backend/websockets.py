@@ -1,6 +1,6 @@
 import logging
 from app import socketio
-from flask_socketio import emit
+from flask_login import current_user
 
 logger = logging.getLogger(__name__)
 
@@ -11,8 +11,10 @@ def conversation_changed_event(data):
 
 @socketio.event
 def connect():
-    emit("connect", {"data": "Connected"})
-    logger.info("Client connected")
+    if current_user.is_authenticated:
+        logger.info("Client connected %s" % current_user.id)
+    else:
+        return False
 
 
 @socketio.event()
