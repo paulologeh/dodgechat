@@ -152,15 +152,29 @@ export const ApplicationProvider: FC = ({ children }) => {
     if (!isEmpty(events)) {
       const newEvents = [...events]
       const event = newEvents.pop()
-      if (event?.name === 'message') {
+      if (event?.name === 'conversation') {
         const id = event?.id
         const kind = event?.kind
         if (!id || !kind) return
         syncConversation(id, kind).catch(console.error)
-        setEvents(newEvents)
+      } else if (event?.name === 'relationship') {
+        syncRelationships().catch(console.error)
       }
+      setEvents(newEvents)
     }
   }, [events])
+
+  const syncRelationships = async () => {
+    const respone = await Relationships.getFriends()
+    const data = await respone.json()
+    const { friends, friendRequests, others } = data
+    setUserRelationships({
+      userFriends: friends,
+      userRequests: friendRequests,
+      otherUsers: others,
+    })
+  }
+
   const syncConversation = async (
     conversationId: string,
     updateKind: ConversationSyncKind

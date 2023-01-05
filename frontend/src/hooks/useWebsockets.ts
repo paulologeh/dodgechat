@@ -27,7 +27,7 @@ export const useWebsockets = () => {
 
     socket.on('message', (payload) => {
       const { data } = payload
-      const newevents = [...events, { ...data, name: 'message' }]
+      const newevents = [...events, data]
       setEvents(newevents)
     })
 

@@ -1,6 +1,6 @@
 export type ConversationSyncKind = 'NEW' | 'UPDATE' | 'DELETE'
 
-type EventName = 'message' | 'relationship'
+type EventName = 'conversation' | 'relationship'
 
 export type SocketEvent = {
   name: EventName
