@@ -177,7 +177,7 @@ export const UserConversation = ({
           }}
         />
       </Box>
-      <div style={{ height: '95vh', overflow: 'auto' }} ref={containerRef}>
+      <div style={{ height: '80vh', overflow: 'auto' }} ref={containerRef}>
         {isLoadingMessages && (
           <Stack align="center" py={2} px={2}>
             <Spinner thickness="4px" emptyColor="gray.200" color="blue.500" />
