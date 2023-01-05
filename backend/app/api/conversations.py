@@ -15,7 +15,7 @@ from app.serde import (
     Messages,
 )
 from app.utils import extract_all_errors
-from websockets import conversation_changed_event
+from websockets import send_event_to_client
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,10 @@ def get_or_create_conversations():
         db.session.add(message)
         db.session.commit()
 
+        client_user_id = conversation.recipient_id
+        event_data = {"id": str(conversation.id), "kind": "NEW", "name": "conversation"}
+        send_event_to_client(event_data, client_user_id)
+
         return jsonify(
             {
                 **ConversationSchema().dump(conversation),
@@ -87,6 +91,12 @@ def get_or_update_or_remove_conversation(conversation_id):
     if not conversation:
         abort(400, "Conversation does not exist")
 
+    client_user_id = (
+        conversation.recipient_id
+        if current_user.id == conversation.sender_id
+        else conversation.sender_id
+    )
+
     if request.method == "GET":
         messages_limt = int(request.args.get("limit", 10))
         timestamp = request.args.get("timestamp")
@@ -100,10 +110,9 @@ def get_or_update_or_remove_conversation(conversation_id):
             )
         ]
 
-        return jsonify({
-            **ConversationSchema().dump(conversation),
-            "messages": messages
-        })
+        return jsonify(
+            {**ConversationSchema().dump(conversation), "messages": messages}
+        )
     elif request.method == "POST":
         if not conversation.are_friends():
             abort(400, "You cannot message this user as you are not friends")
@@ -120,8 +129,12 @@ def get_or_update_or_remove_conversation(conversation_id):
         db.session.add(message)
         db.session.commit()
 
-        event_data = {"id": str(conversation.id), "kind": "UPDATE"}
-        conversation_changed_event(event_data)
+        event_data = {
+            "id": str(conversation.id),
+            "kind": "UPDATE",
+            "name": "conversation",
+        }
+        send_event_to_client(event_data, client_user_id)
 
         return jsonify(MessageSchema().dump(message))
     elif request.method == "DELETE":
@@ -131,6 +144,14 @@ def get_or_update_or_remove_conversation(conversation_id):
         ):
             db.session.delete(conversation)
             db.session.commit()
+
+            event_data = {
+                "id": str(conversation.id),
+                "kind": "DELETE",
+                "name": "conversation",
+            }
+            send_event_to_client(event_data, client_user_id)
+
             return jsonify({"message": "Deleted conversation"})
         else:
             abort(400, "You do not have permission to delete this conversation")

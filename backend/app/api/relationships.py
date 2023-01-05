@@ -8,6 +8,7 @@ from app import db
 from app.models.relationship import FriendState, Relationship, RelationshipType
 from app.models.user import User
 from app.models.conversation import Conversation
+from websockets import send_event_to_client
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +149,8 @@ def block_user(username):
     db.session.add(block)
     db.session.commit()
 
+    send_event_to_client({"name": "relationship"}, user.id)
+
     return jsonify({"message": f"Blocked {username}"})
 
 
@@ -165,6 +168,8 @@ def unblock_user(username):
     remove_all_relationships(current_user.id, user.id, True)
 
     db.session.commit()
+
+    send_event_to_client({"name": "relationship"}, user.id)
 
     return jsonify({"message": f"Unblocked {username}"})
 
@@ -208,6 +213,8 @@ def add_user(username):
     db.session.add(friendship)
     db.session.commit()
 
+    send_event_to_client({"name": "relationship"}, user.id)
+
     return jsonify({"message": f"Added {username}"})
 
 
@@ -225,5 +232,7 @@ def delete_user(username):
     remove_all_relationships(current_user.id, user.id)
 
     db.session.commit()
+
+    send_event_to_client({"name": "relationship"}, user.id)
 
     return jsonify({"message": f"Deleted friend {username}"})

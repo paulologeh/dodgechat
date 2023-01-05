@@ -31,7 +31,7 @@ def search_user(username):
     ).first()
 
     if blocked:
-        abort(400, "User doesn't exist")
+        abort(400, "Unable to view this user")
 
     # check if you have blocked the user
     block = Relationship.query.filter_by(
