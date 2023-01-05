@@ -39,6 +39,7 @@ export const LoginForm = () => {
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [remember, setRemember] = useState(false)
   const [error, setError] = useState<LoginFormError>({
     emailOrUsername: '',
     password: '',
@@ -81,7 +82,11 @@ export const LoginForm = () => {
     setLoading(true)
 
     try {
-      const response = await Users.login(state.emailOrUsername, state.password)
+      const response = await Users.login(
+        state.emailOrUsername,
+        state.password,
+        remember
+      )
       if (response.status === 200) {
         const data = await response.json()
         setLoggedIn(true)
@@ -180,7 +185,12 @@ export const LoginForm = () => {
                   align="start"
                   justify="space-between"
                 >
-                  <Checkbox>Remember me</Checkbox>
+                  <Checkbox
+                    isChecked={remember}
+                    onChange={() => setRemember(!remember)}
+                  >
+                    Remember me
+                  </Checkbox>
                   <Link
                     as={ReactRouterLink}
                     color="blue.400"

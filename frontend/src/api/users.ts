@@ -17,10 +17,11 @@ export class Users {
     return fetcher(`${USERS_ROUTE}/whoami`, 'GET')
   }
 
-  static login(emailOrUsername: string, password: string) {
+  static login(emailOrUsername: string, password: string, remember: boolean) {
     return fetcher(`${USERS_ROUTE}/login`, 'POST', {
       emailOrUsername,
       password,
+      remember,
     })
   }
 
