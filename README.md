@@ -8,7 +8,7 @@
   <h3 align="center">DodgeChat</h3>
 
   <p align="center">
-    Keep up with dodgecoin while you chat
+    Bringing the dodge community together
     <br />
     <a href="#"><strong>Go to app</strong></a>
     <br />
@@ -41,8 +41,7 @@
   <img src="images/product12.png" width="400"/>
 </div>
 
-Dodgechat is an app to help you connect with friends while keeping up with the latest
-on dodge coin
+Dodgechat is an app to help you connect with fellow dodge coin enthusiasts
 
 ### Built With
 
