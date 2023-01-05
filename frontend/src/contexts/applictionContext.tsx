@@ -293,7 +293,7 @@ export const ApplicationProvider: FC = ({ children }) => {
     let count = 0
     for (let i = 0; i < messages.length; i++) {
       if (messages[i].id && messageIds.includes(messages[i].id)) {
-        messages[i].read = true
+        messages[i].read = new Date(Date.now())
         count++
       }
     }

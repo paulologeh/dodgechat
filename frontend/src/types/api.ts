@@ -39,7 +39,7 @@ export type Message = {
   id: string
   senderId: number
   body: string
-  read: boolean
+  read: Date | null
   createdAt: Date
 }
 export type Conversation = {
