@@ -100,7 +100,10 @@ def get_or_update_or_remove_conversation(conversation_id):
             )
         ]
 
-        return jsonify(messages)
+        return jsonify({
+            **ConversationSchema().dump(conversation),
+            "messages": messages
+        })
     elif request.method == "POST":
         if not conversation.are_friends():
             abort(400, "You cannot message this user as you are not friends")
