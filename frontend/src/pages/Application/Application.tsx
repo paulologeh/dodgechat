@@ -34,8 +34,13 @@ import { useEffect } from 'react'
 import { useWebsockets } from 'hooks'
 
 export const Application = () => {
-  const { userFriends, requestOrAppError, errorMessage, errorKind } =
-    useApplication()
+  const {
+    userFriends,
+    requestOrAppError,
+    errorMessage,
+    errorKind,
+    userConversations,
+  } = useApplication()
   const { colorMode, toggleColorMode } = useColorMode()
   const { currentUser, setLoggedIn, setCurrentUser } = useUser()
   const { avatarHash, name, username, email } = currentUser
@@ -44,6 +49,23 @@ export const Application = () => {
   const displayGravatar =
     avatarHash && email ? getGravatarUrl(avatarHash, email, 100) : undefined
   const { disconnect } = useWebsockets()
+
+  const setDocumentTitle = () => {
+    const unread = userConversations.map(
+      (conversation) =>
+        conversation.messages.filter(
+          (message) => message.senderId !== currentUser.id && !message.read
+        ).length
+    )
+    const unreadCount = unread.reduce((partialSum, a) => partialSum + a, 0)
+    if (unreadCount) {
+      document.title = `Dodgechat | ${unreadCount} New Messages`
+    }
+  }
+
+  useEffect(() => {
+    setDocumentTitle()
+  })
 
   useEffect(() => {
     if (errorKind === 'TOAST' && errorMessage) {

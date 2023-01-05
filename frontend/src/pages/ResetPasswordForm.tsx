@@ -30,6 +30,7 @@ export const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const navigate = useNavigate()
+  document.title = 'Dodgechat | Reset Password'
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()

@@ -19,6 +19,7 @@ export const ForgotPasswordForm = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  document.title = 'Dodgechat | Forgot Password'
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()

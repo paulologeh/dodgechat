@@ -46,6 +46,7 @@ export const LoginForm = () => {
     request: '',
   })
   const { setLoggedIn, setCurrentUser } = useUser()
+  document.title = 'Dodgechat | Login'
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()

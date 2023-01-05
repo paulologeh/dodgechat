@@ -54,6 +54,7 @@ export const RegisterForm = () => {
   const [error, setError] = useState<RegisterFormError>(emptyError)
   const [success, setSuccess] = useState('')
   const navigate = useNavigate()
+  document.title = 'Dodgechat | Register'
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()

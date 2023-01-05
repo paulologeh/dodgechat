@@ -12,6 +12,7 @@ export const VerifyEmailToken = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const navigate = useNavigate()
+  document.title = 'Dodgechat | Verify Email'
 
   useEffect(() => {
     const confirmToken = async () => {

@@ -12,6 +12,7 @@ export const ConfirmAccountToken = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const navigate = useNavigate()
+  document.title = 'Dodgechat | Confirm Account'
 
   useEffect(() => {
     const confirmToken = async () => {

@@ -1,8 +1,9 @@
-import { Box, Heading, Text, Button } from '@chakra-ui/react'
+import { Box, Button, Heading, Text } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 
 export const NotFound = () => {
   const navigate = useNavigate()
+  document.title = 'Dodgechat | Not Found'
 
   return (
     <Box textAlign="center" py={10} px={6}>
