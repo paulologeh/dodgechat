@@ -60,6 +60,8 @@ export const Application = () => {
     const unreadCount = unread.reduce((partialSum, a) => partialSum + a, 0)
     if (unreadCount) {
       document.title = `Dodgechat | ${unreadCount} New Messages`
+    } else {
+      document.title = 'Dodgechat'
     }
   }
 
