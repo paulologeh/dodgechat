@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, jsonify, request, session
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_socketio import disconnect
 from marshmallow.exceptions import ValidationError
@@ -67,14 +67,17 @@ def logout():
 @users.route("/login", methods=["POST"])
 def login():
     payload = request.get_json()
+    remember, user = None, None
 
     try:
-        user = LoginSchema().load(payload)
+        user, remember = LoginSchema().load(payload)
     except ValidationError as err:
         abort(422, extract_all_errors(err))
 
-    login_user(user)
-    logger.info("Logged in user %s" % user.id)
+    login_user(user, remember=True if remember else False)
+    logger.info(
+        "Logged in user %s remembered:%s" % (user.id, True if remember else False)
+    )
     return jsonify(UserSchema().dump(user))
 
 

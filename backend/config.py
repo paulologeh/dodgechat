@@ -1,5 +1,6 @@
 import os
 import redis
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,9 +16,10 @@ class Config:
         f'{os.environ.get("POSTGRESQL_URI")}/{os.environ.get("POSTGRES_DB")}'
     )
     SESSION_TYPE = "redis"
-    SESSION_PERMANENT = False
+    SESSION_PERMANENT = True
     SESSION_USE_SIGNER = True
     SESSION_REDIS = redis.from_url(os.environ.get("REDIS_URI"))
+    PERMANENT_SESSION_LIFETIME = timedelta(seconds=10)
 
     @staticmethod
     def init_app(app):
@@ -40,13 +42,15 @@ class ProductionConfig(Config):
     DEBUG = False
     PRODUCTION = True
     CORS_HEADERS = "Content-Type"
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.googlemail.com")
+    MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
     MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", True)
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     DODGECHAT_MAIL_SUBJECT_PREFIX = "[Dodgechat]"
-    DODGECHAT_MAIL_SENDER = "Dodgechat Admin <dodgechatapp@gmail.com>"
+    DODGECHAT_MAIL_SENDER = (
+        f'{os.environ.get("DODGECHAT_ADMIN")} <{os.environ.get("MAIL_USERNAME")}>'
+    )
     DODGECHAT_ADMIN = os.environ.get("DODGECHAT_ADMIN")
 
 

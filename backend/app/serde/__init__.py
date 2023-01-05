@@ -87,6 +87,7 @@ class UserUpdateSchema(BasicSchema):
 class LoginSchema(BasicSchema):
     email_or_username = fields.Str(validate=must_not_be_blank)
     password = fields.Str(required=True, validate=must_not_be_blank)
+    remember = fields.Boolean()
 
     @post_load
     def get_user(self, data, **kwargs):
@@ -97,4 +98,4 @@ class LoginSchema(BasicSchema):
         if user is None or not user.verify_password(data["password"]):
             raise ValidationError("Invalid email or password.")
 
-        return user
+        return user, data.get("remember")

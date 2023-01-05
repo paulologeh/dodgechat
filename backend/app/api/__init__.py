@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, session, request
 from flask_login import current_user
 
 from app import db
@@ -24,6 +24,10 @@ def handle_before_request():
     if current_user.is_authenticated:
         current_user.ping()
         db.session.commit()
+
+        if request.cookies.get("remember_token") is None:
+            session.modified = True
+            logger.info("Reset session for user %s" % current_user.id)
 
 
 @api.after_request
