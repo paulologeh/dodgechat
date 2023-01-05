@@ -171,12 +171,14 @@ export const ApplicationProvider: FC = ({ children }) => {
     if (updateKind === 'DELETE') {
       removeConversation(conversationId)
     } else if (updateKind === 'NEW') {
-      const conversation = await requestSilent(request)
-      if (!conversation) return
+      const conversation: Conversation = await requestSilent(request)
+      if (isEmpty(conversation)) return
       addNewConversation(conversation)
     } else if (updateKind === 'UPDATE') {
-      const messagesNew = await requestSilent(request)
-      if (!messagesNew) return
+      const conversation: Conversation = await requestSilent(request)
+      if (isEmpty(conversation)) return
+      const messagesNew = conversation.messages
+      if (isEmpty(messagesNew)) return
       const conversationsUpdate = [...userConversations]
       for (let i = 0; i < conversationsUpdate.length; i++) {
         if (conversationId === conversationsUpdate[i].id) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useOnScreen } from 'hooks/useOnScreen'
 import { useApplication } from 'contexts/applictionContext'
 import { Conversations } from 'api'
-import { Message } from 'types/api'
+import { Conversation } from 'types/api'
 import { isEmpty } from 'lodash'
 import { useUser } from 'contexts/userContext'
 
@@ -64,7 +64,9 @@ export const useMessages = () => {
         timestamp
       )
       if (response.status === 200) {
-        const msgs: Message[] = await response.json()
+        const conversation: Conversation = await response.json()
+        if (isEmpty(conversation)) return
+        const msgs = conversation.messages
         if (isEmpty(msgs)) {
           setHasMore(false)
         } else {
