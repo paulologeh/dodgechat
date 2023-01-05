@@ -19,7 +19,7 @@ class Config:
     SESSION_PERMANENT = True
     SESSION_USE_SIGNER = True
     SESSION_REDIS = redis.from_url(os.environ.get("REDIS_URI"))
-    PERMANENT_SESSION_LIFETIME = timedelta(seconds=10)
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=20)
 
     @staticmethod
     def init_app(app):
@@ -52,6 +52,7 @@ class ProductionConfig(Config):
         f'{os.environ.get("DODGECHAT_ADMIN")} <{os.environ.get("MAIL_USERNAME")}>'
     )
     DODGECHAT_ADMIN = os.environ.get("DODGECHAT_ADMIN")
+    SESSION_COOKIE_SECURE = True
 
 
 config = {
