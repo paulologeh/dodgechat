@@ -83,9 +83,11 @@ export const RegisterForm = () => {
       const response = await Users.register(user)
 
       if (response.status !== 201) {
+        const data = await response.json()
+        const errorMessage = data['messages'][0] ?? data['message']
         setError((prevState) => ({
           ...prevState,
-          request: 'Failed to register',
+          request: errorMessage ?? 'Failed to register',
         }))
         setLoading(false)
         return
