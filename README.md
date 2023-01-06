@@ -48,10 +48,12 @@ Dodgechat is an app to help you connect with fellow dodge coin enthusiasts
 This project was built with the following tools:
 
 - [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Chakra UI](https://chakra-ui.com/)
 - [Postgres](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
+- [Nginx](https://www.nginx.com/)
+- [Docker](https://www.docker.com/)
 - [Python](https://python.org)
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
-
-## Getting Started
-
-TBD
+- [Celery](https://docs.celeryq.dev/en/stable/)
