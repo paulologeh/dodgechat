@@ -46,8 +46,7 @@ const getJoined = (date: Date) => {
   const d = new Date(date)
   const year = d.getFullYear() // 2019
   const month = d.getMonth() // 12
-  if (month > 12 || month < 1) return ''
-  return `Joined ${months[month - 1]} ${year}`
+  return `Joined ${months[month]} ${year}`
 }
 
 export const UserProfileModal = () => {
