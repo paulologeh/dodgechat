@@ -1,28 +1,15 @@
-from threading import Thread
-
-from flask import current_app, render_template
+from flask import render_template
 from flask_mail import Message
-
-from app import mail
-
-
-def send_async_email(app, msg):
-    with app.app_context():
-        mail.send(msg)
+from app.tasks import send_async_email
+import os
 
 
 def send_email(to, subject, template, **kwargs):
-    app = current_app._get_current_object()
-    if current_app.config.get("PRODUCTION") is None:
-        return
-
     msg = Message(
-        app.config["DODGECHAT_MAIL_SUBJECT_PREFIX"] + " " + subject,
-        sender=app.config["DODGECHAT_MAIL_SENDER"],
+        "[Dodgechat]" + " " + subject,
+        sender=f'[Dodgechat] <{os.environ.get("MAIL_USERNAME", "")}>',
         recipients=[to],
     )
     msg.body = render_template(template + ".txt", **kwargs)
     msg.html = render_template(template + ".html", **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr
+    send_async_email.delay(msg)

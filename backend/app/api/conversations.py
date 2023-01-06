@@ -15,7 +15,7 @@ from app.serde import (
     Messages,
 )
 from app.utils import extract_all_errors
-from websockets import send_event_to_client
+
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +74,8 @@ def get_or_create_conversations():
 
         client_user_id = conversation.recipient_id
         event_data = {"id": str(conversation.id), "kind": "NEW", "name": "conversation"}
+        from websockets import send_event_to_client
+
         send_event_to_client(event_data, client_user_id)
 
         return jsonify(
@@ -134,6 +136,9 @@ def get_or_update_or_remove_conversation(conversation_id):
             "kind": "UPDATE",
             "name": "conversation",
         }
+
+        from websockets import send_event_to_client
+
         send_event_to_client(event_data, client_user_id)
 
         return jsonify(MessageSchema().dump(message))
@@ -150,6 +155,9 @@ def get_or_update_or_remove_conversation(conversation_id):
                 "kind": "DELETE",
                 "name": "conversation",
             }
+
+            from websockets import send_event_to_client
+
             send_event_to_client(event_data, client_user_id)
 
             return jsonify({"message": "Deleted conversation"})

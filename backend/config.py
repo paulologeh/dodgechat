@@ -8,6 +8,7 @@ CELERY_CONFIG = {
     "broker_url": os.environ.get("REDIS_URI"),
     "result_backend": os.environ.get("REDIS_URI"),
     "imports": ("app.tasks",),
+    "accept_content": ["json", "pickle"],
 }
 
 

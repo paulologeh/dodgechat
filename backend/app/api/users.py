@@ -112,7 +112,7 @@ def register():
         user.email,
         "Confirm Your Account",
         "confirm_email",
-        user=user,
+        name=user.name,
         token=token,
         root=FRONT_END_URI,
     )
@@ -169,7 +169,7 @@ def resend_confirmation():
         current_user.email,
         "Confirm Your Account",
         "confirm_email",
-        user=current_user,
+        name=current_user.name,
         token=token,
         root=FRONT_END_URI,
     )
@@ -218,7 +218,7 @@ def password_reset_request():
             user.email,
             "Reset Your Password",
             "reset_password",
-            user=user,
+            name=user.name,
             token=token,
             root=FRONT_END_URI,
         )
@@ -268,7 +268,7 @@ def change_email_request():
         new_email,
         "Confirm your email address",
         "change_email",
-        user=current_user,
+        name=current_user.name,
         token=token,
         root=FRONT_END_URI,
     )
