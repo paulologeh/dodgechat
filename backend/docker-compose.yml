@@ -12,8 +12,6 @@ services:
     container_name: redis
     env_file: .env
     entrypoint: redis-server --requirepass $REDIS_PASSWORD
-    ports:
-      - "8002:6379"
     volumes:
       - ${HOME}/redis-data:/data
 
@@ -29,10 +27,20 @@ services:
 
   flask:
     build: .
+    command: gunicorn "application:app" --config=gunicorn.config.py
     container_name: flask
     depends_on:
       - postgres
       - redis
+    env_file: .env
+    volumes: [".:/app"]
+
+  celery:
+    build: .
+    command: celery --app=app.celery worker -f celery.log
+    container_name: celery
+    depends_on:
+      - flask
     env_file: .env
     volumes: [".:/app"]
 

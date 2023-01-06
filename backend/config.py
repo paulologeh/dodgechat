@@ -4,13 +4,19 @@ from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+CELERY_CONFIG = {
+    "broker_url": os.environ.get("REDIS_URI"),
+    "result_backend": os.environ.get("REDIS_URI"),
+    "imports": ("app.tasks",),
+}
+
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SSL_REDIRECT = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
-    DODGECHAT_SLOW_DB_QUERY_TIME = 0.5
+    DODGECHAT_SLOW_DB_QUERY_TIME = 60
     FRONT_END_URL = os.getenv("FRONT_END_URL")
     SQLALCHEMY_DATABASE_URI = (
         f'{os.environ.get("POSTGRESQL_URI")}/{os.environ.get("POSTGRES_DB")}'
@@ -43,14 +49,10 @@ class ProductionConfig(Config):
     PRODUCTION = True
     CORS_HEADERS = "Content-Type"
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
-    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
-    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", True)
+    MAIL_PORT = int(os.environ.get("MAIL_PORT"))
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS")
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-    DODGECHAT_MAIL_SUBJECT_PREFIX = "[Dodgechat]"
-    DODGECHAT_MAIL_SENDER = (
-        f'{os.environ.get("DODGECHAT_ADMIN")} <{os.environ.get("MAIL_USERNAME")}>'
-    )
     DODGECHAT_ADMIN = os.environ.get("DODGECHAT_ADMIN")
     SESSION_COOKIE_SECURE = True
 

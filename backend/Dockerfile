@@ -32,6 +32,3 @@ USER flask
 
 # Install application into container
 COPY . .
-
-# Run the application
-ENTRYPOINT [ "gunicorn", "application:app", "-c", "gunicorn.config.py"]

@@ -5,14 +5,28 @@ from flask_mail import Mail
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
+from celery import Celery
 
-from config import config
+from config import config, CELERY_CONFIG
+
 
 mail = Mail()
 db = SQLAlchemy()
 socketio = SocketIO()
 session = Session()
 login_manager = LoginManager()
+celery = Celery()
+celery.config_from_object(CELERY_CONFIG)
+
+
+def make_celery(app):
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
 
 
 def create_app(config_name):
@@ -48,5 +62,6 @@ def create_app(config_name):
     api_blueprint.register_blueprint(conversations_blueprint)
 
     app.register_blueprint(api_blueprint)
+    make_celery(app)
 
     return app
