@@ -1,4 +1,4 @@
-Dear {{ user.name }},
+Dear {{ name }},
 
 Welcome to Dodgechat!
 
