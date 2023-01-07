@@ -112,7 +112,7 @@ export const Account = () => {
             setSucess('Sent verification email')
             break
           case 'change-password':
-            setSucess('Sent email to confirm password change')
+            setSucess('Changed password')
             break
           case 'change-email':
             setSucess('Sent email to confirm email change')
@@ -122,7 +122,8 @@ export const Account = () => {
         }
       } else {
         const data = await response?.json()
-        setError(data.message)
+        const errorMessage = data.messages ? data.messages[0] : data.message
+        setError(errorMessage ?? 'Something went wrong')
       }
     } catch (e) {
       console.error(e)
