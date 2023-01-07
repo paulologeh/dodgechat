@@ -10,7 +10,7 @@
   <p align="center">
     Bringing the dodge community together
     <br />
-    <a href="#"><strong>Go to app</strong></a>
+    <a href="https://drive.google.com/file/d/1ib8RZOTcE3wPWOesAuyDtFvPPLhAglx6/view?usp=sharing"><strong>View Demo</strong></a>
     <br />
     <br />
   </p>
@@ -57,3 +57,7 @@ This project was built with the following tools:
 - [Python](https://python.org)
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
 - [Celery](https://docs.celeryq.dev/en/stable/)
+
+### Deployment
+
+Application will go live soon!
