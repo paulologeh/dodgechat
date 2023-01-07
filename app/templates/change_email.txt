@@ -2,7 +2,7 @@ Dear {{ name }},
 
 To confirm your new email address click on the following link:
 
-{{ root }}/changeemail?token={{ token }}
+{{ root }}/verifyemail?token={{ token }}
 
 Sincerely,
 

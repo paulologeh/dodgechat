@@ -33,11 +33,11 @@ class NewConversationSchema(BasicSchema):
     message_body = fields.Str()
 
 
-class DeleteAccountSchema(Schema):
+class DeleteAccountSchema(BasicSchema):
     password = fields.Str(required=True, validate=must_not_be_blank)
 
 
-class ChangeEmailSchema(Schema):
+class ChangeEmailSchema(BasicSchema):
     email = fields.Str(required=True, validate=must_not_be_blank)
     password = fields.Str(required=True, validate=must_not_be_blank)
 
@@ -46,7 +46,7 @@ class ChangeEmailSchema(Schema):
         return lower_strip_email(data)
 
 
-class ResetPasswordSchema(Schema):
+class ResetPasswordSchema(BasicSchema):
     password = fields.Str(required=True, validate=must_not_be_blank)
     confirm_password = fields.Str(required=True, validate=must_not_be_blank)
 
@@ -56,7 +56,7 @@ class ResetPasswordSchema(Schema):
         return data
 
 
-class PasswordResetRequestSchema(Schema):
+class PasswordResetRequestSchema(BasicSchema):
     email = fields.Str(required=True, validate=must_not_be_blank)
 
     @pre_load
@@ -64,7 +64,7 @@ class PasswordResetRequestSchema(Schema):
         return lower_strip_email(data)
 
 
-class ChangePasswordSchema(Schema):
+class ChangePasswordSchema(BasicSchema):
     old_password = fields.Str(required=True, validate=must_not_be_blank)
     password = fields.Str(required=True, validate=must_not_be_blank)
     confirm_password = fields.Str(required=True, validate=must_not_be_blank)
