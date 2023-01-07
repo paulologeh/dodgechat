@@ -27,18 +27,18 @@
 ### About The Project
 
 <div>
-  <img src="images/product1.png" width="400">
-  <img src="images/product2.png" width="400"/>
-  <img src="images/product3.png" width="400"/>
-  <img src="images/product4.png" width="400">
-  <img src="images/product5.png" width="400"/>
-  <img src="images/product6.png" width="400"/>
-  <img src="images/product7.png" width="400">
-  <img src="images/product8.png" width="400"/>
-  <img src="images/product9.png" width="400"/>
-  <img src="images/product10.png" width="400">
-  <img src="images/product11.png" width="400"/>
-  <img src="images/product12.png" width="400"/>
+  <img src="sample_images/product1.png" width="400">
+  <img src="sample_images/product2.png" width="400"/>
+  <img src="sample_images/product3.png" width="400"/>
+  <img src="sample_images/product4.png" width="400">
+  <img src="sample_images/product5.png" width="400"/>
+  <img src="sample_images/product6.png" width="400"/>
+  <img src="sample_images/product7.png" width="400">
+  <img src="sample_images/product8.png" width="400"/>
+  <img src="sample_images/product9.png" width="400"/>
+  <img src="sample_images/product10.png" width="400">
+  <img src="sample_images/product11.png" width="400"/>
+  <img src="sample_images/product12.png" width="400"/>
 </div>
 
 Dodgechat is an app to help you connect with fellow dodge coin enthusiasts
@@ -58,6 +58,14 @@ This project was built with the following tools:
 - [Flask](https://flask.palletsprojects.com/en/2.0.x/)
 - [Celery](https://docs.celeryq.dev/en/stable/)
 
+### Getting Started
+
+TBD
+
 ### Deployment
 
 Application will go live soon!
+
+### Gravatar generator
+
+https://vinicius73.github.io/gravatar-url-generator/#/

@@ -1,12 +1,13 @@
 #!/bin/zsh
 set -e
 
+# shellcheck disable=SC1090
 source ~/.zshrc
 
 echo "Starting colima"
 colima start
 
-cd /Users/paulologeh/Projects/dodgechat/backend
+cd /Users/paulologeh/Projects/dodgechat
 rm flask.log
 echo "Starting backend"
 docker-compose -f docker-compose.yml up --force-recreate -d

@@ -1,6 +1,7 @@
 #!/bin/zsh
 set -e
 
+# shellcheck disable=SC1090
 source ~/.zshrc
 
 echo "Killing colima"
