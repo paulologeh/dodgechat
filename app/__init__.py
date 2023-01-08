@@ -9,17 +9,17 @@ from celery import Celery
 
 from config import config, CELERY_CONFIG
 
-
 mail = Mail()
 db = SQLAlchemy()
 socketio = SocketIO()
 session = Session()
 login_manager = LoginManager()
-celery = Celery()
-celery.config_from_object(CELERY_CONFIG)
 
 
 def make_celery(app):
+    celery = Celery(app.import_name)
+    celery.conf.update(CELERY_CONFIG)
+
     class ContextTask(celery.Task):
         def __call__(self, *args, **kwargs):
             with app.app_context():
@@ -27,6 +27,16 @@ def make_celery(app):
 
     celery.Task = ContextTask
     return celery
+
+
+def create_celery_app(config_name):
+    app = Flask(__name__)
+
+    app.config.from_object(config[config_name])
+    mail.init_app(app)
+    db.init_app(app)
+
+    return app
 
 
 def create_app(config_name):
@@ -62,6 +72,5 @@ def create_app(config_name):
     api_blueprint.register_blueprint(conversations_blueprint)
 
     app.register_blueprint(api_blueprint)
-    make_celery(app)
 
     return app

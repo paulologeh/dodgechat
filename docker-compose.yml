@@ -37,7 +37,7 @@ services:
 
   celery:
     build: .
-    command: celery --app=app.celery worker
+    command: celery --app=app.tasks.celery worker
     container_name: celery
     depends_on:
       - flask

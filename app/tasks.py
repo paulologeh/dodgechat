@@ -1,15 +1,16 @@
 import os
 import logging
-from app import mail, celery, create_app
+from app import mail, make_celery, create_celery_app
 
 logger = logging.getLogger(__name__)
+
+app = create_celery_app(os.environ.get("ENVIRONMENT"))
+celery = make_celery(app)
 
 
 @celery.task(serializer="pickle")
 def send_async_email(msg):
-    celery_app = create_app(os.environ.get("ENVIRONMENT"))
-    with celery_app.app_context():
-        try:
-            mail.send(msg)
-        except Exception as e:
-            logger.exception(e)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        logger.exception(e)
