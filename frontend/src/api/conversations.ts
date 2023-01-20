@@ -1,6 +1,6 @@
 import { fetcher } from 'utils'
 
-const ROOT = `${process.env.API_URI}/api/conversations`
+const ROOT = `${process.env.APP_URL}/api/conversations`
 
 type NewConversation = {
   recipientId: number

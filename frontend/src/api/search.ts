@@ -1,6 +1,6 @@
 import { fetcher } from 'utils'
 
-const ROOT_URL = `${process.env.API_URI}/api/search`
+const ROOT_URL = `${process.env.APP_URL}/api/search`
 
 export class Search {
   static searchAll(term: string) {

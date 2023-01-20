@@ -10,7 +10,7 @@ type NewUser = {
   aboutMe?: string
 }
 
-const USERS_ROUTE = `${process.env.API_URI}/api/users`
+const USERS_ROUTE = `${process.env.APP_URL}/api/users`
 
 export class Users {
   static whoami() {

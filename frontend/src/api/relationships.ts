@@ -1,6 +1,6 @@
 import { fetcher } from 'utils'
 
-const ROOT = `${process.env.API_URI}/api/relationships`
+const ROOT = `${process.env.APP_URL}/api/relationships`
 
 export class Relationships {
   static getFriends() {

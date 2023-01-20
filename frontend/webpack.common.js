@@ -1,6 +1,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
+const Dotenv = require('dotenv-webpack')
 
 module.exports = {
   entry: path.resolve(__dirname, './src/index.tsx'),
@@ -11,6 +13,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    plugins: [new TsconfigPathsPlugin()],
   },
   module: {
     rules: [
@@ -46,6 +49,7 @@ module.exports = {
       publicPath: '/',
       fileName: path.resolve(__dirname, './public/manifest.json'),
     }),
+    new Dotenv(),
   ],
   stats: 'errors-only',
 }

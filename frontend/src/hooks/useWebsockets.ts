@@ -4,7 +4,7 @@ import { SocketEvent } from 'types/sockets'
 import { useUser } from 'contexts/userContext'
 import beepSound from 'assets/messagealert.mp3'
 
-const SERVER = process.env.API_URI ?? ''
+const SERVER = process.env.APP_URL ?? ''
 const socket = io(SERVER, { autoConnect: false, withCredentials: true })
 
 export const useWebsockets = () => {
