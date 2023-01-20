@@ -22,7 +22,7 @@ from app.utils.email import send_email
 
 logger = logging.getLogger(__name__)
 
-FRONT_END_URI = os.getenv("FRONT_END_URL")
+APP_URL = os.getenv("APP_URL")
 
 users = Blueprint("auth", __name__, url_prefix="/users")
 
@@ -113,7 +113,7 @@ def register():
         "confirm_email",
         name=user.name,
         token=token,
-        root=FRONT_END_URI,
+        root=APP_URL,
     )
 
     return response
@@ -170,7 +170,7 @@ def resend_confirmation():
         "confirm_email",
         name=current_user.name,
         token=token,
-        root=FRONT_END_URI,
+        root=APP_URL,
     )
 
     return jsonify({"message": "A confirmation email will be sent to you by email"})
@@ -219,7 +219,7 @@ def password_reset_request():
             "reset_password",
             name=user.name,
             token=token,
-            root=FRONT_END_URI,
+            root=APP_URL,
         )
 
     return jsonify(
@@ -269,7 +269,7 @@ def change_email_request():
         "change_email",
         name=current_user.name,
         token=token,
-        root=FRONT_END_URI,
+        root=APP_URL,
     )
     return jsonify(
         {

@@ -21,7 +21,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     DODGECHAT_SLOW_DB_QUERY_TIME = 60
-    FRONT_END_URL = os.getenv("FRONT_END_URL")
+    APP_URL = os.getenv("APP_URL")
     SQLALCHEMY_DATABASE_URI = get_database_uri()
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = True
@@ -51,7 +51,7 @@ class ProductionConfig(Config):
     PRODUCTION = True
     CORS_HEADERS = "Content-Type"
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
-    MAIL_PORT = int(os.environ.get("MAIL_PORT"))
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", 537))
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")

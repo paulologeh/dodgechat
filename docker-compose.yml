@@ -16,7 +16,7 @@ services:
       - ${HOME}/redis-data:/data
 
   postgres:
-    image: postgres:14
+    image: postgres:14-alpine3.17
     container_name: postgres
     env_file: .env
     volumes:
@@ -50,3 +50,4 @@ services:
       - "80:80"
     volumes:
       - ./nginx.prod.conf:/etc/nginx/nginx.conf
+      - ./frontend/build:/var/www/build
