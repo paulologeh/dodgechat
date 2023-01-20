@@ -47,7 +47,7 @@ services:
     depends_on:
       - flask
     ports:
-      - "80:80"
+      - "127.0.0.1:8080:80"
     volumes:
       - ./nginx.prod.conf:/etc/nginx/nginx.conf
       - ./frontend/build:/var/www/build
