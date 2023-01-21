@@ -55,7 +55,7 @@ def create_app(config_name):
     session.init_app(app)
     login_manager.init_app(app)
     socketio.init_app(
-        app, cors_allowed_origins=client, async_mode="eventlet", manage_session=False
+        app, cors_allowed_origins=client, async_mode="eventlet", manage_session=False, engineio_logger=True
     )
 
     from app.api import api as api_blueprint
