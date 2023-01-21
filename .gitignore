@@ -3,6 +3,5 @@
 *.log
 *.env
 *.DS_Store
-*build
 *node_modules
 *__pycache__
