@@ -9,6 +9,8 @@ const socket = io(SERVER, { autoConnect: false, withCredentials: true })
 export const useWebsockets = () => {
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [events, setEvents] = useState<Partial<SocketEvent>[]>([])
+  const [lastPong, setLastPong] = useState<Date | null>(null)
+  const [lastPing, setLastPing] = useState<Date | null>(null)
   const { loggedIn } = useUser()
 
   useEffect(() => {
@@ -25,6 +27,14 @@ export const useWebsockets = () => {
       setIsConnected(false)
     })
 
+    socket.on('pong', () => {
+      setLastPong(new Date())
+    })
+
+    socket.on('ping', () => {
+      setLastPing(new Date())
+    })
+
     socket.on('message', (payload) => {
       const { data } = payload
       const newevents = [...events, data]
@@ -34,6 +44,8 @@ export const useWebsockets = () => {
     return () => {
       socket.off('connect')
       socket.off('disconnect')
+      socket.off('pong')
+      socket.off('ping')
       socket.off('message')
     }
   }, [])
@@ -44,5 +56,5 @@ export const useWebsockets = () => {
     }
   }
 
-  return { isConnected, setEvents, events, disconnect }
+  return { isConnected, setEvents, events, disconnect, lastPing, lastPong }
 }
