@@ -1,4 +1,5 @@
 import os
+import click
 import logging
 import socket
 
@@ -59,7 +60,8 @@ def setup_db():
 
 
 @app.cli.command("setup-test-accounts")
-def setup_test_accounts():
+@click.argument("delete")
+def setup_test_accounts(delete):
     try:
         from app.utils import get_test_emails, get_test_conversation
 
@@ -78,6 +80,9 @@ def setup_test_accounts():
 
             db.session.commit()
 
+            if delete == "delete":
+                continue
+
             _username = _email.replace("@example.com", "")
             _name = " ".join([name.capitalize() for name in _username.split(".")])
 
@@ -93,6 +98,8 @@ def setup_test_accounts():
             db.session.add(_user)
             db.session.commit()
 
+        if delete == "delete":
+            return
         # create relationships
         # all users add the first user
         first_user = user.User.query.filter_by(email=test_emails[0]).first()

@@ -10,7 +10,12 @@
   <p align="center">
     Bringing the dodge community together
     <br />
-    <a href="https://drive.google.com/file/d/1ib8RZOTcE3wPWOesAuyDtFvPPLhAglx6/view?usp=sharing"><strong>View Demo</strong></a>
+    <a href="https://app.dodge-chat.com/"><strong>Go to app</strong></a>
+    <br />
+    <i><small>Search for "Paul" to find me</small></i>
+    <br />
+    <a href="https://drive.google.com/file/d/1ib8RZOTcE3wPWOesAuyDtFvPPLhAglx6/view?usp=sharing"><strong>Demo or 
+tutorial</strong></a>
     <br />
     <br />
   </p>
@@ -64,7 +69,12 @@ TBD
 
 ### Deployment
 
-Application will go live soon!
+I used CloudFlare for DNS management
+The application is hosted on my dev vm instance on google cloud compute engine
+I have an nginx proxy on the vm that
+
+- Upgrades HTTP connections to HTTPS
+- Routes traffic to the relevant application
 
 ### Gravatar generator
 
