@@ -11,6 +11,8 @@ import {
   Input,
   MenuItem,
   Modal,
+  ModalBody,
+  ModalCloseButton,
   ModalContent,
   Stack,
   Textarea,
@@ -92,124 +94,121 @@ export const ProfileEdit = ({ currentUser }: { currentUser: CurrentUser }) => {
         blockScrollOnMount={false}
       >
         <ModalContent>
-          <Flex
-            align={'center'}
-            justify={'center'}
-            bg={useColorModeValue('gray.50', 'gray.800')}
-          >
-            <Stack
-              spacing={4}
-              w={'full'}
-              maxW={'md'}
-              bg={useColorModeValue('white', 'gray.700')}
-              rounded={'xl'}
-              boxShadow={'lg'}
-              p={6}
-            >
-              <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-                User Profile Edit
-              </Heading>
-              <FormControl id="userIcon">
-                <Stack direction={['column', 'row']} spacing={6}>
-                  <Center>
-                    <Avatar size="xl" src={displayGravatar}></Avatar>
-                  </Center>
-                  <Center w="full">
-                    <Button
-                      w="full"
-                      onClick={() =>
-                        window.location.replace('https://gravatar.com')
-                      }
-                    >
-                      Change gravatar
-                    </Button>
-                  </Center>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex align={'center'} justify={'center'}>
+              <Stack
+                spacing={4}
+                w={'full'}
+                maxW={'md'}
+                bg={useColorModeValue('white', 'gray.700')}
+                py={6}
+              >
+                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                  User Profile Edit
+                </Heading>
+                <FormControl id="userIcon">
+                  <Stack direction={['column', 'row']} spacing={6}>
+                    <Center>
+                      <Avatar size="xl" src={displayGravatar}></Avatar>
+                    </Center>
+                    <Center w="full">
+                      <Button
+                        w="full"
+                        onClick={() =>
+                          window.location.replace('https://gravatar.com')
+                        }
+                      >
+                        Change gravatar
+                      </Button>
+                    </Center>
+                  </Stack>
+                </FormControl>
+                {error && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    {error}
+                  </Alert>
+                )}
+                {success && (
+                  <Alert status="success">
+                    <AlertIcon />
+                    {'Successfully updated'}
+                  </Alert>
+                )}
+                <FormControl id="userName">
+                  <FormLabel>Username</FormLabel>
+                  <Input
+                    placeholder="UserName"
+                    _placeholder={{ color: 'gray.500' }}
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) =>
+                      setFormData({ ...formData, username: e.target.value })
+                    }
+                  />
+                </FormControl>
+                <FormControl id="name">
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    placeholder="Jane Doe"
+                    _placeholder={{ color: 'gray.500' }}
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                </FormControl>
+                <FormControl id="location">
+                  <FormLabel>Location</FormLabel>
+                  <Input
+                    placeholder="London, United Kingdom"
+                    _placeholder={{ color: 'gray.500' }}
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                  />
+                </FormControl>
+                <FormControl id="aboutMe">
+                  <FormLabel>About me</FormLabel>
+                  <Textarea
+                    value={formData.aboutMe}
+                    onChange={(e) =>
+                      setFormData({ ...formData, aboutMe: e.target.value })
+                    }
+                  />
+                </FormControl>
+                <Stack spacing={6} direction={['column', 'row']}>
+                  <Button
+                    bg={'red.400'}
+                    color={'white'}
+                    w="full"
+                    _hover={{
+                      bg: 'red.500',
+                    }}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    bg={'blue.400'}
+                    color={'white'}
+                    w="full"
+                    _hover={{
+                      bg: 'blue.500',
+                    }}
+                    isLoading={isSubmitting}
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
                 </Stack>
-              </FormControl>
-              {error && (
-                <Alert status="error">
-                  <AlertIcon />
-                  {error}
-                </Alert>
-              )}
-              {success && (
-                <Alert status="success">
-                  <AlertIcon />
-                  {'Successfully updated'}
-                </Alert>
-              )}
-              <FormControl id="userName">
-                <FormLabel>Username</FormLabel>
-                <Input
-                  placeholder="UserName"
-                  _placeholder={{ color: 'gray.500' }}
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
-                  }
-                />
-              </FormControl>
-              <FormControl id="name">
-                <FormLabel>Name</FormLabel>
-                <Input
-                  placeholder="Jane Doe"
-                  _placeholder={{ color: 'gray.500' }}
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
-              </FormControl>
-              <FormControl id="location">
-                <FormLabel>Location</FormLabel>
-                <Input
-                  placeholder="London, United Kingdom"
-                  _placeholder={{ color: 'gray.500' }}
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                />
-              </FormControl>
-              <FormControl id="aboutMe">
-                <FormLabel>About me</FormLabel>
-                <Textarea
-                  value={formData.aboutMe}
-                  onChange={(e) =>
-                    setFormData({ ...formData, aboutMe: e.target.value })
-                  }
-                />
-              </FormControl>
-              <Stack spacing={6} direction={['column', 'row']}>
-                <Button
-                  bg={'red.400'}
-                  color={'white'}
-                  w="full"
-                  _hover={{
-                    bg: 'red.500',
-                  }}
-                  onClick={handleClose}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  bg={'blue.400'}
-                  color={'white'}
-                  w="full"
-                  _hover={{
-                    bg: 'blue.500',
-                  }}
-                  isLoading={isSubmitting}
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
               </Stack>
-            </Stack>
-          </Flex>
+            </Flex>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>

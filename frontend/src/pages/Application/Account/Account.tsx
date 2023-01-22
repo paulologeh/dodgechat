@@ -10,6 +10,8 @@ import {
   Input,
   MenuItem,
   Modal,
+  ModalBody,
+  ModalCloseButton,
   ModalContent,
   Select,
   Stack,
@@ -160,145 +162,144 @@ export const Account = () => {
         blockScrollOnMount={false}
       >
         <ModalContent>
-          <Flex
-            align={'center'}
-            justify={'center'}
-            bg={useColorModeValue('gray.50', 'gray.800')}
-          >
-            <Stack
-              spacing={4}
-              w={'full'}
-              maxW={'md'}
-              bg={useColorModeValue('white', 'gray.700')}
-              rounded={'xl'}
-              boxShadow={'lg'}
-              p={6}
-            >
-              <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-                Account management
-              </Heading>
-              <Select
-                value={selected}
-                onChange={handleSelectChange}
-                disabled={isSubmitting}
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex align={'center'} justify={'center'}>
+              <Stack
+                spacing={4}
+                w={'full'}
+                maxW={'md'}
+                bg={useColorModeValue('white', 'gray.700')}
+                py={6}
               >
-                <option value="change-email">Change email</option>
-                <option value="change-password">Change password</option>
-                <option value="resend-email-verification">
-                  Resend email verfication
-                </option>
-                <option value="delete-account">Delete account</option>
-              </Select>
-              {error && (
-                <Alert status="error">
-                  <AlertIcon />
-                  {error}
-                </Alert>
-              )}
-              {success && (
-                <Alert status="success">
-                  <AlertIcon />
-                  {success}
-                </Alert>
-              )}
-              {selected === 'change-email' && (
-                <>
-                  <FormControl id="email">
-                    <FormLabel>Email</FormLabel>
-                    <Input
-                      placeholder="Email"
-                      _placeholder={{ color: 'gray.500' }}
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl id="password">
-                    <FormLabel>Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </FormControl>
-                </>
-              )}
-              {selected === 'change-password' && (
-                <>
-                  <FormControl id="Oldpassword">
-                    <FormLabel>Old Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl id="Newpassword">
-                    <FormLabel>New Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl id="Confirmpassword">
-                    <FormLabel>Confirm Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </FormControl>
-                </>
-              )}
-              {selected === 'delete-account' && (
-                <>
-                  <FormControl id="">
-                    <FormLabel>Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormControl id="Deleteaccount">
-                    <Checkbox
-                      isChecked={consented}
-                      onChange={(e) => setConsented(e.target.checked)}
-                      isRequired
-                    >
-                      I acknowledge this action is permanent
-                    </Checkbox>
-                  </FormControl>
-                </>
-              )}
-              <Stack spacing={6} direction={['column', 'row']}>
-                <Button
-                  bg={'red.400'}
-                  color={'white'}
-                  w="full"
-                  _hover={{
-                    bg: 'red.500',
-                  }}
-                  onClick={handleClose}
+                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                  Account management
+                </Heading>
+                <Select
+                  value={selected}
+                  onChange={handleSelectChange}
+                  disabled={isSubmitting}
                 >
-                  Cancel
-                </Button>
-                <Button
-                  bg={'blue.400'}
-                  color={'white'}
-                  w="full"
-                  _hover={{
-                    bg: 'blue.500',
-                  }}
-                  isLoading={isSubmitting}
-                  onClick={handleSubmit}
-                >
-                  {selected === 'resend-email-verification' ? 'Send' : 'Submit'}
-                </Button>
+                  <option value="change-email">Change email</option>
+                  <option value="change-password">Change password</option>
+                  <option value="resend-email-verification">
+                    Resend email verfication
+                  </option>
+                  <option value="delete-account">Delete account</option>
+                </Select>
+                {error && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    {error}
+                  </Alert>
+                )}
+                {success && (
+                  <Alert status="success">
+                    <AlertIcon />
+                    {success}
+                  </Alert>
+                )}
+                {selected === 'change-email' && (
+                  <>
+                    <FormControl id="email">
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        placeholder="Email"
+                        _placeholder={{ color: 'gray.500' }}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl id="password">
+                      <FormLabel>Password</FormLabel>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </FormControl>
+                  </>
+                )}
+                {selected === 'change-password' && (
+                  <>
+                    <FormControl id="Oldpassword">
+                      <FormLabel>Old Password</FormLabel>
+                      <Input
+                        type="password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl id="Newpassword">
+                      <FormLabel>New Password</FormLabel>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl id="Confirmpassword">
+                      <FormLabel>Confirm Password</FormLabel>
+                      <Input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </FormControl>
+                  </>
+                )}
+                {selected === 'delete-account' && (
+                  <>
+                    <FormControl id="">
+                      <FormLabel>Password</FormLabel>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl id="Deleteaccount">
+                      <Checkbox
+                        isChecked={consented}
+                        onChange={(e) => setConsented(e.target.checked)}
+                        isRequired
+                      >
+                        I acknowledge this action is permanent
+                      </Checkbox>
+                    </FormControl>
+                  </>
+                )}
+                <Stack spacing={6} direction={['column', 'row']}>
+                  <Button
+                    bg={'red.400'}
+                    color={'white'}
+                    w="full"
+                    _hover={{
+                      bg: 'red.500',
+                    }}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    bg={'blue.400'}
+                    color={'white'}
+                    w="full"
+                    _hover={{
+                      bg: 'blue.500',
+                    }}
+                    isLoading={isSubmitting}
+                    onClick={handleSubmit}
+                  >
+                    {selected === 'resend-email-verification'
+                      ? 'Send'
+                      : 'Submit'}
+                  </Button>
+                </Stack>
               </Stack>
-            </Stack>
-          </Flex>
+            </Flex>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
