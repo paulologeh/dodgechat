@@ -10,6 +10,7 @@ services:
   redis:
     image: redis:7.0.7-alpine3.17
     container_name: redis
+    restart: always
     env_file: .env
     entrypoint: redis-server --requirepass $REDIS_PASSWORD
     volumes:
@@ -18,6 +19,7 @@ services:
   postgres:
     image: postgres:14-alpine3.17
     container_name: postgres
+    restart: always
     env_file: .env
     volumes:
       - ${HOME}/postgres-data/:/var/lib/postgresql/data
@@ -26,6 +28,7 @@ services:
     build: .
     command: gunicorn "application:app" --config=gunicorn.config.py
     container_name: flask
+    restart: always
     depends_on:
       - postgres
       - redis
@@ -36,6 +39,7 @@ services:
     build: .
     command: celery --app=app.tasks.celery worker
     container_name: celery
+    restart: always
     depends_on:
       - flask
     env_file: .env
@@ -44,6 +48,7 @@ services:
   nginx:
     image: nginx:1.23.3-alpine
     container_name: nginx
+    restart: always
     depends_on:
       - flask
     ports:
