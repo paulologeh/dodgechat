@@ -69,12 +69,11 @@ TBD
 
 ### Deployment
 
-I used CloudFlare for DNS management
-The application is hosted on my dev vm instance on google cloud compute engine
-I have an nginx proxy on the vm that
-
-- Upgrades HTTP connections to HTTPS
-- Routes traffic to the relevant application
+* CloudFlare for DNS management.
+* Hosted on my dev vm instance on Google cloud compute engine.
+* Uses nginx proxy on the vm that
+  - Upgrades HTTP connections to HTTPS 
+  - Routes traffic to the relevant application
 
 ### Gravatar generator
 
