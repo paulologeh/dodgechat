@@ -46,7 +46,8 @@ tutorial</strong></a>
   <img src="sample_images/product12.png" width="400"/>
 </div>
 
-Dodgechat is an app to help you connect with fellow doge coin enthusiasts.
+Dodgechat is an app to help you connect with fellow doge coin enthusiasts
+
 ### Built With
 
 This project was built with the following tools:
