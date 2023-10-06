@@ -1,0 +1,10 @@
+*.venv
+*.idea
+*.log
+*.env
+*.DS_Store
+*node_modules
+*__pycache__
+frontend/build/
+.vscode/
+*dist/
