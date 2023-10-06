@@ -1,0 +1,8 @@
+export { LoginForm } from 'pages/LoginForm'
+export { RegisterForm } from 'pages/RegisterForm'
+export { ForgotPasswordForm } from 'pages/ForgotPasswordForm'
+export { NotFound } from 'pages/NotFound'
+export { ResetPasswordForm } from 'pages/ResetPasswordForm'
+export { ConfirmAccountToken } from 'pages/ConfirmAccountToken'
+export { VerifyEmailToken } from 'pages/VerifyEmailToken'
+export { Application } from 'pages/Application'

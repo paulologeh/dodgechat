@@ -1,0 +1,6 @@
+declare module '*.png'
+declare module '*.jpg'
+declare module '*.svg'
+declare module '*.mp3'
+declare module 'highlight-words-core'
+declare module 'react-infinite-scroller'

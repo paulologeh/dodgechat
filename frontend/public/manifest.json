@@ -1,0 +1,6 @@
+{
+  "main.js": "/bundle.js",
+  "favicon.ico": "/favicon.ico",
+  "index.html": "/index.html",
+  "bundle.js.map": "/bundle.js.map"
+}
