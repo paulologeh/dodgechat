@@ -1,0 +1,11 @@
+Dear {{ name }},
+
+To confirm your new email address click on the following link:
+
+{{ root }}/verifyemail?token={{ token }}
+
+Sincerely,
+
+The Dodgechat Team
+
+Note: replies to this email address are not monitored.
