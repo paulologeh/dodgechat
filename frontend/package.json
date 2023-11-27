@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "start": "webpack server --config webpack.config.js --env env=dev",
-    "build": "webpack --config webpack.config.js --env env=prod",
+    "build": "webpack --config webpack.config.js --env env=prod --progress",
     "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "test": "echo \"Error: no test specified\" && exit 1"

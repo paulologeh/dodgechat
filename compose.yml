@@ -5,6 +5,7 @@ volumes:
   redis_data:
   flask: {}
   celery: {}
+  shared_volume:
 
 services:
   redis:
@@ -53,6 +54,17 @@ services:
     env_file: .env
     volumes: 
       - "./backend:/app"
+  
+  webapp:
+    build:
+      context: frontend
+      dockerfile: ./frontend.Dockerfile
+    image: webapp
+    container_name: webapp
+    restart: always
+    env_file: .env
+    volumes:
+      - shared_volume:/var/www/build
 
   nginx:
     image: nginx:1.23.3-alpine
@@ -61,7 +73,7 @@ services:
     depends_on:
       - flask
     ports:
-      - "127.0.0.1:8080:80"
+      - "8080:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./frontend/build:/var/www/build
+      - shared_volume:/var/www/build

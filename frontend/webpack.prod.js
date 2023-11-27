@@ -4,5 +4,11 @@ const BundleAnalyserPlugin =
 module.exports = {
   mode: 'production',
   devtool: 'source-map',
-  plugins: [new BundleAnalyserPlugin()],
+  plugins: [
+    new BundleAnalyserPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false,
+      reportFilename: 'bundle-report.html',
+    }),
+  ],
 }
